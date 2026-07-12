@@ -1,0 +1,14 @@
+node_modules
+.pnpm-store
+.turbo
+.next
+out
+dist
+build
+*.tsbuildinfo
+.env
+.env.local
+.env.*.local
+packages/db/src/generated
+.DS_Store
+npm-debug.log*
