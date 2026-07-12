@@ -1,0 +1,333 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Auth / RBAC
+// ---------------------------------------------------------------------------
+
+enum UserRole {
+  ADMIN
+  EDITOR
+}
+
+model User {
+  id            String        @id @default(cuid())
+  email         String        @unique
+  name          String?
+  passwordHash  String
+  role          UserRole      @default(EDITOR)
+  invitedById   String?
+  invitedBy     User?         @relation("UserInvites", fields: [invitedById], references: [id])
+  invitees      User[]        @relation("UserInvites")
+  sessions      Session[]
+  auditLogs     AuditLog[]
+  revisions     Revision[]
+  sentInvites   InviteToken[] @relation("SentInvites")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model InviteToken {
+  token       String    @id @default(cuid())
+  email       String
+  role        UserRole
+  invitedById String
+  invitedBy   User      @relation("SentInvites", fields: [invitedById], references: [id])
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([email])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String // e.g. "project.publish", "redirect.create"
+  entity    String // e.g. "Project"
+  entityId  String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// Shared enums / content status
+// ---------------------------------------------------------------------------
+
+enum ContentStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+// entityType/entityId is a lightweight polymorphic reference (Page, Project,
+// or Post) rather than a real FK — Prisma has no native polymorphic
+// relation, and these three models don't share a table to point at.
+model Revision {
+  id          String        @id @default(cuid())
+  entityType  String
+  entityId    String
+  status      ContentStatus
+  data        Json
+  createdById String?
+  createdBy   User?         @relation(fields: [createdById], references: [id])
+  createdAt   DateTime      @default(now())
+
+  previewTokens PreviewToken[]
+
+  @@index([entityType, entityId, createdAt])
+}
+
+model PreviewToken {
+  token      String   @id @default(cuid())
+  entityType String
+  entityId   String
+  revisionId String
+  revision   Revision @relation(fields: [revisionId], references: [id], onDelete: Cascade)
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+}
+
+// ---------------------------------------------------------------------------
+// SEO / cross-cutting content concerns
+// ---------------------------------------------------------------------------
+
+// Reused 1:1 by Page / Project / Post via a nullable back-relation.
+model Seo {
+  id              String   @id @default(cuid())
+  metaTitle       String?
+  metaDescription String?
+  canonicalUrl    String?
+  ogImageId       String?
+  ogImage         Media?   @relation(fields: [ogImageId], references: [id])
+  noindex         Boolean  @default(false)
+  nofollow        Boolean  @default(false)
+  structuredData  Json?
+  page            Page?
+  project         Project?
+  post            Post?
+  updatedAt       DateTime @updatedAt
+}
+
+model Redirect {
+  id         String   @id @default(cuid())
+  fromPath   String   @unique
+  toPath     String
+  statusCode Int      @default(308)
+  createdAt  DateTime @default(now())
+}
+
+model Media {
+  id           String   @id @default(cuid())
+  url          String
+  width        Int
+  height       Int
+  blurDataUrl  String?
+  altText      String?
+  decorative   Boolean  @default(false)
+  uploadedById String?
+  createdAt    DateTime @default(now())
+
+  seoUsages     Seo[]
+  projectCovers Project[] @relation("ProjectCoverImage")
+  postCovers    Post[]    @relation("PostCoverImage")
+}
+
+model Author {
+  id       String  @id @default(cuid())
+  name     String
+  slug     String  @unique
+  imageUrl String?
+  bio      String?
+  sameAs   String[]
+  posts    Post[]
+}
+
+// ---------------------------------------------------------------------------
+// Section registry (drives the homepage / page composer)
+// ---------------------------------------------------------------------------
+
+enum SectionType {
+  HERO
+  ABOUT
+  PROJECTS
+  EXPERIENCE
+  SKILLS
+  SERVICES
+  TESTIMONIALS
+  BLOG
+  CONTACT
+  RESUME
+}
+
+model Page {
+  id                String        @id @default(cuid())
+  slug              String
+  locale             String
+  translationGroupId String
+  title             String
+  status            ContentStatus @default(DRAFT)
+  publishedAt       DateTime?
+  sections          SectionInstance[]
+  seoId             String?       @unique
+  seo               Seo?          @relation(fields: [seoId], references: [id])
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@unique([slug, locale])
+  @@index([translationGroupId])
+}
+
+model SectionInstance {
+  id        String      @id @default(cuid())
+  pageId    String
+  page      Page        @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  type      SectionType
+  order     Int
+  enabled   Boolean     @default(true)
+  content   Json // validated against the section type's schema at write time
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([pageId, order])
+}
+
+// ---------------------------------------------------------------------------
+// Domain content
+// ---------------------------------------------------------------------------
+
+model Project {
+  id                 String        @id @default(cuid())
+  slug               String
+  locale             String
+  translationGroupId String
+  title              String
+  excerpt            String?
+  body               String? // rendered HTML / MDX output
+  coverImageId       String?
+  coverImage         Media?        @relation("ProjectCoverImage", fields: [coverImageId], references: [id])
+  codeRepository     String?
+  liveUrl            String?
+  programmingLanguages String[]
+  tags               Tag[]         @relation("ProjectTags")
+  status             ContentStatus @default(DRAFT)
+  publishedAt        DateTime?
+  seoId              String?       @unique
+  seo                Seo?          @relation(fields: [seoId], references: [id])
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@unique([slug, locale])
+  @@index([translationGroupId])
+}
+
+model Post {
+  id                 String        @id @default(cuid())
+  slug               String
+  locale             String
+  translationGroupId String
+  title              String
+  excerpt            String?
+  body               String?
+  coverImageId       String?
+  coverImage         Media?        @relation("PostCoverImage", fields: [coverImageId], references: [id])
+  authorId           String?
+  author             Author?       @relation(fields: [authorId], references: [id])
+  tags               Tag[]         @relation("PostTags")
+  status             ContentStatus @default(DRAFT)
+  publishedAt        DateTime?
+  seoId              String?       @unique
+  seo                Seo?          @relation(fields: [seoId], references: [id])
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@unique([slug, locale])
+  @@index([translationGroupId])
+}
+
+model Tag {
+  id       String    @id @default(cuid())
+  slug     String    @unique
+  name     String
+  projects Project[] @relation("ProjectTags")
+  posts    Post[]    @relation("PostTags")
+}
+
+model Experience {
+  id          String   @id @default(cuid())
+  locale      String
+  company     String
+  title       String
+  startDate   DateTime
+  endDate     DateTime?
+  description String?
+  order       Int      @default(0)
+}
+
+model Skill {
+  id       String @id @default(cuid())
+  locale   String
+  name     String
+  category String?
+  level    Int? // 1-5
+  order    Int    @default(0)
+}
+
+model Service {
+  id          String  @id @default(cuid())
+  locale      String
+  title       String
+  description String?
+  order       Int     @default(0)
+}
+
+model Testimonial {
+  id         String  @id @default(cuid())
+  locale     String
+  authorName String
+  authorRole String?
+  quote      String
+  avatarUrl  String?
+  order      Int     @default(0)
+}
+
+model NavigationItem {
+  id       String  @id @default(cuid())
+  locale   String
+  label    String
+  href     String
+  order    Int     @default(0)
+  parentId String?
+  parent   NavigationItem?  @relation("NavChildren", fields: [parentId], references: [id])
+  children NavigationItem[] @relation("NavChildren")
+}
+
+model SiteSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value Json
+}
