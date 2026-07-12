@@ -1,50 +1,52 @@
 import Link from "next/link";
+import { PlusIcon } from "lucide-react";
 import { prisma } from "@portfolio/db/server";
 import { CreatePageForm } from "@/components/admin/create-page-form";
 import { StatusBadge } from "@/components/admin/status-badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatRelativeTime } from "@/lib/admin/format-relative-time";
+import { Card, CardContent } from "@/components/ui/card";
+import styles from "./page.module.scss";
 
 export default async function AdminPagesListPage() {
   const pages = await prisma.page.findMany({ orderBy: { updatedAt: "desc" } });
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-2xl font-semibold">Pages</h1>
+    <div className={styles.page}>
+      <h1 className={styles.heading}>Pages</h1>
 
       <Card>
-        <CardContent>
-          <ul className="divide-y">
+        <CardContent className={styles.listContent}>
+          <ul className={styles.list}>
             {pages.map((page) => (
               <li key={page.id}>
-                <Link
-                  href={`/admin/pages/${page.id}`}
-                  className="flex items-center justify-between gap-4 py-3 text-sm hover:opacity-80"
-                >
-                  <span>
-                    <span className="font-medium">{page.title}</span>{" "}
-                    <span className="text-muted-foreground">
-                      {page.slug}/{page.locale}
+                <Link href={`/admin/pages/${page.id}`} className={styles.row}>
+                  <span className={styles.rowMain}>
+                    <span className={styles.title}>{page.title}</span>
+                    <span className={styles.meta}>
+                      {page.slug}/{page.locale} · updated{" "}
+                      <time dateTime={page.updatedAt.toISOString()}>
+                        {formatRelativeTime(page.updatedAt)}
+                      </time>
                     </span>
                   </span>
                   <StatusBadge status={page.status} />
                 </Link>
               </li>
             ))}
-            {pages.length === 0 ? (
-              <li className="py-3 text-sm text-muted-foreground">No pages yet.</li>
-            ) : null}
+            {pages.length === 0 ? <li className={styles.empty}>No pages yet.</li> : null}
           </ul>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>New page</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <details className={styles.createDisclosure}>
+        <summary className={styles.createTrigger}>
+          <PlusIcon className={styles.createIcon} />
+          New page
+        </summary>
+        <div className={styles.createBody}>
           <CreatePageForm />
-        </CardContent>
-      </Card>
+        </div>
+      </details>
     </div>
   );
 }

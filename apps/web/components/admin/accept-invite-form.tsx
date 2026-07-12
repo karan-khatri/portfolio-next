@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { ApiResponseBody } from "@/lib/api/response";
+import styles from "./accept-invite-form.module.scss";
 
 export function AcceptInviteForm({ token }: { token: string }) {
   const router = useRouter();
@@ -37,8 +38,8 @@ export function AcceptInviteForm({ token }: { token: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-1.5">
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <div className={styles.field}>
         <Label htmlFor="password">Choose a password</Label>
         <Input
           id="password"
@@ -50,8 +51,8 @@ export function AcceptInviteForm({ token }: { token: string }) {
           onChange={(event) => setPassword(event.target.value)}
         />
       </div>
-      <Button type="submit" disabled={submitting} className="w-full">
-        {submitting ? <Loader2Icon className="animate-spin" /> : null}
+      <Button type="submit" disabled={submitting} className={styles.submit}>
+        {submitting ? <Loader2Icon className={styles.spinner} /> : null}
         {submitting ? "Setting up…" : "Set password & sign in"}
       </Button>
     </form>

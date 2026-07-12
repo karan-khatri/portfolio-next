@@ -1,18 +1,11 @@
-import { Badge } from "@/components/ui/badge";
-
-const VARIANT_BY_STATUS: Record<string, "default" | "secondary" | "outline" | "ghost"> = {
-  PUBLISHED: "default",
-  DRAFT: "secondary",
-  SCHEDULED: "outline",
-  ARCHIVED: "ghost",
-};
+import styles from "./status-badge.module.scss";
 
 export function StatusBadge({ status, count }: { status: string; count?: number }) {
-  const variant = VARIANT_BY_STATUS[status] ?? "outline";
   return (
-    <Badge variant={variant}>
+    <span className={styles.badge} data-status={status.toLowerCase()}>
+      <span className={styles.dot} aria-hidden="true" />
       {status}
-      {typeof count === "number" ? ` · ${count}` : null}
-    </Badge>
+      {typeof count === "number" ? <span className={styles.count}>{count}</span> : null}
+    </span>
   );
 }

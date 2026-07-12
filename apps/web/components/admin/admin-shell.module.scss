@@ -1,0 +1,158 @@
+@use "../../styles/admin/variables" as vars;
+@use "../../styles/admin/mixins" as mix;
+
+.shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--muted);
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  width: vars.$sidebar-width;
+  height: 100vh;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  background: var(--background);
+
+  @media (max-width: vars.$breakpoint-collapse) {
+    width: vars.$sidebar-width-collapsed;
+  }
+}
+
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  height: 3.5rem;
+  padding-inline: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.wordmark {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+
+  @media (max-width: vars.$breakpoint-collapse) {
+    display: none;
+  }
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  flex: 1;
+  padding: 0.75rem;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    background: var(--muted);
+    color: var(--foreground);
+  }
+
+  &:focus-visible {
+    @include mix.focus-ring;
+  }
+
+  &[data-active] {
+    background: var(--muted);
+    color: var(--foreground);
+    font-weight: 600;
+  }
+}
+
+.navIcon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.navLabel {
+  @media (max-width: vars.$breakpoint-collapse) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+.sidebarFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.userEmail {
+  padding-inline: 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+  @include mix.truncate;
+
+  @media (max-width: vars.$breakpoint-collapse) {
+    display: none;
+  }
+}
+
+.signOutButton {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    background: var(--muted);
+    color: var(--foreground);
+  }
+
+  &:focus-visible {
+    @include mix.focus-ring;
+  }
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  max-width: vars.$content-max-width;
+  margin-inline: auto;
+  padding: 2rem 1.5rem;
+  width: 100%;
+
+  @media (min-width: 48rem) {
+    padding: 2.5rem 2rem;
+  }
+}

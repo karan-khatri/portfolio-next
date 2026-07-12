@@ -7,6 +7,7 @@ import { CopyIcon, Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -14,8 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { StatusBadge } from "@/components/admin/status-badge";
+import { formatRelativeTime } from "@/lib/admin/format-relative-time";
 import type { ApiResponseBody } from "@/lib/api/response";
+import styles from "./invites-panel.module.scss";
 
 interface RoleOption {
   id: string;
@@ -86,9 +88,9 @@ export function InvitesPanel({
   }
 
   return (
-    <div className="space-y-4">
-      <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-2">
-        <div className="space-y-1.5">
+    <div className={styles.panel}>
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <div className={styles.field}>
           <Label htmlFor="invite-email">Email</Label>
           <Input
             id="invite-email"
@@ -98,7 +100,7 @@ export function InvitesPanel({
             onChange={(event) => setEmail(event.target.value)}
           />
         </div>
-        <div className="space-y-1.5">
+        <div className={styles.field}>
           <Label htmlFor="invite-role">Role</Label>
           <Select value={roleId} onValueChange={(value) => setRoleId(value ?? "")}>
             <SelectTrigger id="invite-role">
@@ -114,7 +116,7 @@ export function InvitesPanel({
           </Select>
         </div>
         {selectedRole && !selectedRole.isPermanent ? (
-          <div className="space-y-1.5">
+          <div className={styles.field}>
             <Label htmlFor="invite-expires">Expires in (days)</Label>
             <Input
               id="invite-expires"
@@ -123,44 +125,44 @@ export function InvitesPanel({
               required
               value={expiresInDays}
               onChange={(event) => setExpiresInDays(event.target.value)}
-              className="w-24"
+              className={styles.expiresInput}
             />
           </div>
         ) : null}
         <Button type="submit" disabled={submitting}>
-          {submitting ? <Loader2Icon className="animate-spin" /> : null}
+          {submitting ? <Loader2Icon className={styles.spinner} /> : null}
           {submitting ? "Sending…" : "Send invite"}
         </Button>
       </form>
 
       {lastInviteLink ? (
-        <div className="flex items-center gap-2 rounded-lg border bg-muted/50 p-2 text-sm">
-          <span className="truncate">{lastInviteLink}</span>
+        <div className={styles.linkBox}>
+          <span className={styles.linkText}>{lastInviteLink}</span>
           <Button type="button" variant="ghost" size="icon-sm" onClick={copyInviteLink}>
             <CopyIcon />
           </Button>
         </div>
       ) : null}
 
-      <ul className="divide-y">
+      <ul className={styles.list}>
         {pendingInvites.map((invite) => (
-          <li key={invite.token} className="flex items-center justify-between gap-4 py-2 text-sm">
-            <span>
-              <span className="font-medium">{invite.email}</span>{" "}
-              <span className="text-muted-foreground">
+          <li key={invite.token} className={styles.row}>
+            <span className={styles.rowMain}>
+              <span className={styles.email}>{invite.email}</span>
+              <span className={styles.meta}>
                 invited by {invite.invitedBy.email}
                 {invite.roleExpiresAt
-                  ? `, role expires ${invite.roleExpiresAt.toLocaleDateString()}`
+                  ? `, role expires ${formatRelativeTime(invite.roleExpiresAt)}`
                   : ""}
-                , invite link expires {invite.expiresAt.toLocaleDateString()}
+                , invite link expires {formatRelativeTime(invite.expiresAt)}
               </span>
             </span>
-            <StatusBadge status={invite.role.name} />
+            <Badge variant="outline" className={styles.roleBadge}>
+              {invite.role.name}
+            </Badge>
           </li>
         ))}
-        {pendingInvites.length === 0 ? (
-          <li className="py-2 text-sm text-muted-foreground">No pending invites.</li>
-        ) : null}
+        {pendingInvites.length === 0 ? <li className={styles.empty}>No pending invites.</li> : null}
       </ul>
     </div>
   );

@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import styles from "./auth-shell.module.scss";
 
 export function AuthShell({
   title,
@@ -16,16 +17,14 @@ export function AuthShell({
   children: React.ReactNode;
 }) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-muted/30 p-6">
-      <div className="w-full max-w-sm">
-        <div className="mb-6 text-center">
-          <span className="text-sm font-medium text-muted-foreground">
-            Portfolio Admin
-          </span>
+    <main className={styles.page}>
+      <div className={styles.frame}>
+        <div className={styles.wordmarkRow}>
+          <span className={styles.wordmark}>Portfolio Admin</span>
         </div>
-        <Card>
+        <Card className={styles.card}>
           <CardHeader>
-            <CardTitle className="text-xl">{title}</CardTitle>
+            <CardTitle className={styles.title}>{title}</CardTitle>
             {description ? <CardDescription>{description}</CardDescription> : null}
           </CardHeader>
           <CardContent>{children}</CardContent>

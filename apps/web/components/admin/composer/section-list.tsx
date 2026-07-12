@@ -1,15 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { Reorder, useDragControls } from "framer-motion";
 import { GripVerticalIcon, Trash2Icon } from "lucide-react";
 import { sectionRegistry } from "@portfolio/sections";
 import { SectionForm } from "./section-form";
 import type { ComposerSection } from "./types";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { cn } from "@/lib/utils";
+import { sectionIcons } from "@/lib/admin/section-icons";
+import styles from "./section-list.module.scss";
 
 function SortableSectionItem({
   section,
@@ -23,54 +24,57 @@ function SortableSectionItem({
   onContentChange: (content: Record<string, unknown>) => void;
 }) {
   const controls = useDragControls();
+  const [isDragging, setIsDragging] = useState(false);
+  const Icon = sectionIcons[section.type];
 
   return (
     <Reorder.Item
       value={section}
       dragListener={false}
       dragControls={controls}
-      className="list-none"
+      onDragStart={() => setIsDragging(true)}
+      onDragEnd={() => setIsDragging(false)}
+      className={styles.itemWrapper}
     >
-      <Card className={cn(!section.enabled && "opacity-60")}>
-        <div className="flex items-start gap-2 px-4">
-          <button
-            type="button"
-            onPointerDown={(event) => controls.start(event)}
-            className="mt-1 shrink-0 cursor-grab touch-none text-muted-foreground hover:text-foreground active:cursor-grabbing"
-            aria-label="Drag to reorder"
-          >
-            <GripVerticalIcon className="size-4" />
-          </button>
-          <div className="min-w-0 flex-1 space-y-3">
-            <div className="flex items-center justify-between gap-2">
-              <span className="font-medium">{sectionRegistry[section.type].label}</span>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1.5">
-                  <Switch
-                    id={`enabled-${section.clientId}`}
-                    checked={section.enabled}
-                    onCheckedChange={onToggle}
-                  />
-                  <Label
-                    htmlFor={`enabled-${section.clientId}`}
-                    className="text-xs text-muted-foreground"
-                  >
-                    Enabled
-                  </Label>
-                </div>
-                <Button type="button" variant="ghost" size="icon-sm" onClick={onRemove}>
-                  <Trash2Icon />
-                </Button>
+      <div
+        className={styles.card}
+        data-enabled={section.enabled ? undefined : "false"}
+        data-dragging={isDragging || undefined}
+      >
+        <button
+          type="button"
+          onPointerDown={(event) => controls.start(event)}
+          className={styles.dragHandle}
+          aria-label="Drag to reorder"
+        >
+          <GripVerticalIcon className={styles.dragIcon} />
+        </button>
+
+        <div className={styles.body}>
+          <div className={styles.cardHeader}>
+            <span className={styles.typeLabel}>
+              <Icon className={styles.typeIcon} />
+              {sectionRegistry[section.type].label}
+            </span>
+            <div className={styles.headerControls}>
+              <div className={styles.enabledToggle}>
+                <Switch
+                  id={`enabled-${section.clientId}`}
+                  checked={section.enabled}
+                  onCheckedChange={onToggle}
+                />
+                <Label htmlFor={`enabled-${section.clientId}`} className={styles.enabledLabel}>
+                  Enabled
+                </Label>
               </div>
+              <Button type="button" variant="ghost" size="icon-sm" onClick={onRemove}>
+                <Trash2Icon />
+              </Button>
             </div>
-            <SectionForm
-              type={section.type}
-              content={section.content}
-              onChange={onContentChange}
-            />
           </div>
+          <SectionForm type={section.type} content={section.content} onChange={onContentChange} />
         </div>
-      </Card>
+      </div>
     </Reorder.Item>
   );
 }
@@ -89,7 +93,7 @@ export function SectionListEditor({
   onContentChange: (clientId: string, content: Record<string, unknown>) => void;
 }) {
   return (
-    <Reorder.Group axis="y" values={sections} onReorder={onReorder} className="space-y-3">
+    <Reorder.Group axis="y" values={sections} onReorder={onReorder} className={styles.list}>
       {sections.map((section) => (
         <SortableSectionItem
           key={section.clientId}

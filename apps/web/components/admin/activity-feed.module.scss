@@ -1,0 +1,76 @@
+.empty {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  padding-block: 0.375rem;
+
+  &:not(:last-child) .iconWrap::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    bottom: -0.375rem;
+    width: 1px;
+    background: var(--border);
+    transform: translateX(-50%);
+  }
+}
+
+.iconWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  background: var(--muted);
+  flex-shrink: 0;
+}
+
+.icon {
+  width: 0.875rem;
+  height: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.25rem;
+}
+
+.primary {
+  font-size: 0.875rem;
+  min-width: 0;
+}
+
+.user {
+  font-weight: 500;
+}
+
+.action {
+  color: var(--muted-foreground);
+}
+
+.time {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}

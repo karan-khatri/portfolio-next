@@ -1,0 +1,40 @@
+@use "../../styles/admin/variables" as vars;
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.1875rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--foreground);
+  white-space: nowrap;
+}
+
+.dot {
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+  background: vars.$status-draft;
+
+  [data-status="published"] & {
+    background: vars.$status-published;
+  }
+  [data-status="scheduled"] & {
+    background: vars.$status-scheduled;
+  }
+  [data-status="archived"] & {
+    background: vars.$status-archived;
+  }
+}
+
+.count {
+  color: var(--muted-foreground);
+
+  &::before {
+    content: "· ";
+  }
+}

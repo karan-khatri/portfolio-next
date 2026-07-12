@@ -1,0 +1,33 @@
+.page {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: var(--muted);
+  padding: 1.5rem;
+}
+
+.frame {
+  width: 100%;
+  max-width: 24rem;
+}
+
+.wordmarkRow {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.wordmark {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--muted-foreground);
+}
+
+.card {
+  border-top: 2px solid var(--foreground);
+}
+
+.title {
+  font-size: 1.25rem;
+}

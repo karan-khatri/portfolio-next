@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -27,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { StatusBadge } from "@/components/admin/status-badge";
+import styles from "./page-composer.module.scss";
 
 export type { ComposerSection };
 
@@ -138,17 +140,14 @@ export function PageComposer({
   }
 
   return (
-    <div className="space-y-6 pb-24">
-      <div className="space-y-3">
-        <Link
-          href="/admin/pages"
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeftIcon className="size-4" />
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <Link href="/admin/pages" className={styles.backLink}>
+          <ArrowLeftIcon className={styles.backIcon} />
           Pages
         </Link>
-        <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-2xl font-semibold">Edit page</h1>
+        <div className={styles.titleRow}>
+          <h1 className={styles.heading}>Edit page</h1>
           <StatusBadge status={pageStatus} />
           {hasDraft ? <StatusBadge status="UNPUBLISHED DRAFT LOADED" /> : null}
         </div>
@@ -156,7 +155,7 @@ export function PageComposer({
 
       <Card>
         <CardContent>
-          <div className="space-y-1.5">
+          <div className={styles.field}>
             <Label htmlFor="page-title">Title</Label>
             <Input
               id="page-title"
@@ -175,9 +174,9 @@ export function PageComposer({
         onContentChange={updateContent}
       />
 
-      <div className="flex items-center gap-2">
+      <div className={styles.addSectionRow}>
         <Select value={newSectionType} onValueChange={(value) => setNewSectionType(value as SectionType)}>
-          <SelectTrigger className="w-48">
+          <SelectTrigger className={styles.addSectionSelect}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -195,15 +194,10 @@ export function PageComposer({
       </div>
 
       {previewUrl ? (
-        <div className="flex items-center gap-2 rounded-lg border bg-muted/50 p-2 text-sm">
-          <a
-            href={previewUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="flex flex-1 items-center gap-1.5 truncate hover:underline"
-          >
+        <div className={styles.previewBox}>
+          <a href={previewUrl} target="_blank" rel="noreferrer" className={styles.previewLink}>
             {previewUrl}
-            <ExternalLinkIcon className="size-3.5 shrink-0" />
+            <ExternalLinkIcon className={styles.previewIcon} />
           </a>
           <Button type="button" variant="ghost" size="icon-sm" onClick={copyPreviewLink}>
             <CopyIcon />
@@ -211,22 +205,21 @@ export function PageComposer({
         </div>
       ) : null}
 
-      <div className="fixed inset-x-0 bottom-0 border-t bg-background/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-6 py-3">
-          <Button type="button" variant="outline" onClick={handleSaveDraft} disabled={pending}>
-            {pending ? <Loader2Icon className="animate-spin" /> : null}
-            Save draft
-          </Button>
-          <Button type="button" variant="outline" onClick={handlePreview} disabled={pending}>
-            Preview
-          </Button>
-          <Button type="button" onClick={handlePublish} disabled={pending}>
-            Publish
-          </Button>
-          <Button type="button" variant="destructive" onClick={handleUnpublish} disabled={pending}>
-            Unpublish
-          </Button>
-        </div>
+      <div className={styles.actionBar}>
+        <Button type="button" onClick={handlePublish} disabled={pending}>
+          Publish
+        </Button>
+        <Button type="button" variant="outline" onClick={handleSaveDraft} disabled={pending}>
+          {pending ? <Loader2Icon className={styles.spinner} /> : null}
+          Save draft
+        </Button>
+        <Button type="button" variant="ghost" onClick={handlePreview} disabled={pending}>
+          Preview
+        </Button>
+        <Separator orientation="vertical" className={styles.actionSeparator} />
+        <Button type="button" variant="destructive" onClick={handleUnpublish} disabled={pending}>
+          Unpublish
+        </Button>
       </div>
     </div>
   );

@@ -1,0 +1,23 @@
+@mixin focus-ring {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Spinning loader icon (e.g. inside a submit button while pending). Each
+// .module.scss that @includes this gets its own module-scoped @keyframes —
+// no cross-file collisions, no need to redeclare the keyframes by hand.
+@mixin spinner {
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  animation: spin 1s linear infinite;
+}

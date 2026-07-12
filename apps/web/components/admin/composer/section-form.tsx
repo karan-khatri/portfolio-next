@@ -5,6 +5,7 @@ import type { SectionType } from "@portfolio/db";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import styles from "./section-form.module.scss";
 
 export function SectionForm({
   type,
@@ -38,13 +39,13 @@ export function SectionForm({
   }
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
+    <div className={styles.fieldGroup}>
       {fields.map((field) => {
         const value = content[field.key];
         const fieldId = `${type}-${field.key}`;
         if (field.type === "textarea") {
           return (
-            <div key={field.key} className="space-y-1.5 sm:col-span-2">
+            <div key={field.key} className={`${styles.field} ${styles.fieldWide}`}>
               <Label htmlFor={fieldId}>{field.label}</Label>
               <Textarea
                 id={fieldId}
@@ -57,7 +58,7 @@ export function SectionForm({
         }
         if (field.type === "number") {
           return (
-            <div key={field.key} className="space-y-1.5">
+            <div key={field.key} className={styles.field}>
               <Label htmlFor={fieldId}>{field.label}</Label>
               <Input
                 id={fieldId}
@@ -70,7 +71,7 @@ export function SectionForm({
           );
         }
         return (
-          <div key={field.key} className="space-y-1.5">
+          <div key={field.key} className={styles.field}>
             <Label htmlFor={fieldId}>{field.label}</Label>
             <Input
               id={fieldId}

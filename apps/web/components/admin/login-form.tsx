@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { ApiResponseBody } from "@/lib/api/response";
+import styles from "./login-form.module.scss";
 
 export function LoginForm() {
   const router = useRouter();
@@ -38,8 +39,8 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-1.5">
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <div className={styles.field}>
         <Label htmlFor="email">Email</Label>
         <Input
           id="email"
@@ -50,7 +51,7 @@ export function LoginForm() {
           onChange={(event) => setEmail(event.target.value)}
         />
       </div>
-      <div className="space-y-1.5">
+      <div className={styles.field}>
         <Label htmlFor="password">Password</Label>
         <Input
           id="password"
@@ -61,8 +62,8 @@ export function LoginForm() {
           onChange={(event) => setPassword(event.target.value)}
         />
       </div>
-      <Button type="submit" disabled={submitting} className="w-full">
-        {submitting ? <Loader2Icon className="animate-spin" /> : null}
+      <Button type="submit" disabled={submitting} className={styles.submit}>
+        {submitting ? <Loader2Icon className={styles.spinner} /> : null}
         {submitting ? "Signing in…" : "Sign in"}
       </Button>
     </form>
