@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { StatusCodes } from "http-status-codes";
-import { acceptInvite, createSession } from "@portfolio/db/server";
+import { acceptInvite, createSession, getActiveRoleAssignment } from "@portfolio/db/server";
 import { SESSION_COOKIE } from "@/lib/auth/constants";
 import { apiSuccess, apiError } from "@/lib/api/response";
 
@@ -30,5 +30,6 @@ export async function POST(request: Request) {
     expires: expiresAt,
   });
 
-  return apiSuccess({ email: user.email, role: user.role }, "Invite accepted");
+  const activeRole = await getActiveRoleAssignment(user.id);
+  return apiSuccess({ email: user.email, role: activeRole?.role.name ?? null }, "Invite accepted");
 }

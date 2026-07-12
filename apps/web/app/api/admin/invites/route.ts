@@ -1,9 +1,7 @@
 import { StatusCodes } from "http-status-codes";
-import { createInvite, type UserRole } from "@portfolio/db/server";
+import { createInvite, prisma } from "@portfolio/db/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { apiSuccess, apiError } from "@/lib/api/response";
-
-const VALID_ROLES: UserRole[] = ["ADMIN", "EDITOR"];
 
 export async function POST(request: Request) {
   const currentUser = await getCurrentUser();
@@ -16,12 +14,35 @@ export async function POST(request: Request) {
 
   const body = await request.json().catch(() => null);
   const email = typeof body?.email === "string" ? body.email : null;
-  const role = VALID_ROLES.includes(body?.role) ? (body.role as UserRole) : "EDITOR";
+  const roleId = typeof body?.roleId === "string" ? body.roleId : null;
+  const expiresInDays =
+    typeof body?.expiresInDays === "number" && Number.isFinite(body.expiresInDays)
+      ? body.expiresInDays
+      : null;
 
-  if (!email) {
-    return apiError("Email is required", { status: StatusCodes.BAD_REQUEST });
+  if (!email || !roleId) {
+    return apiError("Email and role are required", { status: StatusCodes.BAD_REQUEST });
   }
 
-  const invite = await createInvite({ email, role, invitedById: currentUser.id });
-  return apiSuccess({ token: invite.token, expiresAt: invite.expiresAt }, "Invite sent");
+  const role = await prisma.role.findUnique({ where: { id: roleId } });
+  if (!role) {
+    return apiError("Unknown role", { status: StatusCodes.BAD_REQUEST });
+  }
+
+  // Pass the client's intent through as-is (don't silently normalize a
+  // mismatch away) — createInvite's assertRoleTimeFrame is the single
+  // source of truth for "permanent roles can't have an expiry, everything
+  // else must," and it rejects a bad combination with a clear error.
+  const roleExpiresAt = expiresInDays
+    ? new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000)
+    : null;
+
+  try {
+    const invite = await createInvite({ email, roleId, roleExpiresAt, invitedById: currentUser.id });
+    return apiSuccess({ token: invite.token, expiresAt: invite.expiresAt }, "Invite sent");
+  } catch (error) {
+    return apiError(error instanceof Error ? error.message : "Could not create invite", {
+      status: StatusCodes.BAD_REQUEST,
+    });
+  }
 }

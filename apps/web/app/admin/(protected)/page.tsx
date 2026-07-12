@@ -25,8 +25,12 @@ async function getPendingInvites() {
   return prisma.inviteToken.findMany({
     where: { acceptedAt: null, expiresAt: { gt: new Date() } },
     orderBy: { createdAt: "desc" },
-    include: { invitedBy: { select: { email: true } } },
+    include: { invitedBy: { select: { email: true } }, role: true },
   });
+}
+
+async function getRoles() {
+  return prisma.role.findMany({ orderBy: { name: "asc" } });
 }
 
 function StatusCard({
@@ -63,10 +67,11 @@ function StatusCard({
 }
 
 export default async function AdminDashboardPage() {
-  const [{ pages, projects, posts }, activity, invites] = await Promise.all([
+  const [{ pages, projects, posts }, activity, invites, roles] = await Promise.all([
     getStatusCounts(),
     getRecentActivity(),
     getPendingInvites(),
+    getRoles(),
   ]);
 
   return (
@@ -118,7 +123,7 @@ export default async function AdminDashboardPage() {
         </h2>
         <Card>
           <CardContent>
-            <InvitesPanel pendingInvites={invites} />
+            <InvitesPanel pendingInvites={invites} roles={roles} />
           </CardContent>
         </Card>
       </section>

@@ -17,20 +17,38 @@ import {
 import { StatusBadge } from "@/components/admin/status-badge";
 import type { ApiResponseBody } from "@/lib/api/response";
 
+interface RoleOption {
+  id: string;
+  name: string;
+  isPermanent: boolean;
+}
+
 interface PendingInvite {
   token: string;
   email: string;
-  role: string;
+  role: { name: string };
+  roleExpiresAt: Date | null;
   expiresAt: Date;
   invitedBy: { email: string };
 }
 
-export function InvitesPanel({ pendingInvites }: { pendingInvites: PendingInvite[] }) {
+const DEFAULT_EXPIRES_IN_DAYS = 30;
+
+export function InvitesPanel({
+  pendingInvites,
+  roles,
+}: {
+  pendingInvites: PendingInvite[];
+  roles: RoleOption[];
+}) {
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<"ADMIN" | "EDITOR">("EDITOR");
+  const [roleId, setRoleId] = useState(roles[0]?.id ?? "");
+  const [expiresInDays, setExpiresInDays] = useState(String(DEFAULT_EXPIRES_IN_DAYS));
   const [submitting, setSubmitting] = useState(false);
   const [lastInviteLink, setLastInviteLink] = useState<string | null>(null);
+
+  const selectedRole = roles.find((r) => r.id === roleId);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -40,7 +58,11 @@ export function InvitesPanel({ pendingInvites }: { pendingInvites: PendingInvite
     const response = await fetch("/api/admin/invites", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, role }),
+      body: JSON.stringify({
+        email,
+        roleId,
+        expiresInDays: selectedRole?.isPermanent ? null : Number(expiresInDays),
+      }),
     });
 
     setSubmitting(false);
@@ -78,16 +100,33 @@ export function InvitesPanel({ pendingInvites }: { pendingInvites: PendingInvite
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="invite-role">Role</Label>
-          <Select value={role} onValueChange={(value) => setRole(value as "ADMIN" | "EDITOR")}>
+          <Select value={roleId} onValueChange={(value) => setRoleId(value ?? "")}>
             <SelectTrigger id="invite-role">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="EDITOR">Editor</SelectItem>
-              <SelectItem value="ADMIN">Admin</SelectItem>
+              {roles.map((r) => (
+                <SelectItem key={r.id} value={r.id}>
+                  {r.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
+        {selectedRole && !selectedRole.isPermanent ? (
+          <div className="space-y-1.5">
+            <Label htmlFor="invite-expires">Expires in (days)</Label>
+            <Input
+              id="invite-expires"
+              type="number"
+              min={1}
+              required
+              value={expiresInDays}
+              onChange={(event) => setExpiresInDays(event.target.value)}
+              className="w-24"
+            />
+          </div>
+        ) : null}
         <Button type="submit" disabled={submitting}>
           {submitting ? <Loader2Icon className="animate-spin" /> : null}
           {submitting ? "Sending…" : "Send invite"}
@@ -109,11 +148,14 @@ export function InvitesPanel({ pendingInvites }: { pendingInvites: PendingInvite
             <span>
               <span className="font-medium">{invite.email}</span>{" "}
               <span className="text-muted-foreground">
-                invited by {invite.invitedBy.email}, expires{" "}
-                {invite.expiresAt.toLocaleDateString()}
+                invited by {invite.invitedBy.email}
+                {invite.roleExpiresAt
+                  ? `, role expires ${invite.roleExpiresAt.toLocaleDateString()}`
+                  : ""}
+                , invite link expires {invite.expiresAt.toLocaleDateString()}
               </span>
             </span>
-            <StatusBadge status={invite.role} />
+            <StatusBadge status={invite.role.name} />
           </li>
         ))}
         {pendingInvites.length === 0 ? (

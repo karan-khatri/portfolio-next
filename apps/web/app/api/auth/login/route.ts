@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { StatusCodes } from "http-status-codes";
-import { prisma, verifyPassword, createSession } from "@portfolio/db/server";
+import { prisma, verifyPassword, createSession, getActiveRoleAssignment } from "@portfolio/db/server";
 import { SESSION_COOKIE } from "@/lib/auth/constants";
 import { apiSuccess, apiError } from "@/lib/api/response";
 
@@ -28,5 +28,6 @@ export async function POST(request: Request) {
     expires: expiresAt,
   });
 
-  return apiSuccess({ email: user.email, role: user.role }, "Signed in");
+  const activeRole = await getActiveRoleAssignment(user.id);
+  return apiSuccess({ email: user.email, role: activeRole?.role.name ?? null }, "Signed in");
 }
