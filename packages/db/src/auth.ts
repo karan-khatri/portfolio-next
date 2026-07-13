@@ -103,6 +103,16 @@ export async function assignRole(params: {
   });
 }
 
+// Doesn't delete the row — sets its expiry to now, same spirit as
+// unpublishEntity not deleting Revisions: the grant/revoke history stays
+// intact for audit purposes, it just stops resolving as "active".
+export async function revokeRole(assignmentId: string) {
+  return prisma.userRoleAssignment.update({
+    where: { id: assignmentId },
+    data: { expiresAt: new Date() },
+  });
+}
+
 export async function createInvite(params: {
   email: string;
   roleId: string;

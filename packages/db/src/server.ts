@@ -12,3 +12,5 @@ export * from "./audit";
 export * from "./tags";
 export * from "./seo";
 export * from "./media";
+export * from "./site-settings";
+export * from "./revisions";
