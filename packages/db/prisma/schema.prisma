@@ -181,6 +181,9 @@ model Media {
   blurDataUrl  String?
   altText      String?
   decorative   Boolean  @default(false)
+  filename     String
+  mimeType     String
+  sizeBytes    Int
   uploadedById String?
   createdAt    DateTime @default(now())
 
