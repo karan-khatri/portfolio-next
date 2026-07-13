@@ -9,3 +9,5 @@ export * from "./client";
 export * from "./auth";
 export * from "./cms";
 export * from "./audit";
+export * from "./tags";
+export * from "./seo";

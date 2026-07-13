@@ -24,6 +24,13 @@ export interface FlatRevisionData {
   excerpt?: string | null;
   body?: string | null;
   coverImageId?: string | null;
+  tagIds?: string[];
+  // Project-only
+  codeRepository?: string | null;
+  liveUrl?: string | null;
+  programmingLanguages?: string[];
+  // Post-only
+  authorId?: string | null;
 }
 
 export type RevisionData = PageRevisionData | FlatRevisionData;
@@ -94,7 +101,7 @@ async function applyFlatRevision(
   entityId: string,
   data: FlatRevisionData,
 ) {
-  const update = {
+  const base = {
     title: data.title,
     excerpt: data.excerpt,
     body: data.body,
@@ -102,10 +109,24 @@ async function applyFlatRevision(
     status: "PUBLISHED" as const,
     publishedAt: new Date(),
   };
+  const tags = data.tagIds ? { set: data.tagIds.map((id) => ({ id })) } : undefined;
+
   if (entityType === "Project") {
-    await prisma.project.update({ where: { id: entityId }, data: update });
+    await prisma.project.update({
+      where: { id: entityId },
+      data: {
+        ...base,
+        tags,
+        codeRepository: data.codeRepository,
+        liveUrl: data.liveUrl,
+        programmingLanguages: data.programmingLanguages,
+      },
+    });
   } else {
-    await prisma.post.update({ where: { id: entityId }, data: update });
+    await prisma.post.update({
+      where: { id: entityId },
+      data: { ...base, tags, authorId: data.authorId },
+    });
   }
 }
 
