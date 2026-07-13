@@ -11,7 +11,7 @@ export function SiteHeader({ title, navItems }: { title: string; navItems: Secti
           {navItems.map((item) => (
             <a
               key={item.id}
-              href={`#${item.id}`}
+              href={item.href}
               className="font-mono text-xs tracking-widest text-muted-foreground uppercase transition-colors hover:text-foreground"
             >
               {item.label}

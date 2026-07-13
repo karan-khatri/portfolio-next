@@ -1,11 +1,21 @@
 export interface SimpleField {
   key: string;
   label: string;
-  type: "text" | "textarea" | "number" | "date" | "url";
+  type: "text" | "textarea" | "number" | "date" | "url" | "tags" | "boolean";
   required?: boolean;
+  // "boolean" fields render as a Switch; this is the label shown next to it
+  // (falls back to `label` when omitted).
+  booleanLabel?: string;
 }
 
-export type SimpleContentType = "experience" | "skill" | "service" | "testimonial";
+export type SimpleContentType =
+  | "experience"
+  | "skill"
+  | "service"
+  | "testimonial"
+  | "author"
+  | "navigationItem"
+  | "redirect";
 
 export interface SimpleContentSummary {
   primary: string;
@@ -31,6 +41,12 @@ export const simpleContentSummaries: Record<
   testimonial: (item) => ({
     primary: item.authorName as string,
     secondary: (item.authorRole as string) || undefined,
+  }),
+  author: (item) => ({ primary: item.name as string, secondary: item.slug as string }),
+  navigationItem: (item) => ({ primary: item.label as string, secondary: item.href as string }),
+  redirect: (item) => ({
+    primary: `${item.fromPath as string} → ${item.toPath as string}`,
+    secondary: (item.statusCode as number) === 308 ? "Permanent" : "Temporary",
   }),
 };
 
@@ -58,4 +74,23 @@ export const testimonialFields: SimpleField[] = [
   { key: "authorRole", label: "Author role", type: "text" },
   { key: "quote", label: "Quote", type: "textarea", required: true },
   { key: "avatarUrl", label: "Avatar URL", type: "url" },
+];
+
+export const authorFields: SimpleField[] = [
+  { key: "name", label: "Name", type: "text", required: true },
+  { key: "slug", label: "Slug", type: "text", required: true },
+  { key: "imageUrl", label: "Image URL", type: "url" },
+  { key: "bio", label: "Bio", type: "textarea" },
+  { key: "sameAs", label: "Links", type: "tags" },
+];
+
+export const navigationItemFields: SimpleField[] = [
+  { key: "label", label: "Label", type: "text", required: true },
+  { key: "href", label: "Link", type: "text", required: true },
+];
+
+export const redirectFields: SimpleField[] = [
+  { key: "fromPath", label: "From path", type: "text", required: true },
+  { key: "toPath", label: "To path", type: "text", required: true },
+  { key: "permanent", label: "Permanent", type: "boolean", booleanLabel: "Permanent (308)" },
 ];

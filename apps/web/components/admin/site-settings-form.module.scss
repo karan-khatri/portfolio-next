@@ -1,0 +1,22 @@
+@use "../../styles/admin/mixins" as mix;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 32rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.saveButton {
+  width: fit-content;
+}
+
+.spinner {
+  @include mix.spinner;
+}

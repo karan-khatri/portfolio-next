@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
-import { prisma, getLatestRevision, type FlatRevisionData } from "@portfolio/db/server";
+import { prisma, getLatestRevision, listRevisions, type FlatRevisionData } from "@portfolio/db/server";
 import { ProjectEditor } from "@/components/admin/project-editor";
 import { toMediaPickerValue, type MediaPickerValue } from "@/lib/admin/media";
+import type { RevisionHistoryItem } from "@/components/admin/revision-history-panel";
 
 export default async function ProjectEditorRoute({
   params,
@@ -49,11 +50,20 @@ export default async function ProjectEditorRoute({
     }
   }
 
+  const revisionRows = await listRevisions("Project", id);
+  const revisions: RevisionHistoryItem[] = revisionRows.map((revision) => ({
+    id: revision.id,
+    status: revision.status,
+    createdAt: revision.createdAt,
+    createdByEmail: revision.createdBy?.email ?? null,
+  }));
+
   return (
     <ProjectEditor
       projectId={project.id}
       projectStatus={project.status}
       hasDraft={Boolean(latestDraft)}
+      revisions={revisions}
       initial={{
         title,
         excerpt,

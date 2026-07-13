@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
-import { prisma, getLatestRevision, type PageRevisionData } from "@portfolio/db/server";
+import { prisma, getLatestRevision, listRevisions, type PageRevisionData } from "@portfolio/db/server";
 import { PageComposer, type ComposerSection } from "@/components/admin/composer/page-composer";
 import { toMediaPickerValue, type MediaPickerValue } from "@/lib/admin/media";
+import type { RevisionHistoryItem } from "@/components/admin/revision-history-panel";
 
 export default async function PageComposerRoute({
   params,
@@ -52,6 +53,14 @@ export default async function PageComposerRoute({
     mediaRows.map((media) => [media.id, toMediaPickerValue(media)]),
   );
 
+  const revisionRows = await listRevisions("Page", id);
+  const revisions: RevisionHistoryItem[] = revisionRows.map((revision) => ({
+    id: revision.id,
+    status: revision.status,
+    createdAt: revision.createdAt,
+    createdByEmail: revision.createdBy?.email ?? null,
+  }));
+
   return (
     <PageComposer
       pageId={page.id}
@@ -60,6 +69,7 @@ export default async function PageComposerRoute({
       initialSections={initialSections}
       initialResolvedMedia={initialResolvedMedia}
       hasDraft={Boolean(latestDraft)}
+      revisions={revisions}
     />
   );
 }

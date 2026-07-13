@@ -1,20 +1,25 @@
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import { getSiteSettings } from "@portfolio/db/server";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default: "Portfolio",
-    template: "%s | Portfolio",
-  },
-  description: "Portfolio site",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+
+  return {
+    metadataBase: new URL(siteUrl),
+    title: {
+      default: settings.title,
+      template: `%s | ${settings.title}`,
+    },
+    description: settings.description,
+  };
+}
 
 export default function RootLayout({
   children,

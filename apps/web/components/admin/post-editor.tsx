@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -29,6 +29,7 @@ import { TagInput } from "@/components/admin/tag-input";
 import { MediaPicker } from "@/components/admin/media-picker";
 import { SeoFieldsPanel } from "@/components/admin/seo-fields-panel";
 import { ComposerActionBar } from "@/components/admin/composer-action-bar";
+import { RevisionHistoryPanel, type RevisionHistoryItem } from "@/components/admin/revision-history-panel";
 import type { MediaPickerValue } from "@/lib/admin/media";
 import styles from "./post-editor.module.scss";
 
@@ -55,6 +56,7 @@ export function PostEditor({
   postId,
   postStatus,
   hasDraft,
+  revisions,
   authors,
   initial,
   seo,
@@ -62,6 +64,7 @@ export function PostEditor({
   postId: string;
   postStatus: string;
   hasDraft: boolean;
+  revisions: RevisionHistoryItem[];
   authors: { id: string; name: string }[];
   initial: PostEditorInitial;
   seo: SeoInitial;
@@ -75,6 +78,19 @@ export function PostEditor({
   const [authorId, setAuthorId] = useState(initial.authorId ?? NO_AUTHOR);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+
+  // Re-sync when the server re-fetches (e.g. after restoring an older
+  // revision via <RevisionHistoryPanel>, which calls router.refresh() from
+  // a sibling component) — useState's initial value only applies on mount,
+  // so without this the form would keep showing stale content.
+  useEffect(() => {
+    setTitle(initial.title);
+    setExcerpt(initial.excerpt);
+    setBody(initial.body);
+    setTags(initial.tags);
+    setCoverImage(initial.coverImage);
+    setAuthorId(initial.authorId ?? NO_AUTHOR);
+  }, [initial]);
 
   function toInput(): PostFormInput {
     return {
@@ -199,6 +215,8 @@ export function PostEditor({
           </Button>
         </div>
       ) : null}
+
+      <RevisionHistoryPanel entityType="Post" entityId={postId} revisions={revisions} />
 
       <ComposerActionBar
         pending={pending}

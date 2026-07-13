@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
-import { prisma, getLatestRevision, type FlatRevisionData } from "@portfolio/db/server";
+import { prisma, getLatestRevision, listRevisions, type FlatRevisionData } from "@portfolio/db/server";
 import { PostEditor } from "@/components/admin/post-editor";
 import { toMediaPickerValue, type MediaPickerValue } from "@/lib/admin/media";
+import type { RevisionHistoryItem } from "@/components/admin/revision-history-panel";
 
 export default async function PostEditorRoute({
   params,
@@ -46,11 +47,20 @@ export default async function PostEditorRoute({
     }
   }
 
+  const revisionRows = await listRevisions("Post", id);
+  const revisions: RevisionHistoryItem[] = revisionRows.map((revision) => ({
+    id: revision.id,
+    status: revision.status,
+    createdAt: revision.createdAt,
+    createdByEmail: revision.createdBy?.email ?? null,
+  }));
+
   return (
     <PostEditor
       postId={post.id}
       postStatus={post.status}
       hasDraft={Boolean(latestDraft)}
+      revisions={revisions}
       authors={authors}
       initial={{ title, excerpt, body, tags: tagNames, coverImage, authorId }}
       seo={{

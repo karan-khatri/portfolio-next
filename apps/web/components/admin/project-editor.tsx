@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -22,6 +22,7 @@ import { TagInput } from "@/components/admin/tag-input";
 import { MediaPicker } from "@/components/admin/media-picker";
 import { SeoFieldsPanel } from "@/components/admin/seo-fields-panel";
 import { ComposerActionBar } from "@/components/admin/composer-action-bar";
+import { RevisionHistoryPanel, type RevisionHistoryItem } from "@/components/admin/revision-history-panel";
 import type { MediaPickerValue } from "@/lib/admin/media";
 import styles from "./project-editor.module.scss";
 
@@ -48,12 +49,14 @@ export function ProjectEditor({
   projectId,
   projectStatus,
   hasDraft,
+  revisions,
   initial,
   seo,
 }: {
   projectId: string;
   projectStatus: string;
   hasDraft: boolean;
+  revisions: RevisionHistoryItem[];
   initial: ProjectEditorInitial;
   seo: SeoInitial;
 }) {
@@ -68,6 +71,21 @@ export function ProjectEditor({
   const [programmingLanguages, setProgrammingLanguages] = useState(initial.programmingLanguages);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+
+  // Re-sync when the server re-fetches (e.g. after restoring an older
+  // revision via <RevisionHistoryPanel>, which calls router.refresh() from
+  // a sibling component) — useState's initial value only applies on mount,
+  // so without this the form would keep showing stale content.
+  useEffect(() => {
+    setTitle(initial.title);
+    setExcerpt(initial.excerpt);
+    setBody(initial.body);
+    setTags(initial.tags);
+    setCoverImage(initial.coverImage);
+    setCodeRepository(initial.codeRepository);
+    setLiveUrl(initial.liveUrl);
+    setProgrammingLanguages(initial.programmingLanguages);
+  }, [initial]);
 
   function toInput(): ProjectFormInput {
     return {
@@ -213,6 +231,8 @@ export function ProjectEditor({
           </Button>
         </div>
       ) : null}
+
+      <RevisionHistoryPanel entityType="Project" entityId={projectId} revisions={revisions} />
 
       <ComposerActionBar
         pending={pending}

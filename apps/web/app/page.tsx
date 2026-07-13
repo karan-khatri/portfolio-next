@@ -50,7 +50,14 @@ export default async function HomePage() {
     );
   }
 
-  const navItems = getSectionNavItems(page.sections);
+  const configuredNav = await prisma.navigationItem.findMany({
+    where: { locale: LOCALE, parentId: null },
+    orderBy: { order: "asc" },
+  });
+  const navItems =
+    configuredNav.length > 0
+      ? configuredNav.map((item) => ({ id: item.id, label: item.label, href: item.href }))
+      : getSectionNavItems(page.sections);
 
   return (
     <div id="top" className="theme-site min-h-screen bg-background text-foreground">

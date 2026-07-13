@@ -8,10 +8,15 @@ import {
   FolderKanbanIcon,
   NewspaperIcon,
   ImageIcon,
+  UserIcon,
   BriefcaseIcon,
   SparklesIcon,
   WrenchIcon,
   QuoteIcon,
+  LinkIcon,
+  ArrowRightLeftIcon,
+  SettingsIcon,
+  UsersIcon,
   LogOutIcon,
 } from "lucide-react";
 import styles from "./admin-shell.module.scss";
@@ -24,6 +29,7 @@ const NAV_GROUPS = [
       { href: "/admin/pages", label: "Pages", icon: FileTextIcon },
       { href: "/admin/projects", label: "Projects", icon: FolderKanbanIcon },
       { href: "/admin/posts", label: "Posts", icon: NewspaperIcon },
+      { href: "/admin/authors", label: "Authors", icon: UserIcon },
       { href: "/admin/media", label: "Media", icon: ImageIcon },
     ],
   },
@@ -34,6 +40,15 @@ const NAV_GROUPS = [
       { href: "/admin/skills", label: "Skills", icon: SparklesIcon },
       { href: "/admin/services", label: "Services", icon: WrenchIcon },
       { href: "/admin/testimonials", label: "Testimonials", icon: QuoteIcon },
+    ],
+  },
+  {
+    label: "Site",
+    items: [
+      { href: "/admin/navigation", label: "Navigation", icon: LinkIcon },
+      { href: "/admin/redirects", label: "Redirects", icon: ArrowRightLeftIcon },
+      { href: "/admin/settings", label: "Settings", icon: SettingsIcon },
+      { href: "/admin/users", label: "Users", icon: UsersIcon },
     ],
   },
 ];

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/select";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { ComposerActionBar } from "@/components/admin/composer-action-bar";
+import { RevisionHistoryPanel, type RevisionHistoryItem } from "@/components/admin/revision-history-panel";
 import styles from "./page-composer.module.scss";
 
 export type { ComposerSection };
@@ -42,6 +43,7 @@ export function PageComposer({
   initialSections,
   initialResolvedMedia,
   hasDraft,
+  revisions,
 }: {
   pageId: string;
   pageStatus: string;
@@ -49,12 +51,23 @@ export function PageComposer({
   initialSections: ComposerSection[];
   initialResolvedMedia: Record<string, MediaPickerValue>;
   hasDraft: boolean;
+  revisions: RevisionHistoryItem[];
 }) {
   const router = useRouter();
   const [title, setTitle] = useState(initialTitle);
   const [sections, setSections] = useState(initialSections);
   const [resolvedMedia, setResolvedMedia] = useState(initialResolvedMedia);
   const [newSectionType, setNewSectionType] = useState<SectionType>(ALL_SECTION_TYPES[0]);
+
+  // Re-sync when the server re-fetches (e.g. after restoring an older
+  // revision via <RevisionHistoryPanel>, which calls router.refresh() from
+  // a sibling component) — useState's initial value only applies on mount,
+  // so without this the form would keep showing stale content.
+  useEffect(() => {
+    setTitle(initialTitle);
+    setSections(initialSections);
+    setResolvedMedia(initialResolvedMedia);
+  }, [initialTitle, initialSections, initialResolvedMedia]);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -214,6 +227,8 @@ export function PageComposer({
           </Button>
         </div>
       ) : null}
+
+      <RevisionHistoryPanel entityType="Page" entityId={pageId} revisions={revisions} />
 
       <ComposerActionBar
         pending={pending}

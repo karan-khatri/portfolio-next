@@ -202,6 +202,7 @@ function enabledSections(sections: RenderableSection[]) {
 export interface SectionNavItem {
   id: string;
   label: string;
+  href: string;
 }
 
 // Shared by SiteHeader (nav links) and SectionRenderer itself, so both
@@ -210,7 +211,7 @@ export function getSectionNavItems(sections: RenderableSection[]): SectionNavIte
   return enabledSections(sections).map((section) => {
     const def = sectionRegistry[section.type];
     const content = def.schema.parse(section.content) as { heading: string };
-    return { id: `section-${section.id}`, label: content.heading };
+    return { id: `section-${section.id}`, label: content.heading, href: `#section-${section.id}` };
   });
 }
 
