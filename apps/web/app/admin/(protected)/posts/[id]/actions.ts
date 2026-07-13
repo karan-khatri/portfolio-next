@@ -22,6 +22,7 @@ export interface PostFormInput {
   excerpt: string;
   body: string;
   tags: string[];
+  coverImageId: string | null;
   authorId: string | null;
 }
 
@@ -38,6 +39,7 @@ async function buildData(input: PostFormInput): Promise<FlatRevisionData> {
     excerpt: input.excerpt || null,
     body: input.body || null,
     tagIds,
+    coverImageId: input.coverImageId,
     authorId: input.authorId,
   };
 }

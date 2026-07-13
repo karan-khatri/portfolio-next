@@ -5,16 +5,22 @@ import type { SectionType } from "@portfolio/db";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { MediaPicker } from "@/components/admin/media-picker";
+import type { MediaPickerValue } from "@/lib/admin/media";
 import styles from "./section-form.module.scss";
 
 export function SectionForm({
   type,
   content,
   onChange,
+  resolvedMedia,
+  onResolveMedia,
 }: {
   type: SectionType;
   content: Record<string, unknown>;
   onChange: (content: Record<string, unknown>) => void;
+  resolvedMedia: Record<string, MediaPickerValue>;
+  onResolveMedia: (media: MediaPickerValue) => void;
 }) {
   const fields = sectionFields[type];
 
@@ -52,6 +58,21 @@ export function SectionForm({
                 value={typeof value === "string" ? value : ""}
                 required={field.required}
                 onChange={(event) => setField(field.key, event.target.value)}
+              />
+            </div>
+          );
+        }
+        if (field.type === "image") {
+          const imageId = typeof value === "string" ? value : null;
+          return (
+            <div key={field.key} className={`${styles.field} ${styles.fieldWide}`}>
+              <MediaPicker
+                label={field.label}
+                value={imageId ? (resolvedMedia[imageId] ?? null) : null}
+                onChange={(media) => {
+                  setField(field.key, media?.id ?? "");
+                  if (media) onResolveMedia(media);
+                }}
               />
             </div>
           );

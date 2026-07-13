@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma, getLatestRevision, type PageRevisionData } from "@portfolio/db/server";
 import { PageComposer, type ComposerSection } from "@/components/admin/composer/page-composer";
+import { toMediaPickerValue, type MediaPickerValue } from "@/lib/admin/media";
 
 export default async function PageComposerRoute({
   params,
@@ -40,12 +41,24 @@ export default async function PageComposerRoute({
     }));
   }
 
+  const imageIds = new Set<string>();
+  for (const section of initialSections) {
+    const imageId = section.content.imageId;
+    if (typeof imageId === "string" && imageId) imageIds.add(imageId);
+  }
+  const mediaRows =
+    imageIds.size > 0 ? await prisma.media.findMany({ where: { id: { in: [...imageIds] } } }) : [];
+  const initialResolvedMedia: Record<string, MediaPickerValue> = Object.fromEntries(
+    mediaRows.map((media) => [media.id, toMediaPickerValue(media)]),
+  );
+
   return (
     <PageComposer
       pageId={page.id}
       pageStatus={page.status}
       initialTitle={initialTitle}
       initialSections={initialSections}
+      initialResolvedMedia={initialResolvedMedia}
       hasDraft={Boolean(latestDraft)}
     />
   );

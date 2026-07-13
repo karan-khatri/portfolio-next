@@ -9,6 +9,7 @@ import type { SectionType } from "@portfolio/db";
 import { sectionRegistry } from "@portfolio/sections";
 import { SectionListEditor } from "./section-list";
 import type { ComposerSection } from "./types";
+import type { MediaPickerValue } from "@/lib/admin/media";
 import {
   saveDraftAction,
   publishAction,
@@ -39,17 +40,20 @@ export function PageComposer({
   pageStatus,
   initialTitle,
   initialSections,
+  initialResolvedMedia,
   hasDraft,
 }: {
   pageId: string;
   pageStatus: string;
   initialTitle: string;
   initialSections: ComposerSection[];
+  initialResolvedMedia: Record<string, MediaPickerValue>;
   hasDraft: boolean;
 }) {
   const router = useRouter();
   const [title, setTitle] = useState(initialTitle);
   const [sections, setSections] = useState(initialSections);
+  const [resolvedMedia, setResolvedMedia] = useState(initialResolvedMedia);
   const [newSectionType, setNewSectionType] = useState<SectionType>(ALL_SECTION_TYPES[0]);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -92,6 +96,10 @@ export function PageComposer({
     setSections((prev) =>
       prev.map((section) => (section.clientId === clientId ? { ...section, content } : section)),
     );
+  }
+
+  function resolveMedia(media: MediaPickerValue) {
+    setResolvedMedia((prev) => ({ ...prev, [media.id]: media }));
   }
 
   function handleSaveDraft() {
@@ -172,6 +180,8 @@ export function PageComposer({
         onToggle={toggleSection}
         onRemove={removeSection}
         onContentChange={updateContent}
+        resolvedMedia={resolvedMedia}
+        onResolveMedia={resolveMedia}
       />
 
       <div className={styles.addSectionRow}>

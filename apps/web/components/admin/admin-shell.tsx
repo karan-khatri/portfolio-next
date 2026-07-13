@@ -7,6 +7,7 @@ import {
   FileTextIcon,
   FolderKanbanIcon,
   NewspaperIcon,
+  ImageIcon,
   BriefcaseIcon,
   SparklesIcon,
   WrenchIcon,
@@ -23,6 +24,7 @@ const NAV_GROUPS = [
       { href: "/admin/pages", label: "Pages", icon: FileTextIcon },
       { href: "/admin/projects", label: "Projects", icon: FolderKanbanIcon },
       { href: "/admin/posts", label: "Posts", icon: NewspaperIcon },
+      { href: "/admin/media", label: "Media", icon: ImageIcon },
     ],
   },
   {

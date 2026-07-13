@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma, getLatestRevision, type FlatRevisionData } from "@portfolio/db/server";
 import { ProjectEditor } from "@/components/admin/project-editor";
+import { toMediaPickerValue, type MediaPickerValue } from "@/lib/admin/media";
 
 export default async function ProjectEditorRoute({
   params,
@@ -11,7 +12,7 @@ export default async function ProjectEditorRoute({
 
   const project = await prisma.project.findUnique({
     where: { id },
-    include: { tags: true, seo: true },
+    include: { tags: true, seo: true, coverImage: true },
   });
   if (!project) notFound();
 
@@ -21,6 +22,9 @@ export default async function ProjectEditorRoute({
   let excerpt = project.excerpt ?? "";
   let body = project.body ?? "";
   let tagNames = project.tags.map((tag) => tag.name);
+  let coverImage: MediaPickerValue | null = project.coverImage
+    ? toMediaPickerValue(project.coverImage)
+    : null;
   let codeRepository = project.codeRepository ?? "";
   let liveUrl = project.liveUrl ?? "";
   let programmingLanguages = project.programmingLanguages;
@@ -37,6 +41,12 @@ export default async function ProjectEditorRoute({
       const draftTags = await prisma.tag.findMany({ where: { id: { in: data.tagIds } } });
       tagNames = draftTags.map((tag) => tag.name);
     }
+    if (data.coverImageId !== undefined) {
+      const media = data.coverImageId
+        ? await prisma.media.findUnique({ where: { id: data.coverImageId } })
+        : null;
+      coverImage = media ? toMediaPickerValue(media) : null;
+    }
   }
 
   return (
@@ -49,6 +59,7 @@ export default async function ProjectEditorRoute({
         excerpt,
         body,
         tags: tagNames,
+        coverImage,
         codeRepository,
         liveUrl,
         programmingLanguages,

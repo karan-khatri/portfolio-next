@@ -19,6 +19,15 @@ export interface RenderableSection {
   content: unknown;
 }
 
+async function resolveSectionImage(imageId: unknown) {
+  if (typeof imageId !== "string" || !imageId) return null;
+  const media = await prisma.media.findUnique({
+    where: { id: imageId },
+    select: { url: true, width: true, height: true, blurDataUrl: true, altText: true },
+  });
+  return media;
+}
+
 async function renderSection(section: RenderableSection, locale: string) {
   const def = sectionRegistry[section.type];
   const content = def.schema.parse(section.content);
@@ -26,29 +35,43 @@ async function renderSection(section: RenderableSection, locale: string) {
   const headingLevel = def.headingLevel;
 
   switch (section.type) {
-    case SectionType.HERO:
+    case SectionType.HERO: {
+      const image = await resolveSectionImage((content as { imageId?: string }).imageId);
       return (
         <HeroSection
           id={headingId}
           content={content as never}
           headingLevel={headingLevel}
+          image={image}
         />
       );
-    case SectionType.ABOUT:
+    }
+    case SectionType.ABOUT: {
+      const image = await resolveSectionImage((content as { imageId?: string }).imageId);
       return (
         <AboutSection
           id={headingId}
           content={content as never}
           headingLevel={headingLevel}
+          image={image}
         />
       );
+    }
     case SectionType.PROJECTS: {
       const typed = content as { limit?: number };
       const projects = await prisma.project.findMany({
         where: { locale, status: "PUBLISHED" },
         orderBy: { publishedAt: "desc" },
         take: typed.limit ?? 6,
-        select: { id: true, slug: true, title: true, excerpt: true },
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          excerpt: true,
+          coverImage: {
+            select: { url: true, width: true, height: true, blurDataUrl: true, altText: true },
+          },
+        },
       });
       return (
         <ProjectsSection
@@ -132,7 +155,15 @@ async function renderSection(section: RenderableSection, locale: string) {
         where: { locale, status: "PUBLISHED" },
         orderBy: { publishedAt: "desc" },
         take: typed.limit ?? 3,
-        select: { id: true, slug: true, title: true, excerpt: true },
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          excerpt: true,
+          coverImage: {
+            select: { url: true, width: true, height: true, blurDataUrl: true, altText: true },
+          },
+        },
       });
       return (
         <BlogSection

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Reorder, useDragControls } from "framer-motion";
-import { GripVerticalIcon, Trash2Icon } from "lucide-react";
+import { GripVerticalIcon, InfoIcon, Trash2Icon } from "lucide-react";
 import { sectionRegistry } from "@portfolio/sections";
 import { SectionForm } from "./section-form";
 import type { ComposerSection } from "./types";
@@ -10,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { sectionIcons } from "@/lib/admin/section-icons";
+import { sectionDataSource } from "@/lib/admin/section-fields";
+import type { MediaPickerValue } from "@/lib/admin/media";
 import styles from "./section-list.module.scss";
 
 function SortableSectionItem({
@@ -17,15 +20,20 @@ function SortableSectionItem({
   onToggle,
   onRemove,
   onContentChange,
+  resolvedMedia,
+  onResolveMedia,
 }: {
   section: ComposerSection;
   onToggle: () => void;
   onRemove: () => void;
   onContentChange: (content: Record<string, unknown>) => void;
+  resolvedMedia: Record<string, MediaPickerValue>;
+  onResolveMedia: (media: MediaPickerValue) => void;
 }) {
   const controls = useDragControls();
   const [isDragging, setIsDragging] = useState(false);
   const Icon = sectionIcons[section.type];
+  const dataSource = sectionDataSource[section.type];
 
   return (
     <Reorder.Item
@@ -72,7 +80,23 @@ function SortableSectionItem({
               </Button>
             </div>
           </div>
-          <SectionForm type={section.type} content={section.content} onChange={onContentChange} />
+          {dataSource ? (
+            <p className={styles.dataSourceNote}>
+              <InfoIcon className={styles.typeIcon} />
+              Heading only — the list itself comes from{" "}
+              <Link href={dataSource.href} className={styles.dataSourceLink}>
+                {dataSource.label}
+              </Link>
+              .
+            </p>
+          ) : null}
+          <SectionForm
+            type={section.type}
+            content={section.content}
+            onChange={onContentChange}
+            resolvedMedia={resolvedMedia}
+            onResolveMedia={onResolveMedia}
+          />
         </div>
       </div>
     </Reorder.Item>
@@ -85,12 +109,16 @@ export function SectionListEditor({
   onToggle,
   onRemove,
   onContentChange,
+  resolvedMedia,
+  onResolveMedia,
 }: {
   sections: ComposerSection[];
   onReorder: (sections: ComposerSection[]) => void;
   onToggle: (clientId: string) => void;
   onRemove: (clientId: string) => void;
   onContentChange: (clientId: string, content: Record<string, unknown>) => void;
+  resolvedMedia: Record<string, MediaPickerValue>;
+  onResolveMedia: (media: MediaPickerValue) => void;
 }) {
   return (
     <Reorder.Group axis="y" values={sections} onReorder={onReorder} className={styles.list}>
@@ -101,6 +129,8 @@ export function SectionListEditor({
           onToggle={() => onToggle(section.clientId)}
           onRemove={() => onRemove(section.clientId)}
           onContentChange={(content) => onContentChange(section.clientId, content)}
+          resolvedMedia={resolvedMedia}
+          onResolveMedia={onResolveMedia}
         />
       ))}
     </Reorder.Group>

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma, getLatestRevision, type FlatRevisionData } from "@portfolio/db/server";
 import { PostEditor } from "@/components/admin/post-editor";
+import { toMediaPickerValue, type MediaPickerValue } from "@/lib/admin/media";
 
 export default async function PostEditorRoute({
   params,
@@ -11,7 +12,7 @@ export default async function PostEditorRoute({
 
   const post = await prisma.post.findUnique({
     where: { id },
-    include: { tags: true, seo: true },
+    include: { tags: true, seo: true, coverImage: true },
   });
   if (!post) notFound();
 
@@ -22,6 +23,9 @@ export default async function PostEditorRoute({
   let excerpt = post.excerpt ?? "";
   let body = post.body ?? "";
   let tagNames = post.tags.map((tag) => tag.name);
+  let coverImage: MediaPickerValue | null = post.coverImage
+    ? toMediaPickerValue(post.coverImage)
+    : null;
   let authorId = post.authorId;
 
   if (latestDraft) {
@@ -34,6 +38,12 @@ export default async function PostEditorRoute({
       const draftTags = await prisma.tag.findMany({ where: { id: { in: data.tagIds } } });
       tagNames = draftTags.map((tag) => tag.name);
     }
+    if (data.coverImageId !== undefined) {
+      const media = data.coverImageId
+        ? await prisma.media.findUnique({ where: { id: data.coverImageId } })
+        : null;
+      coverImage = media ? toMediaPickerValue(media) : null;
+    }
   }
 
   return (
@@ -42,7 +52,7 @@ export default async function PostEditorRoute({
       postStatus={post.status}
       hasDraft={Boolean(latestDraft)}
       authors={authors}
-      initial={{ title, excerpt, body, tags: tagNames, authorId }}
+      initial={{ title, excerpt, body, tags: tagNames, coverImage, authorId }}
       seo={{
         metaTitle: post.seo?.metaTitle ?? null,
         metaDescription: post.seo?.metaDescription ?? null,

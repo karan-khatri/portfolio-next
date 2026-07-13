@@ -10,5 +10,6 @@ build
 .env.local
 .env.*.local
 packages/db/src/generated
+public/uploads
 .DS_Store
 npm-debug.log*

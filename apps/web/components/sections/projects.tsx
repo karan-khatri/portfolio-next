@@ -3,12 +3,14 @@ import { ArrowUpRightIcon } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
 import { SectionShell } from "./section-shell";
 import { EmptyState } from "./empty-state";
+import type { SectionImage } from "./hero";
 
 export interface ProjectListItem {
   id: string;
   slug: string;
   title: string;
   excerpt: string | null;
+  coverImage: SectionImage | null;
 }
 
 export function ProjectsSection({
@@ -41,6 +43,13 @@ export function ProjectsSection({
                   href={`/projects/${project.slug}`}
                   className="group flex h-full flex-col p-6 sm:p-8"
                 >
+                  {project.coverImage ? (
+                    <img
+                      src={project.coverImage.url}
+                      alt={project.coverImage.altText ?? ""}
+                      className="mb-4 aspect-4/3 w-full rounded-md object-cover"
+                    />
+                  ) : null}
                   <span className="font-mono text-xs text-muted-foreground">
                     {String(index + 1).padStart(2, "0")}
                   </span>

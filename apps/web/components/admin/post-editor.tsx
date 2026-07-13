@@ -26,8 +26,10 @@ import {
 } from "@/components/ui/select";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { TagInput } from "@/components/admin/tag-input";
+import { MediaPicker } from "@/components/admin/media-picker";
 import { SeoFieldsPanel } from "@/components/admin/seo-fields-panel";
 import { ComposerActionBar } from "@/components/admin/composer-action-bar";
+import type { MediaPickerValue } from "@/lib/admin/media";
 import styles from "./post-editor.module.scss";
 
 const NO_AUTHOR = "__none__";
@@ -38,6 +40,15 @@ interface SeoInitial {
   canonicalUrl: string | null;
   noindex: boolean;
   nofollow: boolean;
+}
+
+interface PostEditorInitial {
+  title: string;
+  excerpt: string;
+  body: string;
+  tags: string[];
+  coverImage: MediaPickerValue | null;
+  authorId: string | null;
 }
 
 export function PostEditor({
@@ -52,7 +63,7 @@ export function PostEditor({
   postStatus: string;
   hasDraft: boolean;
   authors: { id: string; name: string }[];
-  initial: PostFormInput;
+  initial: PostEditorInitial;
   seo: SeoInitial;
 }) {
   const router = useRouter();
@@ -60,12 +71,20 @@ export function PostEditor({
   const [excerpt, setExcerpt] = useState(initial.excerpt);
   const [body, setBody] = useState(initial.body);
   const [tags, setTags] = useState(initial.tags);
+  const [coverImage, setCoverImage] = useState(initial.coverImage);
   const [authorId, setAuthorId] = useState(initial.authorId ?? NO_AUTHOR);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   function toInput(): PostFormInput {
-    return { title, excerpt, body, tags, authorId: authorId === NO_AUTHOR ? null : authorId };
+    return {
+      title,
+      excerpt,
+      body,
+      tags,
+      coverImageId: coverImage?.id ?? null,
+      authorId: authorId === NO_AUTHOR ? null : authorId,
+    };
   }
 
   function handleSaveDraft() {
@@ -147,6 +166,7 @@ export function PostEditor({
             />
           </div>
           <TagInput label="Tags" value={tags} onChange={setTags} placeholder="Type a tag, press Enter" />
+          <MediaPicker label="Cover image" value={coverImage} onChange={setCoverImage} />
           <div className={styles.field}>
             <Label htmlFor="post-author">Author</Label>
             <Select value={authorId} onValueChange={(value) => setAuthorId(value ?? NO_AUTHOR)}>

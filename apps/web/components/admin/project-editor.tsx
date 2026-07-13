@@ -19,8 +19,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { TagInput } from "@/components/admin/tag-input";
+import { MediaPicker } from "@/components/admin/media-picker";
 import { SeoFieldsPanel } from "@/components/admin/seo-fields-panel";
 import { ComposerActionBar } from "@/components/admin/composer-action-bar";
+import type { MediaPickerValue } from "@/lib/admin/media";
 import styles from "./project-editor.module.scss";
 
 interface SeoInitial {
@@ -29,6 +31,17 @@ interface SeoInitial {
   canonicalUrl: string | null;
   noindex: boolean;
   nofollow: boolean;
+}
+
+interface ProjectEditorInitial {
+  title: string;
+  excerpt: string;
+  body: string;
+  tags: string[];
+  coverImage: MediaPickerValue | null;
+  codeRepository: string;
+  liveUrl: string;
+  programmingLanguages: string[];
 }
 
 export function ProjectEditor({
@@ -41,7 +54,7 @@ export function ProjectEditor({
   projectId: string;
   projectStatus: string;
   hasDraft: boolean;
-  initial: ProjectFormInput;
+  initial: ProjectEditorInitial;
   seo: SeoInitial;
 }) {
   const router = useRouter();
@@ -49,6 +62,7 @@ export function ProjectEditor({
   const [excerpt, setExcerpt] = useState(initial.excerpt);
   const [body, setBody] = useState(initial.body);
   const [tags, setTags] = useState(initial.tags);
+  const [coverImage, setCoverImage] = useState(initial.coverImage);
   const [codeRepository, setCodeRepository] = useState(initial.codeRepository);
   const [liveUrl, setLiveUrl] = useState(initial.liveUrl);
   const [programmingLanguages, setProgrammingLanguages] = useState(initial.programmingLanguages);
@@ -56,7 +70,16 @@ export function ProjectEditor({
   const [pending, startTransition] = useTransition();
 
   function toInput(): ProjectFormInput {
-    return { title, excerpt, body, tags, codeRepository, liveUrl, programmingLanguages };
+    return {
+      title,
+      excerpt,
+      body,
+      tags,
+      coverImageId: coverImage?.id ?? null,
+      codeRepository,
+      liveUrl,
+      programmingLanguages,
+    };
   }
 
   function handleSaveDraft() {
@@ -142,6 +165,7 @@ export function ProjectEditor({
             />
           </div>
           <TagInput label="Tags" value={tags} onChange={setTags} placeholder="Type a tag, press Enter" />
+          <MediaPicker label="Cover image" value={coverImage} onChange={setCoverImage} />
         </CardContent>
       </Card>
 
