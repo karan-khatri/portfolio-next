@@ -33,8 +33,8 @@ export function SectionShell({
       )}
     >
       {!isHero && eyebrow ? (
-        <span className="mb-4 block font-mono text-xs uppercase tracking-[0.15em] text-muted-foreground">
-          {eyebrow}
+        <span className="mb-4 block font-mono text-xs text-primary">
+          {`// ${eyebrow.toLowerCase()}`}
         </span>
       ) : null}
       <SectionHeading id={headingId} level={headingLevel} size={isHero ? "display" : "default"}>

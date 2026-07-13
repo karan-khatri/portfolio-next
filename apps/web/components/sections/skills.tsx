@@ -1,6 +1,5 @@
 import type { SkillsContent } from "@portfolio/sections";
 import { Reveal } from "@/components/motion/reveal";
-import { Badge } from "@/components/ui/badge";
 import { SectionShell } from "./section-shell";
 import { EmptyState } from "./empty-state";
 
@@ -27,13 +26,16 @@ function groupByCategory(items: SkillListItem[]) {
   return { ungrouped, grouped };
 }
 
-function SkillBadgeList({ items }: { items: SkillListItem[] }) {
+function SkillTileList({ items }: { items: SkillListItem[] }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-3">
       {items.map((item) => (
-        <Badge key={item.id} variant="outline" className="rounded-none font-mono text-xs tracking-wide uppercase">
+        <div
+          key={item.id}
+          className="glass-panel glow-primary rounded-lg px-4 py-3 font-mono text-sm text-foreground transition-all duration-300"
+        >
           {item.name}
-        </Badge>
+        </div>
       ))}
     </div>
   );
@@ -54,7 +56,7 @@ export function SkillsSection({
 
   return (
     <SectionShell
-      eyebrow="Skills"
+      eyebrow="Stack"
       headingId={id}
       headingLevel={headingLevel}
       heading={content.heading}
@@ -63,14 +65,14 @@ export function SkillsSection({
       {items.length === 0 ? (
         <EmptyState message="No skills listed yet." />
       ) : (
-        <Reveal className="space-y-6">
-          {ungrouped.length > 0 ? <SkillBadgeList items={ungrouped} /> : null}
+        <Reveal className="space-y-8">
+          {ungrouped.length > 0 ? <SkillTileList items={ungrouped} /> : null}
           {[...grouped.entries()].map(([category, categoryItems]) => (
-            <div key={category}>
-              <span className="mb-2 block font-mono text-xs text-muted-foreground uppercase">
+            <div key={category} className="space-y-3">
+              <span className="block font-mono text-xs tracking-wider text-muted-foreground uppercase">
                 {category}
               </span>
-              <SkillBadgeList items={categoryItems} />
+              <SkillTileList items={categoryItems} />
             </div>
           ))}
         </Reveal>

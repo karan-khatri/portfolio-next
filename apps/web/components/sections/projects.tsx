@@ -1,5 +1,5 @@
 import type { ProjectsContent } from "@portfolio/sections";
-import { ArrowUpRightIcon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
 import { SectionShell } from "./section-shell";
 import { EmptyState } from "./empty-state";
@@ -11,6 +11,9 @@ export interface ProjectListItem {
   title: string;
   excerpt: string | null;
   coverImage: SectionImage | null;
+  tags: string[];
+  codeRepository: string | null;
+  liveUrl: string | null;
 }
 
 export function ProjectsSection({
@@ -35,34 +38,61 @@ export function ProjectsSection({
       {items.length === 0 ? (
         <EmptyState message="No projects published yet." />
       ) : (
-        <ul className="grid gap-px bg-border sm:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {items.map((project, index) => (
-            <li key={project.id} className="bg-background">
+            <li key={project.id}>
               <Reveal delay={Math.min(index * 0.05, 0.3)} className="h-full">
-                <a
-                  href={`/projects/${project.slug}`}
-                  className="group flex h-full flex-col p-6 sm:p-8"
-                >
+                <div className="glass-panel glow-primary flex h-full flex-col rounded-xl p-6 transition-all duration-300 sm:p-8">
                   {project.coverImage ? (
                     <img
                       src={project.coverImage.url}
                       alt={project.coverImage.altText ?? ""}
-                      className="mb-4 aspect-4/3 w-full rounded-md object-cover"
+                      className="mb-4 aspect-4/3 w-full rounded-lg object-cover"
                     />
                   ) : null}
-                  <span className="font-mono text-xs text-muted-foreground">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className="mt-3 flex items-start justify-between gap-2 text-xl font-medium">
-                    {project.title}
-                    <ArrowUpRightIcon className="size-4 shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </span>
+                  <h3 className="font-heading text-xl font-medium">{project.title}</h3>
                   {project.excerpt ? (
-                    <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                       {project.excerpt}
                     </p>
                   ) : null}
-                </a>
+                  {project.tags.length > 0 ? (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {project.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="rounded-full border border-border bg-white/5 px-3 py-1 font-mono text-xs text-primary"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                  <div className="mt-auto flex gap-4 pt-6">
+                    {project.codeRepository ? (
+                      <a
+                        href={project.codeRepository}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="group flex items-center gap-2 font-mono text-xs text-primary"
+                      >
+                        View Repo
+                        <ArrowRightIcon className="size-3.5 transition-transform group-hover:translate-x-1" />
+                      </a>
+                    ) : null}
+                    {project.liveUrl ? (
+                      <a
+                        href={project.liveUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="group flex items-center gap-2 font-mono text-xs text-primary"
+                      >
+                        Live site
+                        <ArrowRightIcon className="size-3.5 transition-transform group-hover:translate-x-1" />
+                      </a>
+                    ) : null}
+                  </div>
+                </div>
               </Reveal>
             </li>
           ))}

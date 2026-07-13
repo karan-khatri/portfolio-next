@@ -117,34 +117,41 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-/* Public site only — dark editorial/technical brand, independent of the
+/* Public site only — dark "terminal/AI-engineer" brand, independent of the
    admin's next-themes light/dark toggle. Applied via `.theme-site` on the
    homepage's outer wrapper, never on <html>, so /admin/** is unaffected. */
 .theme-site {
-  --background: oklch(0.14 0.004 285);
-  --foreground: oklch(0.96 0.002 285);
-  --card: oklch(0.18 0.005 285);
+  --background: oklch(0.16 0.02 240);
+  --foreground: oklch(0.93 0.015 230);
+  --card: oklch(0.2 0.025 240 / 80%);
   --card-foreground: var(--foreground);
-  --popover: oklch(0.18 0.005 285);
+  --popover: oklch(0.2 0.025 240);
   --popover-foreground: var(--foreground);
-  --primary: var(--foreground);
-  --primary-foreground: var(--background);
-  --secondary: oklch(0.22 0.006 285);
-  --secondary-foreground: var(--foreground);
-  --muted: oklch(0.2 0.006 285);
-  --muted-foreground: oklch(0.66 0.01 285);
-  --accent: oklch(0.78 0.14 70);
-  --accent-foreground: oklch(0.15 0.02 70);
-  --border: oklch(1 0 0 / 12%);
+  --primary: oklch(0.87 0.15 175);
+  --primary-foreground: oklch(0.16 0.03 180);
+  --secondary: oklch(0.8 0.13 290);
+  --secondary-foreground: oklch(0.16 0.04 290);
+  --muted: oklch(0.24 0.02 240);
+  --muted-foreground: oklch(0.68 0.03 235);
+  --accent: oklch(0.87 0.15 175);
+  --accent-foreground: oklch(0.16 0.03 180);
+  --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.78 0.14 70);
+  --ring: oklch(0.87 0.15 175 / 50%);
+
+  /* Brand fonts, scoped here so only the public site picks them up —
+     next/font variables are declared in layout.tsx and available globally,
+     this just points the existing Tailwind theme keys at them. */
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+  --font-heading: var(--font-space-grotesk);
 
   /* Redeclare the derived radius scale, not just --radius: --radius-lg
      etc. are only declared once (at :root) as `var(--radius)` references,
      and while CSS custom properties do re-resolve var() chains per the
      cascade at each consuming element, being explicit here avoids relying
      on that chain surviving Tailwind's `@theme inline` processing. */
-  --radius: 0.125rem;
+  --radius: 0.5rem;
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -152,6 +159,25 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Glass-panel + dot-grid decorative treatment shared across the redesigned
+   sections — plain CSS since these are visual textures, not theme tokens
+   another component needs to consume via Tailwind utilities. */
+.theme-site {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.theme-site .glass-panel {
+  background-color: color-mix(in oklch, var(--card) 80%, transparent);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+}
+
+.theme-site .glow-primary:hover {
+  box-shadow: 0 0 20px oklch(0.87 0.15 175 / 20%);
+  border-color: oklch(0.87 0.15 175 / 40%);
 }
 
 @layer base {

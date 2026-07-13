@@ -1,4 +1,4 @@
-import { prisma, SectionType } from "@portfolio/db/server";
+import { prisma, SectionType, getSiteSettings } from "@portfolio/db/server";
 import { sectionRegistry } from "@portfolio/sections";
 import { HeroSection } from "./hero";
 import { AboutSection } from "./about";
@@ -68,9 +68,12 @@ async function renderSection(section: RenderableSection, locale: string) {
           slug: true,
           title: true,
           excerpt: true,
+          codeRepository: true,
+          liveUrl: true,
           coverImage: {
             select: { url: true, width: true, height: true, blurDataUrl: true, altText: true },
           },
+          tags: { select: { name: true } },
         },
       });
       return (
@@ -78,7 +81,10 @@ async function renderSection(section: RenderableSection, locale: string) {
           id={headingId}
           content={content as never}
           headingLevel={headingLevel}
-          items={projects}
+          items={projects.map((project) => ({
+            ...project,
+            tags: project.tags.map((tag) => tag.name),
+          }))}
         />
       );
     }
@@ -174,14 +180,18 @@ async function renderSection(section: RenderableSection, locale: string) {
         />
       );
     }
-    case SectionType.CONTACT:
+    case SectionType.CONTACT: {
+      const settings = await getSiteSettings();
       return (
         <ContactSection
           id={headingId}
           content={content as never}
           headingLevel={headingLevel}
+          githubUrl={settings.githubUrl}
+          linkedinUrl={settings.linkedinUrl}
         />
       );
+    }
     case SectionType.RESUME:
       return (
         <ResumeSection
@@ -207,12 +217,16 @@ export interface SectionNavItem {
 
 // Shared by SiteHeader (nav links) and SectionRenderer itself, so both
 // agree on ordering/labels instead of re-deriving them independently.
+// Hero is excluded — the nav wordmark already links to the top of the page,
+// so listing it again as its own nav item is redundant chrome.
 export function getSectionNavItems(sections: RenderableSection[]): SectionNavItem[] {
-  return enabledSections(sections).map((section) => {
-    const def = sectionRegistry[section.type];
-    const content = def.schema.parse(section.content) as { heading: string };
-    return { id: `section-${section.id}`, label: content.heading, href: `#section-${section.id}` };
-  });
+  return enabledSections(sections)
+    .filter((section) => section.type !== SectionType.HERO)
+    .map((section) => {
+      const def = sectionRegistry[section.type];
+      const content = def.schema.parse(section.content) as { heading: string };
+      return { id: `section-${section.id}`, label: content.heading, href: `#section-${section.id}` };
+    });
 }
 
 export async function SectionRenderer({

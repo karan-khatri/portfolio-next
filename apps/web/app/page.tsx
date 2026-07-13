@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { prisma } from "@portfolio/db/server";
+import { prisma, getSiteSettings } from "@portfolio/db/server";
 import { SectionRenderer, getSectionNavItems } from "@/components/sections/section-renderer";
 import { MotionProvider } from "@/components/motion/motion-provider";
 import { SiteHeader } from "@/components/site-header";
@@ -50,10 +50,13 @@ export default async function HomePage() {
     );
   }
 
-  const configuredNav = await prisma.navigationItem.findMany({
-    where: { locale: LOCALE, parentId: null },
-    orderBy: { order: "asc" },
-  });
+  const [configuredNav, settings] = await Promise.all([
+    prisma.navigationItem.findMany({
+      where: { locale: LOCALE, parentId: null },
+      orderBy: { order: "asc" },
+    }),
+    getSiteSettings(),
+  ]);
   const navItems =
     configuredNav.length > 0
       ? configuredNav.map((item) => ({ id: item.id, label: item.label, href: item.href }))
@@ -67,13 +70,17 @@ export default async function HomePage() {
       >
         Skip to content
       </a>
-      <SiteHeader title={page.title} navItems={navItems} />
+      <SiteHeader title={settings.title} navItems={navItems} resumeUrl={settings.resumeUrl} />
       <MotionProvider>
-        <main id="main-content">
+        <main id="main-content" className="pt-20">
           <SectionRenderer sections={page.sections} locale={LOCALE} />
         </main>
       </MotionProvider>
-      <SiteFooter title={page.title} />
+      <SiteFooter
+        title={settings.title}
+        githubUrl={settings.githubUrl}
+        linkedinUrl={settings.linkedinUrl}
+      />
     </div>
   );
 }

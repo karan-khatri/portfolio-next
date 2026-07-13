@@ -15,10 +15,10 @@ export function SectionHeading({
 }) {
   const sizeClasses =
     size === "display"
-      ? "text-5xl sm:text-6xl lg:text-7xl font-semibold tracking-tight leading-[0.95]"
+      ? "font-heading text-5xl sm:text-6xl lg:text-7xl font-semibold tracking-tight leading-[0.95]"
       : level === 2
-        ? "text-3xl sm:text-4xl font-semibold tracking-tight"
-        : "text-2xl sm:text-3xl font-semibold tracking-tight";
+        ? "font-heading text-3xl sm:text-4xl font-semibold tracking-tight"
+        : "font-heading text-2xl sm:text-3xl font-semibold tracking-tight";
 
   const combined = cn(sizeClasses, className);
 

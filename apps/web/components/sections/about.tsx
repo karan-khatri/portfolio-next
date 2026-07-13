@@ -1,7 +1,15 @@
 import type { AboutContent } from "@portfolio/sections";
+import { GlobeIcon, GraduationCapIcon, MapPinIcon, TerminalIcon } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
 import { SectionShell } from "./section-shell";
 import type { SectionImage } from "./hero";
+
+const QUICK_FACTS = [
+  { icon: MapPinIcon, label: "Location — Florence, Italy" },
+  { icon: TerminalIcon, label: "Focus — Backend + AI/RAG" },
+  { icon: GraduationCapIcon, label: "Education — MSc, Univ. of Florence (2026)" },
+  { icon: GlobeIcon, label: "Status — Open to remote roles" },
+] as const;
 
 export function AboutSection({
   id,
@@ -18,22 +26,40 @@ export function AboutSection({
 
   return (
     <SectionShell eyebrow="About" headingId={id} headingLevel={headingLevel} heading={content.heading}>
-      <Reveal className="max-w-2xl space-y-4">
+      <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
+        <Reveal className="order-2 space-y-6 lg:order-1">
+          <div className="glass-panel glow-primary space-y-4 rounded-xl p-6 transition-all duration-300">
+            {paragraphs.map((paragraph, index) => (
+              <p key={index} className="text-lg leading-relaxed text-muted-foreground">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {QUICK_FACTS.map((fact) => (
+              <div
+                key={fact.label}
+                className="glass-panel flex items-center gap-3 rounded-lg p-4"
+              >
+                <fact.icon className="size-5 shrink-0 text-primary" />
+                <span className="font-mono text-xs text-muted-foreground">{fact.label}</span>
+              </div>
+            ))}
+          </div>
+        </Reveal>
+
         {image ? (
-          <img
-            src={image.url}
-            alt={image.altText ?? ""}
-            width={image.width}
-            height={image.height}
-            className="mb-6 aspect-video w-full rounded-xl object-cover"
-          />
+          <Reveal delay={0.1} className="order-1 lg:order-2">
+            <img
+              src={image.url}
+              alt={image.altText ?? ""}
+              width={image.width}
+              height={image.height}
+              className="glass-panel aspect-square w-full rounded-2xl object-cover lg:aspect-4/3"
+            />
+          </Reveal>
         ) : null}
-        {paragraphs.map((paragraph, index) => (
-          <p key={index} className="text-lg leading-relaxed text-foreground/90">
-            {paragraph}
-          </p>
-        ))}
-      </Reveal>
+      </div>
     </SectionShell>
   );
 }

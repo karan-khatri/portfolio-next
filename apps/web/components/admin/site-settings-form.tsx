@@ -14,12 +14,21 @@ import styles from "./site-settings-form.module.scss";
 export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
   const [title, setTitle] = useState(initial.title);
   const [description, setDescription] = useState(initial.description);
+  const [githubUrl, setGithubUrl] = useState(initial.githubUrl ?? "");
+  const [linkedinUrl, setLinkedinUrl] = useState(initial.linkedinUrl ?? "");
+  const [resumeUrl, setResumeUrl] = useState(initial.resumeUrl ?? "");
   const [pending, startTransition] = useTransition();
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     startTransition(async () => {
-      const result = await saveSiteSettingsAction({ title, description });
+      const result = await saveSiteSettingsAction({
+        title,
+        description,
+        githubUrl: githubUrl || null,
+        linkedinUrl: linkedinUrl || null,
+        resumeUrl: resumeUrl || null,
+      });
       if (result.error) toast.error(result.error);
       else toast.success("Settings saved");
     });
@@ -37,6 +46,36 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
           id="site-description"
           value={description}
           onChange={(event) => setDescription(event.target.value)}
+        />
+      </div>
+      <div className={styles.field}>
+        <Label htmlFor="site-github">GitHub URL</Label>
+        <Input
+          id="site-github"
+          type="url"
+          placeholder="https://github.com/your-username"
+          value={githubUrl}
+          onChange={(event) => setGithubUrl(event.target.value)}
+        />
+      </div>
+      <div className={styles.field}>
+        <Label htmlFor="site-linkedin">LinkedIn URL</Label>
+        <Input
+          id="site-linkedin"
+          type="url"
+          placeholder="https://linkedin.com/in/your-username"
+          value={linkedinUrl}
+          onChange={(event) => setLinkedinUrl(event.target.value)}
+        />
+      </div>
+      <div className={styles.field}>
+        <Label htmlFor="site-resume">Resume URL</Label>
+        <Input
+          id="site-resume"
+          type="url"
+          placeholder="Link to a hosted PDF, or upload one via Media"
+          value={resumeUrl}
+          onChange={(event) => setResumeUrl(event.target.value)}
         />
       </div>
       <Button type="submit" disabled={pending} className={styles.saveButton}>
