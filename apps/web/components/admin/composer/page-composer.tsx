@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowLeftIcon, CopyIcon, ExternalLinkIcon, Loader2Icon, PlusIcon } from "lucide-react";
+import { ArrowLeftIcon, CopyIcon, ExternalLinkIcon, PlusIcon } from "lucide-react";
 import type { SectionType } from "@portfolio/db";
 import { sectionRegistry } from "@portfolio/sections";
 import { SectionListEditor } from "./section-list";
@@ -19,7 +19,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -28,6 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { StatusBadge } from "@/components/admin/status-badge";
+import { ComposerActionBar } from "@/components/admin/composer-action-bar";
 import styles from "./page-composer.module.scss";
 
 export type { ComposerSection };
@@ -205,22 +205,13 @@ export function PageComposer({
         </div>
       ) : null}
 
-      <div className={styles.actionBar}>
-        <Button type="button" onClick={handlePublish} disabled={pending}>
-          Publish
-        </Button>
-        <Button type="button" variant="outline" onClick={handleSaveDraft} disabled={pending}>
-          {pending ? <Loader2Icon className={styles.spinner} /> : null}
-          Save draft
-        </Button>
-        <Button type="button" variant="ghost" onClick={handlePreview} disabled={pending}>
-          Preview
-        </Button>
-        <Separator orientation="vertical" className={styles.actionSeparator} />
-        <Button type="button" variant="destructive" onClick={handleUnpublish} disabled={pending}>
-          Unpublish
-        </Button>
-      </div>
+      <ComposerActionBar
+        pending={pending}
+        onSaveDraft={handleSaveDraft}
+        onPreview={handlePreview}
+        onPublish={handlePublish}
+        onUnpublish={handleUnpublish}
+      />
     </div>
   );
 }

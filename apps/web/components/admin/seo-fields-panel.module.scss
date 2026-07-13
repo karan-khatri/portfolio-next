@@ -1,0 +1,36 @@
+@use "../../styles/admin/mixins" as mix;
+
+.title {
+  font-size: 1rem;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.switchRow {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.switchField {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.saveButton {
+  width: fit-content;
+}
+
+.spinner {
+  @include mix.spinner;
+}

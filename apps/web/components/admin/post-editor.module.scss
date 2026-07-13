@@ -1,0 +1,17 @@
+@use "../../styles/admin/editor-chrome";
+
+@include editor-chrome.editor-chrome-styles;
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.bodyTextarea {
+  min-height: 10rem;
+}
+
+.authorSelect {
+  width: 16rem;
+}

@@ -1,0 +1,23 @@
+@use "../../styles/admin/editor-chrome";
+
+@include editor-chrome.editor-chrome-styles;
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fieldRow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem 1.25rem;
+
+  @media (min-width: 40rem) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.bodyTextarea {
+  min-height: 10rem;
+}

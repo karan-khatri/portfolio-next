@@ -2,12 +2,38 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboardIcon, FileTextIcon, LogOutIcon } from "lucide-react";
+import {
+  LayoutDashboardIcon,
+  FileTextIcon,
+  FolderKanbanIcon,
+  NewspaperIcon,
+  BriefcaseIcon,
+  SparklesIcon,
+  WrenchIcon,
+  QuoteIcon,
+  LogOutIcon,
+} from "lucide-react";
 import styles from "./admin-shell.module.scss";
 
-const NAV_ITEMS = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboardIcon },
-  { href: "/admin/pages", label: "Pages", icon: FileTextIcon },
+const NAV_GROUPS = [
+  {
+    label: "Content",
+    items: [
+      { href: "/admin", label: "Dashboard", icon: LayoutDashboardIcon },
+      { href: "/admin/pages", label: "Pages", icon: FileTextIcon },
+      { href: "/admin/projects", label: "Projects", icon: FolderKanbanIcon },
+      { href: "/admin/posts", label: "Posts", icon: NewspaperIcon },
+    ],
+  },
+  {
+    label: "Profile",
+    items: [
+      { href: "/admin/experience", label: "Experience", icon: BriefcaseIcon },
+      { href: "/admin/skills", label: "Skills", icon: SparklesIcon },
+      { href: "/admin/services", label: "Services", icon: WrenchIcon },
+      { href: "/admin/testimonials", label: "Testimonials", icon: QuoteIcon },
+    ],
+  },
 ];
 
 export function AdminShell({
@@ -34,23 +60,28 @@ export function AdminShell({
         </div>
 
         <nav className={styles.nav}>
-          {NAV_ITEMS.map((item) => {
-            const active =
-              item.href === "/admin" ? pathname === item.href : pathname.startsWith(item.href);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                data-active={active || undefined}
-                className={styles.navLink}
-                title={item.label}
-              >
-                <Icon className={styles.navIcon} />
-                <span className={styles.navLabel}>{item.label}</span>
-              </Link>
-            );
-          })}
+          {NAV_GROUPS.map((group) => (
+            <div key={group.label} className={styles.navGroup}>
+              <span className={styles.navGroupLabel}>{group.label}</span>
+              {group.items.map((item) => {
+                const active =
+                  item.href === "/admin" ? pathname === item.href : pathname.startsWith(item.href);
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    data-active={active || undefined}
+                    className={styles.navLink}
+                    title={item.label}
+                  >
+                    <Icon className={styles.navIcon} />
+                    <span className={styles.navLabel}>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
 
         <div className={styles.sidebarFooter}>

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { PlusIcon } from "lucide-react";
 import { prisma } from "@portfolio/db/server";
-import { CreatePageForm } from "@/components/admin/create-page-form";
+import { CreateSlugContentForm } from "@/components/admin/create-slug-content-form";
 import { StatusBadge } from "@/components/admin/status-badge";
+import { createPageAction } from "./actions";
 import { formatRelativeTime } from "@/lib/admin/format-relative-time";
 import { Card, CardContent } from "@/components/ui/card";
 import styles from "./page.module.scss";
@@ -44,7 +45,7 @@ export default async function AdminPagesListPage() {
           New page
         </summary>
         <div className={styles.createBody}>
-          <CreatePageForm />
+          <CreateSlugContentForm action={createPageAction} submitLabel="Create page" slugPlaceholder="home" />
         </div>
       </details>
     </div>

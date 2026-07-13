@@ -1,0 +1,87 @@
+@use "mixins" as mix;
+
+// Shared by every content editor (Page, Project, Post) — the back link +
+// title row header, the basic field stack, and the preview-link box. Each
+// editor's own .module.scss still defines its content-specific classes
+// (section list, flat field groups, etc.) alongside this.
+@mixin editor-chrome-styles {
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding-bottom: 1rem;
+  }
+
+  .header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    width: fit-content;
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: var(--foreground);
+    }
+  }
+
+  .backIcon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .titleRow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .heading {
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .previewBox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--muted);
+    font-size: 0.875rem;
+  }
+
+  .previewLink {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 0.375rem;
+    min-width: 0;
+    @include mix.truncate;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .previewIcon {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex-shrink: 0;
+  }
+}

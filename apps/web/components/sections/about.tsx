@@ -6,11 +6,11 @@ export function AboutSection({
   id,
   content,
   headingLevel,
-}: {
+}: Readonly<{
   id: string;
   content: AboutContent;
   headingLevel: 2 | 3;
-}) {
+}>) {
   const paragraphs = content.body.split(/\n{2,}/).filter(Boolean);
 
   return (

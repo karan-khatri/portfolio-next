@@ -1,0 +1,127 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import {
+  saveDraft,
+  publishRevision,
+  unpublishEntity,
+  createPreviewToken,
+  resolveTagIds,
+  type FlatRevisionData,
+} from "@portfolio/db/server";
+import { getCurrentUser } from "@/lib/auth/session";
+
+export interface ComposerActionResult {
+  error?: string;
+  revisionId?: string;
+  previewToken?: string;
+}
+
+export interface ProjectFormInput {
+  title: string;
+  excerpt: string;
+  body: string;
+  tags: string[];
+  codeRepository: string;
+  liveUrl: string;
+  programmingLanguages: string[];
+}
+
+async function requireEditor() {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("Unauthorized");
+  return user;
+}
+
+async function buildData(input: ProjectFormInput): Promise<FlatRevisionData> {
+  const tagIds = await resolveTagIds(input.tags);
+  return {
+    title: input.title,
+    excerpt: input.excerpt || null,
+    body: input.body || null,
+    tagIds,
+    codeRepository: input.codeRepository || null,
+    liveUrl: input.liveUrl || null,
+    programmingLanguages: input.programmingLanguages,
+  };
+}
+
+export async function saveDraftAction(
+  projectId: string,
+  input: ProjectFormInput,
+): Promise<ComposerActionResult> {
+  try {
+    const user = await requireEditor();
+    const data = await buildData(input);
+    const revision = await saveDraft({
+      entityType: "Project",
+      entityId: projectId,
+      data,
+      userId: user.id,
+    });
+    return { revisionId: revision.id };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Could not save draft" };
+  }
+}
+
+export async function publishAction(
+  projectId: string,
+  input: ProjectFormInput,
+): Promise<ComposerActionResult> {
+  try {
+    const user = await requireEditor();
+    const data = await buildData(input);
+    const revision = await saveDraft({
+      entityType: "Project",
+      entityId: projectId,
+      data,
+      userId: user.id,
+    });
+    await publishRevision({
+      entityType: "Project",
+      entityId: projectId,
+      revisionId: revision.id,
+      userId: user.id,
+    });
+    revalidatePath("/");
+    return { revisionId: revision.id };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Could not publish" };
+  }
+}
+
+export async function unpublishAction(projectId: string): Promise<ComposerActionResult> {
+  try {
+    const user = await requireEditor();
+    await unpublishEntity({ entityType: "Project", entityId: projectId, userId: user.id });
+    revalidatePath("/");
+    return {};
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Could not unpublish" };
+  }
+}
+
+export async function createPreviewAction(
+  projectId: string,
+  input: ProjectFormInput,
+): Promise<ComposerActionResult> {
+  try {
+    const user = await requireEditor();
+    const data = await buildData(input);
+    const revision = await saveDraft({
+      entityType: "Project",
+      entityId: projectId,
+      data,
+      userId: user.id,
+    });
+    const preview = await createPreviewToken({
+      entityType: "Project",
+      entityId: projectId,
+      revisionId: revision.id,
+    });
+    return { revisionId: revision.id, previewToken: preview.token };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Could not create preview" };
+  }
+}
