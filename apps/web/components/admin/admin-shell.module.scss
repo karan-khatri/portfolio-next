@@ -4,7 +4,7 @@
 .shell {
   display: flex;
   min-height: 100vh;
-  background: var(--muted);
+  background: var(--background);
 }
 
 .sidebar {
@@ -16,7 +16,7 @@
   height: 100vh;
   flex-shrink: 0;
   border-right: 1px solid var(--border);
-  background: var(--background);
+  background: var(--muted);
 
   @media (max-width: vars.$breakpoint-collapse) {
     width: vars.$sidebar-width-collapsed;
@@ -26,15 +26,33 @@
 .sidebarHeader {
   display: flex;
   align-items: center;
+  gap: 0.625rem;
   height: 3.5rem;
   padding-inline: 1.25rem;
   border-bottom: 1px solid var(--border);
 }
 
+.logoMark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: var(--accent-foreground);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
 .wordmark {
-  font-size: 0.8125rem;
+  font-family: var(--font-heading);
+  font-size: 0.9375rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+  color: var(--primary);
 
   @media (max-width: vars.$breakpoint-collapse) {
     display: none;
@@ -47,6 +65,7 @@
   gap: 1.25rem;
   flex: 1;
   padding: 0.75rem;
+  overflow-y: auto;
 }
 
 .navGroup {
@@ -56,12 +75,9 @@
 }
 
 .navGroupLabel {
+  @include mix.label-mono;
   padding: 0 0.75rem 0.375rem;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted-foreground);
+  color: var(--outline);
 
   @media (max-width: vars.$breakpoint-collapse) {
     position: absolute;
@@ -82,6 +98,7 @@
   gap: 0.625rem;
   padding: 0.5rem 0.75rem;
   border-radius: var(--radius-md);
+  border-left: 2px solid transparent;
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--muted-foreground);
@@ -90,7 +107,7 @@
     color 0.15s ease;
 
   &:hover {
-    background: var(--muted);
+    background: var(--surface-high);
     color: var(--foreground);
   }
 
@@ -99,8 +116,9 @@
   }
 
   &[data-active] {
-    background: var(--muted);
-    color: var(--foreground);
+    background: var(--secondary);
+    color: var(--primary);
+    border-left-color: var(--primary);
     font-weight: 600;
   }
 }
@@ -135,7 +153,8 @@
 
 .userEmail {
   padding-inline: 0.75rem;
-  font-size: 0.8125rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
   color: var(--muted-foreground);
   @include mix.truncate;
 
@@ -162,13 +181,163 @@
     color 0.15s ease;
 
   &:hover {
-    background: var(--muted);
-    color: var(--foreground);
+    background: var(--surface-high);
+    color: var(--destructive);
   }
 
   &:focus-visible {
     @include mix.focus-ring;
   }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: vars.$topbar-height;
+  padding-inline: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in oklch, var(--background) 90%, transparent);
+  backdrop-filter: blur(8px);
+  flex-shrink: 0;
+}
+
+.topbarTitle {
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.topbarActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.searchWrap {
+  position: relative;
+  display: none;
+  align-items: center;
+
+  @media (min-width: 48rem) {
+    display: flex;
+  }
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.5rem;
+  width: 1rem;
+  height: 1rem;
+  color: var(--muted-foreground);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 12rem;
+  height: 1.75rem;
+  padding-left: 1.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--foreground);
+  font-size: 0.8125rem;
+  outline: none;
+
+  &::placeholder {
+    color: var(--outline);
+  }
+}
+
+.iconButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    background: var(--surface-high);
+    color: var(--primary);
+  }
+
+  &:focus-visible {
+    @include mix.focus-ring;
+  }
+}
+
+.topbarIcon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.iconDot {
+  position: absolute;
+  top: 0.3rem;
+  right: 0.3rem;
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 999px;
+  background: var(--primary);
+}
+
+.publishButton {
+  padding: 0.3125rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  @media (max-width: 48rem) {
+    display: none;
+  }
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-high);
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
 }
 
 .content {

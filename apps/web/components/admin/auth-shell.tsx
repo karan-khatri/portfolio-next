@@ -1,3 +1,4 @@
+import { LayoutDashboardIcon } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -17,10 +18,13 @@ export function AuthShell({
   children: React.ReactNode;
 }) {
   return (
-    <main className={styles.page}>
+    <main className={`theme-admin ${styles.page}`}>
+      <div className={styles.glow} aria-hidden="true" />
       <div className={styles.frame}>
-        <div className={styles.wordmarkRow}>
-          <span className={styles.wordmark}>Portfolio Admin</span>
+        <div className={styles.badgeRow}>
+          <span className={styles.badge}>
+            <LayoutDashboardIcon className={styles.badgeIcon} />
+          </span>
         </div>
         <Card className={styles.card}>
           <CardHeader>
@@ -29,6 +33,7 @@ export function AuthShell({
           </CardHeader>
           <CardContent>{children}</CardContent>
         </Card>
+        <p className={styles.wordmark}>Portfolio Admin</p>
       </div>
     </main>
   );

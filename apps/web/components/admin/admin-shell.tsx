@@ -18,7 +18,11 @@ import {
   SettingsIcon,
   UsersIcon,
   LogOutIcon,
+  SearchIcon,
+  BellIcon,
+  HelpCircleIcon,
 } from "lucide-react";
+import { initialsFromEmail } from "@/lib/admin/initials";
 import styles from "./admin-shell.module.scss";
 
 const NAV_GROUPS = [
@@ -53,6 +57,8 @@ const NAV_GROUPS = [
   },
 ];
 
+const ALL_NAV_ITEMS = NAV_GROUPS.flatMap((group) => group.items);
+
 export function AdminShell({
   userEmail,
   children,
@@ -63,6 +69,12 @@ export function AdminShell({
   const pathname = usePathname();
   const router = useRouter();
 
+  const currentLabel =
+    [...ALL_NAV_ITEMS]
+      .sort((a, b) => b.href.length - a.href.length)
+      .find((item) => (item.href === "/admin" ? pathname === item.href : pathname.startsWith(item.href)))
+      ?.label ?? "Portfolio Admin";
+
   async function handleSignOut() {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/admin/login");
@@ -70,9 +82,10 @@ export function AdminShell({
   }
 
   return (
-    <div className={styles.shell}>
+    <div className={`theme-admin ${styles.shell}`}>
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
+          <span className={styles.logoMark}>P</span>
           <span className={styles.wordmark}>Portfolio Admin</span>
         </div>
 
@@ -112,7 +125,31 @@ export function AdminShell({
         </div>
       </aside>
 
-      <main className={styles.content}>{children}</main>
+      <div className={styles.main}>
+        <header className={styles.topbar}>
+          <span className={styles.topbarTitle}>{currentLabel}</span>
+          <div className={styles.topbarActions}>
+            <div className={styles.searchWrap}>
+              <SearchIcon className={styles.searchIcon} />
+              <input className={styles.searchInput} placeholder="Search…" type="text" readOnly />
+            </div>
+            <button type="button" className={styles.iconButton} aria-label="Notifications">
+              <BellIcon className={styles.topbarIcon} />
+              <span className={styles.iconDot} aria-hidden="true" />
+            </button>
+            <button type="button" className={styles.iconButton} aria-label="Help">
+              <HelpCircleIcon className={styles.topbarIcon} />
+            </button>
+            <button type="button" className={styles.publishButton}>
+              Publish Changes
+            </button>
+            <span className={styles.avatar} title={userEmail}>
+              {initialsFromEmail(userEmail)}
+            </span>
+          </div>
+        </header>
+        <main className={styles.content}>{children}</main>
+      </div>
     </div>
   );
 }
