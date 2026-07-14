@@ -34,16 +34,18 @@ export function ServicesSection({
         <ul className="grid gap-6 sm:grid-cols-3">
           {items.map((item, index) => (
             <li key={item.id}>
-              <Reveal delay={Math.min(index * 0.05, 0.3)} className="border border-border p-6">
-                <span className="font-mono text-2xl text-muted-foreground">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <p className="mt-3 font-medium">{item.title}</p>
-                {item.description ? (
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {item.description}
-                  </p>
-                ) : null}
+              <Reveal delay={Math.min(index * 0.05, 0.3)} className="h-full">
+                <div className="glass-panel glow-primary h-full rounded-xl p-6 transition-all duration-300">
+                  <span className="font-mono text-xs text-primary">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <p className="font-heading mt-3 text-lg font-medium">{item.title}</p>
+                  {item.description ? (
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                      {item.description}
+                    </p>
+                  ) : null}
+                </div>
               </Reveal>
             </li>
           ))}
