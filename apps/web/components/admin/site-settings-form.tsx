@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Loader2Icon } from "lucide-react";
+import { CodeIcon, Loader2Icon, BriefcaseIcon, FileTextIcon, SaveIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +18,14 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
   const [linkedinUrl, setLinkedinUrl] = useState(initial.linkedinUrl ?? "");
   const [resumeUrl, setResumeUrl] = useState(initial.resumeUrl ?? "");
   const [pending, startTransition] = useTransition();
+
+  function handleReset() {
+    setTitle(initial.title);
+    setDescription(initial.description);
+    setGithubUrl(initial.githubUrl ?? "");
+    setLinkedinUrl(initial.linkedinUrl ?? "");
+    setResumeUrl(initial.resumeUrl ?? "");
+  }
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -36,52 +44,77 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
-      <div className={styles.field}>
-        <Label htmlFor="site-title">Site title</Label>
-        <Input id="site-title" value={title} onChange={(event) => setTitle(event.target.value)} />
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Site Identity</h2>
+        <div className={styles.field}>
+          <Label htmlFor="site-title">Site title</Label>
+          <Input id="site-title" value={title} onChange={(event) => setTitle(event.target.value)} />
+        </div>
+        <div className={styles.field}>
+          <Label htmlFor="site-description">Site description</Label>
+          <Textarea
+            id="site-description"
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+          />
+        </div>
+      </section>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>External Links</h2>
+        <div className={styles.field}>
+          <Label htmlFor="site-github">GitHub URL</Label>
+          <div className={styles.inputWrap}>
+            <CodeIcon className={styles.inputIcon} />
+            <Input
+              id="site-github"
+              type="url"
+              placeholder="https://github.com/your-username"
+              className={styles.inputWithIcon}
+              value={githubUrl}
+              onChange={(event) => setGithubUrl(event.target.value)}
+            />
+          </div>
+        </div>
+        <div className={styles.field}>
+          <Label htmlFor="site-linkedin">LinkedIn URL</Label>
+          <div className={styles.inputWrap}>
+            <BriefcaseIcon className={styles.inputIcon} />
+            <Input
+              id="site-linkedin"
+              type="url"
+              placeholder="https://linkedin.com/in/your-username"
+              className={styles.inputWithIcon}
+              value={linkedinUrl}
+              onChange={(event) => setLinkedinUrl(event.target.value)}
+            />
+          </div>
+        </div>
+        <div className={styles.field}>
+          <Label htmlFor="site-resume">Resume URL</Label>
+          <div className={styles.inputWrap}>
+            <FileTextIcon className={styles.inputIcon} />
+            <Input
+              id="site-resume"
+              type="url"
+              placeholder="Link to a hosted PDF, or upload one via Media"
+              className={styles.inputWithIcon}
+              value={resumeUrl}
+              onChange={(event) => setResumeUrl(event.target.value)}
+            />
+          </div>
+        </div>
+      </section>
+
+      <div className={styles.actions}>
+        <Button type="button" variant="outline" onClick={handleReset} disabled={pending}>
+          Cancel
+        </Button>
+        <Button type="submit" disabled={pending}>
+          {pending ? <Loader2Icon className={styles.spinner} /> : <SaveIcon />}
+          Save changes
+        </Button>
       </div>
-      <div className={styles.field}>
-        <Label htmlFor="site-description">Site description</Label>
-        <Textarea
-          id="site-description"
-          value={description}
-          onChange={(event) => setDescription(event.target.value)}
-        />
-      </div>
-      <div className={styles.field}>
-        <Label htmlFor="site-github">GitHub URL</Label>
-        <Input
-          id="site-github"
-          type="url"
-          placeholder="https://github.com/your-username"
-          value={githubUrl}
-          onChange={(event) => setGithubUrl(event.target.value)}
-        />
-      </div>
-      <div className={styles.field}>
-        <Label htmlFor="site-linkedin">LinkedIn URL</Label>
-        <Input
-          id="site-linkedin"
-          type="url"
-          placeholder="https://linkedin.com/in/your-username"
-          value={linkedinUrl}
-          onChange={(event) => setLinkedinUrl(event.target.value)}
-        />
-      </div>
-      <div className={styles.field}>
-        <Label htmlFor="site-resume">Resume URL</Label>
-        <Input
-          id="site-resume"
-          type="url"
-          placeholder="Link to a hosted PDF, or upload one via Media"
-          value={resumeUrl}
-          onChange={(event) => setResumeUrl(event.target.value)}
-        />
-      </div>
-      <Button type="submit" disabled={pending} className={styles.saveButton}>
-        {pending ? <Loader2Icon className={styles.spinner} /> : null}
-        Save
-      </Button>
     </form>
   );
 }

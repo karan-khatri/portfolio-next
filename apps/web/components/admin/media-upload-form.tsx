@@ -2,7 +2,7 @@
 
 import { useId, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Loader2Icon, UploadIcon } from "lucide-react";
+import { CloudUploadIcon, Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,8 +38,13 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (media: MediaPicke
       <div className={styles.field}>
         <Label htmlFor={fileInputId}>Image</Label>
         <label htmlFor={fileInputId} className={styles.fileTrigger}>
-          <UploadIcon className={styles.fileIcon} />
-          {fileName ?? "Choose an image (JPEG, PNG, WebP, GIF — up to 8MB)"}
+          <span className={styles.fileIconWrap}>
+            <CloudUploadIcon className={styles.fileIcon} />
+          </span>
+          <span className={styles.fileTitle}>{fileName ?? "Upload media"}</span>
+          <span className={styles.fileHint}>
+            {fileName ? "Ready to upload" : "Click to browse — JPEG, PNG, WebP, GIF, up to 8MB"}
+          </span>
         </label>
         <input
           id={fileInputId}

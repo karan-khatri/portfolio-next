@@ -17,9 +17,14 @@
 }
 
 .itemCard {
-  border: 1px solid var(--border);
+  @include mix.glass-panel;
   border-radius: var(--radius-lg);
-  background: var(--card);
+  transition: border-color 0.15s ease;
+
+  &[open] {
+    border-left: 2px solid var(--primary);
+    background: var(--popover);
+  }
 }
 
 .itemSummary {
@@ -44,14 +49,20 @@
   width: 1.75rem;
   height: 1.75rem;
   border-radius: var(--radius-md);
-  color: var(--muted-foreground);
+  color: var(--outline);
   background: transparent;
   border: none;
   cursor: grab;
   touch-action: none;
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
+
+  .itemCard:hover & {
+    opacity: 1;
+  }
 
   &:hover {
-    background: var(--muted);
+    background: var(--surface-high);
     color: var(--foreground);
   }
 
@@ -80,7 +91,8 @@
 }
 
 .secondary {
-  font-size: 0.8125rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
   color: var(--muted-foreground);
   @include mix.truncate;
 }
@@ -129,9 +141,15 @@
 .createDisclosure {
   border: 1px dashed var(--border);
   border-radius: var(--radius-lg);
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: color-mix(in oklch, var(--primary) 50%, transparent);
+  }
 
   &[open] {
     border-style: solid;
+    border-color: var(--border);
   }
 }
 
@@ -152,7 +170,7 @@
   }
 
   &:hover {
-    color: var(--foreground);
+    color: var(--primary);
   }
 }
 

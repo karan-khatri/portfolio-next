@@ -3,8 +3,26 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 2rem;
   max-width: 32rem;
+  padding: 2rem;
+  border-radius: var(--radius-xl);
+  @include mix.glass-panel;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.sectionTitle {
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--primary);
 }
 
 .field {
@@ -13,8 +31,31 @@
   gap: 0.375rem;
 }
 
-.saveButton {
-  width: fit-content;
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 0.75rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--muted-foreground);
+  pointer-events: none;
+}
+
+.inputWrap > .inputWithIcon {
+  padding-left: 2.5rem !important;
+  font-family: var(--font-mono);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
 }
 
 .spinner {

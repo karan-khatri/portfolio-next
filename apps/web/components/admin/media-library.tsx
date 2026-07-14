@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Trash2Icon } from "lucide-react";
+import { AlertTriangleIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -70,7 +70,11 @@ function DeleteMediaDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Delete &ldquo;{media.filename}&rdquo;?</DialogTitle>
-          <DialogDescription>
+          <DialogDescription>This action cannot be undone.</DialogDescription>
+        </DialogHeader>
+        <div className={styles.usageWarning}>
+          <AlertTriangleIcon className={styles.usageWarningIcon} />
+          <span className={styles.usageWarningText}>
             {usage ? (
               <>
                 Currently referenced by: {formatUsage(usage)}. Deleting will remove it from those
@@ -80,8 +84,8 @@ function DeleteMediaDialog({
             ) : (
               "Checking usage…"
             )}
-          </DialogDescription>
-        </DialogHeader>
+          </span>
+        </div>
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Cancel

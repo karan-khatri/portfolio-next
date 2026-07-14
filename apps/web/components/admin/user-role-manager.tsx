@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { formatRelativeTime } from "@/lib/admin/format-relative-time";
+import { initialsFromEmail } from "@/lib/admin/initials";
 import { assignRoleAction, revokeRoleAction } from "@/app/admin/(protected)/users/actions";
 import styles from "./user-role-manager.module.scss";
 
@@ -81,6 +82,9 @@ function UserRow({
   return (
     <details className={styles.itemCard}>
       <summary className={styles.itemSummary}>
+        <span className={styles.avatar} aria-hidden="true">
+          {initialsFromEmail(user.email)}
+        </span>
         <span className={styles.summaryText}>
           <span className={styles.email}>{user.email}</span>
           <span className={styles.meta}>
