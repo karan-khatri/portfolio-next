@@ -1,14 +1,17 @@
 // Layout
-$sidebar-width: 15.5rem;
+$sidebar-width: 15rem;
 $sidebar-width-collapsed: 4rem;
 $breakpoint-collapse: 64rem;
 $content-max-width: 72rem;
+$topbar-height: 2.75rem;
+$row-height-md: 2.75rem;
+$row-height-sm: 2rem;
+$revision-sidebar-width: 18rem;
 
-// Semantic status colors — the shared shadcn theme (app/globals.css) is
-// neutral-only (no green/amber/red), so these live here rather than there.
-// Chosen at lightness/chroma values that read acceptably in both the
-// next-themes light and dark states without separate .dark overrides.
-$status-published: oklch(0.6 0.14 150);
-$status-draft: oklch(0.55 0.01 285);
-$status-scheduled: oklch(0.75 0.15 80);
-$status-archived: oklch(0.5 0.02 285);
+// Semantic status colors, matching the Obsidian theme's scheme (published =
+// primary teal, draft = neutral outline, scheduled = amber, archived =
+// destructive) — consumed by status-badge.module.scss via [data-status].
+$status-published: var(--primary);
+$status-draft: var(--outline);
+$status-scheduled: #f59e0b;
+$status-archived: var(--destructive);

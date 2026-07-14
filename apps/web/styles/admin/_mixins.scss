@@ -21,3 +21,17 @@
 
   animation: spin 1s linear infinite;
 }
+
+@mixin glass-panel {
+  background-color: color-mix(in oklch, var(--card) 80%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+}
+
+@mixin label-mono {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
