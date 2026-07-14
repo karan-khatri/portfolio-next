@@ -5,6 +5,7 @@ import { prisma } from "@portfolio/db/server";
 import { PublicShell } from "@/components/public-shell";
 import { getPublicNav } from "@/lib/public-nav";
 import { formatDate } from "@/lib/format-date";
+import { ProseContent } from "@/components/prose-content";
 
 const LOCALE = "en";
 
@@ -47,7 +48,6 @@ export default async function PostDetailPage({
   if (!post) notFound();
 
   const { navItems, settings } = await getPublicNav();
-  const paragraphs = (post.body ?? "").split(/\n{2,}/).filter(Boolean);
 
   return (
     <PublicShell
@@ -96,13 +96,9 @@ export default async function PostDetailPage({
           </div>
         ) : null}
 
-        {paragraphs.length > 0 ? (
-          <div className="mt-10 space-y-4 border-t border-border pt-10">
-            {paragraphs.map((paragraph, index) => (
-              <p key={index} className="text-lg leading-relaxed text-foreground/90">
-                {paragraph}
-              </p>
-            ))}
+        {post.body ? (
+          <div className="mt-10 border-t border-border pt-10">
+            <ProseContent html={post.body} />
           </div>
         ) : null}
       </article>
