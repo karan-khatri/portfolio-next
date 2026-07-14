@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { prisma, getSiteSettings } from "@portfolio/db/server";
-import { SectionRenderer, getSectionNavItems } from "@/components/sections/section-renderer";
-import { MotionProvider } from "@/components/motion/motion-provider";
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
+import { prisma } from "@portfolio/db/server";
+import { SectionRenderer } from "@/components/sections/section-renderer";
+import { PublicShell } from "@/components/public-shell";
+import { getPublicNav } from "@/lib/public-nav";
 
 const LOCALE = "en";
 
@@ -50,37 +49,17 @@ export default async function HomePage() {
     );
   }
 
-  const [configuredNav, settings] = await Promise.all([
-    prisma.navigationItem.findMany({
-      where: { locale: LOCALE, parentId: null },
-      orderBy: { order: "asc" },
-    }),
-    getSiteSettings(),
-  ]);
-  const navItems =
-    configuredNav.length > 0
-      ? configuredNav.map((item) => ({ id: item.id, label: item.label, href: item.href }))
-      : getSectionNavItems(page.sections);
+  const { navItems, settings } = await getPublicNav();
 
   return (
-    <div id="top" className="theme-site min-h-screen bg-background text-foreground">
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:text-accent-foreground"
-      >
-        Skip to content
-      </a>
-      <SiteHeader title={settings.title} navItems={navItems} resumeUrl={settings.resumeUrl} />
-      <MotionProvider>
-        <main id="main-content" className="pt-20">
-          <SectionRenderer sections={page.sections} locale={LOCALE} />
-        </main>
-      </MotionProvider>
-      <SiteFooter
-        title={settings.title}
-        githubUrl={settings.githubUrl}
-        linkedinUrl={settings.linkedinUrl}
-      />
-    </div>
+    <PublicShell
+      title={settings.title}
+      navItems={navItems}
+      resumeUrl={settings.resumeUrl}
+      githubUrl={settings.githubUrl}
+      linkedinUrl={settings.linkedinUrl}
+    >
+      <SectionRenderer sections={page.sections} locale={LOCALE} />
+    </PublicShell>
   );
 }
