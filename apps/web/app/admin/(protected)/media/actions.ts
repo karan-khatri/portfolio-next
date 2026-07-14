@@ -104,6 +104,6 @@ export async function getMediaUsageAction(id: string): Promise<MediaUsageCounts>
 
 export async function listMediaAction(): Promise<MediaPickerValue[]> {
   await requireEditor();
-  const media = await listMedia();
-  return media.map(toMediaPickerValue);
+  const { items } = await listMedia();
+  return items.map(toMediaPickerValue);
 }
