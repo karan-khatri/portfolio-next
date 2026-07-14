@@ -15,13 +15,23 @@ export async function getPublicNav(): Promise<{
     prisma.navigationItem.findMany({
       where: { locale: LOCALE, parentId: null },
       orderBy: { order: "asc" },
+      include: { children: { orderBy: { order: "asc" } } },
     }),
     getSiteSettings(),
   ]);
 
   if (configuredNav.length > 0) {
     return {
-      navItems: configuredNav.map((item) => ({ id: item.id, label: item.label, href: item.href })),
+      navItems: configuredNav.map((item) => ({
+        id: item.id,
+        label: item.label,
+        href: item.href,
+        children: item.children.map((child) => ({
+          id: child.id,
+          label: child.label,
+          href: child.href,
+        })),
+      })),
       settings,
     };
   }

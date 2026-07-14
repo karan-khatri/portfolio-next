@@ -213,6 +213,7 @@ export interface SectionNavItem {
   id: string;
   label: string;
   href: string;
+  children?: SectionNavItem[];
 }
 
 // Shared by SiteHeader (nav links) and SectionRenderer itself, so both
