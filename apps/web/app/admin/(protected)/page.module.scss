@@ -5,8 +5,10 @@
 }
 
 .heading {
+  font-family: var(--font-heading);
   font-size: 1.5rem;
   font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .section {
@@ -16,9 +18,12 @@
 }
 
 .sectionLabel {
-  font-size: 0.8125rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
   font-weight: 500;
-  color: var(--muted-foreground);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--outline);
 }
 
 .statGrid {

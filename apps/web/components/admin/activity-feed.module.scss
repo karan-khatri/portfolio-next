@@ -66,11 +66,13 @@
 }
 
 .action {
+  font-family: var(--font-mono);
   color: var(--muted-foreground);
 }
 
 .time {
   flex-shrink: 0;
+  font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: var(--muted-foreground);
+  color: var(--outline);
 }

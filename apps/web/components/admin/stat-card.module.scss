@@ -1,4 +1,5 @@
 @use "../../styles/admin/variables" as vars;
+@use "../../styles/admin/mixins" as mix;
 
 .link {
   display: block;
@@ -7,17 +8,35 @@
 }
 
 .card {
+  position: relative;
+  overflow: hidden;
   padding-inline: 1.25rem;
+  @include mix.glass-panel;
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
 
+  &::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    top: -1.5rem;
+    right: -1.5rem;
+    width: 6rem;
+    height: 6rem;
+    border-radius: 999px;
+    background: color-mix(in oklch, var(--primary) 8%, transparent);
+    pointer-events: none;
+  }
+
   .link:hover & {
-    border-color: var(--foreground);
+    border-color: color-mix(in oklch, var(--primary) 50%, transparent);
   }
 }
 
 .header {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -33,15 +52,18 @@
 .icon {
   width: 1rem;
   height: 1rem;
-  color: var(--muted-foreground);
+  color: var(--outline);
 }
 
 .title {
-  font-size: 0.875rem;
-  font-weight: 500;
+  @include mix.label-mono;
+  color: var(--muted-foreground);
 }
 
 .count {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-heading);
   font-size: 1.75rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
