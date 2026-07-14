@@ -50,7 +50,11 @@ export function ProjectsSection({
                       className="mb-4 aspect-4/3 w-full rounded-lg object-cover"
                     />
                   ) : null}
-                  <h3 className="font-heading text-xl font-medium">{project.title}</h3>
+                  <h3 className="font-heading text-xl font-medium">
+                    <a href={`/projects/${project.slug}`} className="hover:underline">
+                      {project.title}
+                    </a>
+                  </h3>
                   {project.excerpt ? (
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                       {project.excerpt}
