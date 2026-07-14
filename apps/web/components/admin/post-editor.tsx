@@ -27,6 +27,7 @@ import {
 import { StatusBadge } from "@/components/admin/status-badge";
 import { TagInput } from "@/components/admin/tag-input";
 import { MediaPicker } from "@/components/admin/media-picker";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { SeoFieldsPanel } from "@/components/admin/seo-fields-panel";
 import { ComposerActionBar } from "@/components/admin/composer-action-bar";
 import { RevisionHistoryPanel, type RevisionHistoryItem } from "@/components/admin/revision-history-panel";
@@ -176,12 +177,7 @@ export function PostEditor({
               </div>
               <div className={styles.field}>
                 <Label htmlFor="post-body">Body</Label>
-                <Textarea
-                  id="post-body"
-                  value={body}
-                  onChange={(event) => setBody(event.target.value)}
-                  className={styles.bodyTextarea}
-                />
+                <RichTextEditor value={body} onChange={setBody} placeholder="Write the post…" />
               </div>
               <TagInput label="Tags" value={tags} onChange={setTags} placeholder="Type a tag, press Enter" />
               <MediaPicker label="Cover image" value={coverImage} onChange={setCoverImage} />
