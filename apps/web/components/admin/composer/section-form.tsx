@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MediaPicker } from "@/components/admin/media-picker";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import type { MediaPickerValue } from "@/lib/admin/media";
 import styles from "./section-form.module.scss";
 
@@ -58,6 +59,17 @@ export function SectionForm({
                 value={typeof value === "string" ? value : ""}
                 required={field.required}
                 onChange={(event) => setField(field.key, event.target.value)}
+              />
+            </div>
+          );
+        }
+        if (field.type === "richtext") {
+          return (
+            <div key={field.key} className={`${styles.field} ${styles.fieldWide}`}>
+              <Label htmlFor={fieldId}>{field.label}</Label>
+              <RichTextEditor
+                value={typeof value === "string" ? value : ""}
+                onChange={(html) => setField(field.key, html)}
               />
             </div>
           );

@@ -3,7 +3,7 @@ import { SectionType } from "@portfolio/db";
 export interface SectionField {
   key: string;
   label: string;
-  type: "text" | "textarea" | "email" | "number" | "image";
+  type: "text" | "textarea" | "richtext" | "email" | "number" | "image";
   required?: boolean;
 }
 
@@ -21,7 +21,7 @@ export const sectionFields: Record<SectionType, SectionField[]> = {
   ],
   [SectionType.ABOUT]: [
     { key: "heading", label: "Heading", type: "text", required: true },
-    { key: "body", label: "Body", type: "textarea", required: true },
+    { key: "body", label: "Body", type: "richtext", required: true },
     { key: "imageId", label: "Image", type: "image" },
   ],
   [SectionType.PROJECTS]: [
