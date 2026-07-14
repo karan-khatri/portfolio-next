@@ -174,69 +174,75 @@ export function PageComposer({
         </div>
       </div>
 
-      <Card>
-        <CardContent>
-          <div className={styles.field}>
-            <Label htmlFor="page-title">Title</Label>
-            <Input
-              id="page-title"
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-            />
+      <div className={styles.layout}>
+        <div className={styles.mainColumn}>
+          <Card>
+            <CardContent>
+              <div className={styles.field}>
+                <Label htmlFor="page-title">Title</Label>
+                <Input
+                  id="page-title"
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <SectionListEditor
+            sections={sections}
+            onReorder={setSections}
+            onToggle={toggleSection}
+            onRemove={removeSection}
+            onContentChange={updateContent}
+            resolvedMedia={resolvedMedia}
+            onResolveMedia={resolveMedia}
+          />
+
+          <div className={styles.addSectionRow}>
+            <Select value={newSectionType} onValueChange={(value) => setNewSectionType(value as SectionType)}>
+              <SelectTrigger className={styles.addSectionSelect}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ALL_SECTION_TYPES.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {sectionRegistry[type].label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button type="button" variant="outline" onClick={addSection}>
+              <PlusIcon />
+              Add section
+            </Button>
           </div>
-        </CardContent>
-      </Card>
 
-      <SectionListEditor
-        sections={sections}
-        onReorder={setSections}
-        onToggle={toggleSection}
-        onRemove={removeSection}
-        onContentChange={updateContent}
-        resolvedMedia={resolvedMedia}
-        onResolveMedia={resolveMedia}
-      />
+          {previewUrl ? (
+            <div className={styles.previewBox}>
+              <a href={previewUrl} target="_blank" rel="noreferrer" className={styles.previewLink}>
+                {previewUrl}
+                <ExternalLinkIcon className={styles.previewIcon} />
+              </a>
+              <Button type="button" variant="ghost" size="icon-sm" onClick={copyPreviewLink}>
+                <CopyIcon />
+              </Button>
+            </div>
+          ) : null}
 
-      <div className={styles.addSectionRow}>
-        <Select value={newSectionType} onValueChange={(value) => setNewSectionType(value as SectionType)}>
-          <SelectTrigger className={styles.addSectionSelect}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {ALL_SECTION_TYPES.map((type) => (
-              <SelectItem key={type} value={type}>
-                {sectionRegistry[type].label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Button type="button" variant="outline" onClick={addSection}>
-          <PlusIcon />
-          Add section
-        </Button>
-      </div>
-
-      {previewUrl ? (
-        <div className={styles.previewBox}>
-          <a href={previewUrl} target="_blank" rel="noreferrer" className={styles.previewLink}>
-            {previewUrl}
-            <ExternalLinkIcon className={styles.previewIcon} />
-          </a>
-          <Button type="button" variant="ghost" size="icon-sm" onClick={copyPreviewLink}>
-            <CopyIcon />
-          </Button>
+          <ComposerActionBar
+            pending={pending}
+            onSaveDraft={handleSaveDraft}
+            onPreview={handlePreview}
+            onPublish={handlePublish}
+            onUnpublish={handleUnpublish}
+          />
         </div>
-      ) : null}
 
-      <RevisionHistoryPanel entityType="Page" entityId={pageId} revisions={revisions} />
-
-      <ComposerActionBar
-        pending={pending}
-        onSaveDraft={handleSaveDraft}
-        onPreview={handlePreview}
-        onPublish={handlePublish}
-        onUnpublish={handleUnpublish}
-      />
+        <div className={styles.sidebarColumn}>
+          <RevisionHistoryPanel entityType="Page" entityId={pageId} revisions={revisions} />
+        </div>
+      </div>
     </div>
   );
 }

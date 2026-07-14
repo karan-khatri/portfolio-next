@@ -159,88 +159,94 @@ export function ProjectEditor({
         </div>
       </div>
 
-      <Card>
-        <CardContent className={styles.fieldGroup}>
-          <div className={styles.field}>
-            <Label htmlFor="project-title">Title</Label>
-            <Input id="project-title" value={title} onChange={(event) => setTitle(event.target.value)} />
-          </div>
-          <div className={styles.field}>
-            <Label htmlFor="project-excerpt">Excerpt</Label>
-            <Textarea
-              id="project-excerpt"
-              value={excerpt}
-              onChange={(event) => setExcerpt(event.target.value)}
-            />
-          </div>
-          <div className={styles.field}>
-            <Label htmlFor="project-body">Body</Label>
-            <Textarea
-              id="project-body"
-              value={body}
-              onChange={(event) => setBody(event.target.value)}
-              className={styles.bodyTextarea}
-            />
-          </div>
-          <TagInput label="Tags" value={tags} onChange={setTags} placeholder="Type a tag, press Enter" />
-          <MediaPicker label="Cover image" value={coverImage} onChange={setCoverImage} />
-        </CardContent>
-      </Card>
+      <div className={styles.layout}>
+        <div className={styles.mainColumn}>
+          <Card>
+            <CardContent className={styles.fieldGroup}>
+              <div className={styles.field}>
+                <Label htmlFor="project-title">Title</Label>
+                <Input id="project-title" value={title} onChange={(event) => setTitle(event.target.value)} />
+              </div>
+              <div className={styles.field}>
+                <Label htmlFor="project-excerpt">Excerpt</Label>
+                <Textarea
+                  id="project-excerpt"
+                  value={excerpt}
+                  onChange={(event) => setExcerpt(event.target.value)}
+                />
+              </div>
+              <div className={styles.field}>
+                <Label htmlFor="project-body">Body</Label>
+                <Textarea
+                  id="project-body"
+                  value={body}
+                  onChange={(event) => setBody(event.target.value)}
+                  className={styles.bodyTextarea}
+                />
+              </div>
+              <TagInput label="Tags" value={tags} onChange={setTags} placeholder="Type a tag, press Enter" />
+              <MediaPicker label="Cover image" value={coverImage} onChange={setCoverImage} />
+            </CardContent>
+          </Card>
 
-      <Card>
-        <CardContent className={styles.fieldGroup}>
-          <div className={styles.fieldRow}>
-            <div className={styles.field}>
-              <Label htmlFor="project-repo">Code repository</Label>
-              <Input
-                id="project-repo"
-                type="url"
-                value={codeRepository}
-                onChange={(event) => setCodeRepository(event.target.value)}
+          <Card>
+            <CardContent className={styles.fieldGroup}>
+              <div className={styles.fieldRow}>
+                <div className={styles.field}>
+                  <Label htmlFor="project-repo">Code repository</Label>
+                  <Input
+                    id="project-repo"
+                    type="url"
+                    value={codeRepository}
+                    onChange={(event) => setCodeRepository(event.target.value)}
+                  />
+                </div>
+                <div className={styles.field}>
+                  <Label htmlFor="project-live">Live URL</Label>
+                  <Input
+                    id="project-live"
+                    type="url"
+                    value={liveUrl}
+                    onChange={(event) => setLiveUrl(event.target.value)}
+                  />
+                </div>
+              </div>
+              <TagInput
+                label="Programming languages"
+                value={programmingLanguages}
+                onChange={setProgrammingLanguages}
+                placeholder="Type a language, press Enter"
               />
+            </CardContent>
+          </Card>
+
+          <SeoFieldsPanel entityType="Project" entityId={projectId} initial={seo} />
+
+          {previewUrl ? (
+            <div className={styles.previewBox}>
+              <a href={previewUrl} target="_blank" rel="noreferrer" className={styles.previewLink}>
+                {previewUrl}
+                <ExternalLinkIcon className={styles.previewIcon} />
+              </a>
+              <Button type="button" variant="ghost" size="icon-sm" onClick={copyPreviewLink}>
+                <CopyIcon />
+              </Button>
             </div>
-            <div className={styles.field}>
-              <Label htmlFor="project-live">Live URL</Label>
-              <Input
-                id="project-live"
-                type="url"
-                value={liveUrl}
-                onChange={(event) => setLiveUrl(event.target.value)}
-              />
-            </div>
-          </div>
-          <TagInput
-            label="Programming languages"
-            value={programmingLanguages}
-            onChange={setProgrammingLanguages}
-            placeholder="Type a language, press Enter"
+          ) : null}
+
+          <ComposerActionBar
+            pending={pending}
+            onSaveDraft={handleSaveDraft}
+            onPreview={handlePreview}
+            onPublish={handlePublish}
+            onUnpublish={handleUnpublish}
           />
-        </CardContent>
-      </Card>
-
-      <SeoFieldsPanel entityType="Project" entityId={projectId} initial={seo} />
-
-      {previewUrl ? (
-        <div className={styles.previewBox}>
-          <a href={previewUrl} target="_blank" rel="noreferrer" className={styles.previewLink}>
-            {previewUrl}
-            <ExternalLinkIcon className={styles.previewIcon} />
-          </a>
-          <Button type="button" variant="ghost" size="icon-sm" onClick={copyPreviewLink}>
-            <CopyIcon />
-          </Button>
         </div>
-      ) : null}
 
-      <RevisionHistoryPanel entityType="Project" entityId={projectId} revisions={revisions} />
-
-      <ComposerActionBar
-        pending={pending}
-        onSaveDraft={handleSaveDraft}
-        onPreview={handlePreview}
-        onPublish={handlePublish}
-        onUnpublish={handleUnpublish}
-      />
+        <div className={styles.sidebarColumn}>
+          <RevisionHistoryPanel entityType="Project" entityId={projectId} revisions={revisions} />
+        </div>
+      </div>
     </div>
   );
 }

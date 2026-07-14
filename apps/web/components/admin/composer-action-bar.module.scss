@@ -1,7 +1,7 @@
 @use "../../styles/admin/mixins" as mix;
 
-// Sticky-in-flow, not fixed — stays inside the content column (correctly
-// offset from the sidebar) instead of spanning the full viewport width.
+// Sticky-in-flow, not fixed — stays inside the main editor column (next to
+// the fixed revision-history sidebar on wide viewports), not the viewport.
 .actionBar {
   position: sticky;
   bottom: 0;
@@ -9,18 +9,10 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
-  // Bleeds to the edges of the content column by canceling its padding —
-  // must track admin-shell.module.scss's .content padding breakpoint.
-  margin-inline: -1.5rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 0;
   border-top: 1px solid var(--border);
   background: color-mix(in oklch, var(--background) 92%, transparent);
   backdrop-filter: blur(6px);
-
-  @media (min-width: 48rem) {
-    margin-inline: -2rem;
-    padding-inline: 2rem;
-  }
 }
 
 .actionSeparator {

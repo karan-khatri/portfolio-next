@@ -162,69 +162,75 @@ export function PostEditor({
         </div>
       </div>
 
-      <Card>
-        <CardContent className={styles.fieldGroup}>
-          <div className={styles.field}>
-            <Label htmlFor="post-title">Title</Label>
-            <Input id="post-title" value={title} onChange={(event) => setTitle(event.target.value)} />
-          </div>
-          <div className={styles.field}>
-            <Label htmlFor="post-excerpt">Excerpt</Label>
-            <Textarea id="post-excerpt" value={excerpt} onChange={(event) => setExcerpt(event.target.value)} />
-          </div>
-          <div className={styles.field}>
-            <Label htmlFor="post-body">Body</Label>
-            <Textarea
-              id="post-body"
-              value={body}
-              onChange={(event) => setBody(event.target.value)}
-              className={styles.bodyTextarea}
-            />
-          </div>
-          <TagInput label="Tags" value={tags} onChange={setTags} placeholder="Type a tag, press Enter" />
-          <MediaPicker label="Cover image" value={coverImage} onChange={setCoverImage} />
-          <div className={styles.field}>
-            <Label htmlFor="post-author">Author</Label>
-            <Select value={authorId} onValueChange={(value) => setAuthorId(value ?? NO_AUTHOR)}>
-              <SelectTrigger id="post-author" className={styles.authorSelect}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={NO_AUTHOR}>No author</SelectItem>
-                {authors.map((author) => (
-                  <SelectItem key={author.id} value={author.id}>
-                    {author.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+      <div className={styles.layout}>
+        <div className={styles.mainColumn}>
+          <Card>
+            <CardContent className={styles.fieldGroup}>
+              <div className={styles.field}>
+                <Label htmlFor="post-title">Title</Label>
+                <Input id="post-title" value={title} onChange={(event) => setTitle(event.target.value)} />
+              </div>
+              <div className={styles.field}>
+                <Label htmlFor="post-excerpt">Excerpt</Label>
+                <Textarea id="post-excerpt" value={excerpt} onChange={(event) => setExcerpt(event.target.value)} />
+              </div>
+              <div className={styles.field}>
+                <Label htmlFor="post-body">Body</Label>
+                <Textarea
+                  id="post-body"
+                  value={body}
+                  onChange={(event) => setBody(event.target.value)}
+                  className={styles.bodyTextarea}
+                />
+              </div>
+              <TagInput label="Tags" value={tags} onChange={setTags} placeholder="Type a tag, press Enter" />
+              <MediaPicker label="Cover image" value={coverImage} onChange={setCoverImage} />
+              <div className={styles.field}>
+                <Label htmlFor="post-author">Author</Label>
+                <Select value={authorId} onValueChange={(value) => setAuthorId(value ?? NO_AUTHOR)}>
+                  <SelectTrigger id="post-author" className={styles.authorSelect}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={NO_AUTHOR}>No author</SelectItem>
+                    {authors.map((author) => (
+                      <SelectItem key={author.id} value={author.id}>
+                        {author.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
 
-      <SeoFieldsPanel entityType="Post" entityId={postId} initial={seo} />
+          <SeoFieldsPanel entityType="Post" entityId={postId} initial={seo} />
 
-      {previewUrl ? (
-        <div className={styles.previewBox}>
-          <a href={previewUrl} target="_blank" rel="noreferrer" className={styles.previewLink}>
-            {previewUrl}
-            <ExternalLinkIcon className={styles.previewIcon} />
-          </a>
-          <Button type="button" variant="ghost" size="icon-sm" onClick={copyPreviewLink}>
-            <CopyIcon />
-          </Button>
+          {previewUrl ? (
+            <div className={styles.previewBox}>
+              <a href={previewUrl} target="_blank" rel="noreferrer" className={styles.previewLink}>
+                {previewUrl}
+                <ExternalLinkIcon className={styles.previewIcon} />
+              </a>
+              <Button type="button" variant="ghost" size="icon-sm" onClick={copyPreviewLink}>
+                <CopyIcon />
+              </Button>
+            </div>
+          ) : null}
+
+          <ComposerActionBar
+            pending={pending}
+            onSaveDraft={handleSaveDraft}
+            onPreview={handlePreview}
+            onPublish={handlePublish}
+            onUnpublish={handleUnpublish}
+          />
         </div>
-      ) : null}
 
-      <RevisionHistoryPanel entityType="Post" entityId={postId} revisions={revisions} />
-
-      <ComposerActionBar
-        pending={pending}
-        onSaveDraft={handleSaveDraft}
-        onPreview={handlePreview}
-        onPublish={handlePublish}
-        onUnpublish={handleUnpublish}
-      />
+        <div className={styles.sidebarColumn}>
+          <RevisionHistoryPanel entityType="Post" entityId={postId} revisions={revisions} />
+        </div>
+      </div>
     </div>
   );
 }

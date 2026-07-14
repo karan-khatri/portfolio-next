@@ -3,9 +3,8 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2Icon } from "lucide-react";
+import { HistoryIcon, Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { formatRelativeTime } from "@/lib/admin/format-relative-time";
 import { restoreRevisionAction } from "@/app/admin/(protected)/revision-actions";
@@ -23,10 +22,12 @@ function RevisionRow({
   entityType,
   entityId,
   revision,
+  isCurrent,
 }: {
   entityType: EntityType;
   entityId: string;
   revision: RevisionHistoryItem;
+  isCurrent: boolean;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -43,20 +44,32 @@ function RevisionRow({
   }
 
   return (
-    <li className={styles.row}>
-      <span className={styles.rowMain}>
-        <StatusBadge status={revision.status} />
-        <span className={styles.meta}>
-          <time dateTime={revision.createdAt.toISOString()}>
-            {formatRelativeTime(revision.createdAt)}
-          </time>
-          {revision.createdByEmail ? ` · by ${revision.createdByEmail}` : null}
+    <li className={styles.row} data-current={isCurrent || undefined}>
+      <div className={styles.rowTop}>
+        <span className={styles.rowTopLeft}>
+          <StatusBadge status={revision.status} />
+          {isCurrent ? <span className={styles.currentTag}>Current</span> : null}
         </span>
-      </span>
-      <Button type="button" variant="outline" size="sm" disabled={pending} onClick={handleRestore}>
-        {pending ? <Loader2Icon className={styles.spinner} /> : null}
-        Restore
-      </Button>
+        <time className={styles.time} dateTime={revision.createdAt.toISOString()}>
+          {formatRelativeTime(revision.createdAt)}
+        </time>
+      </div>
+      <div className={styles.rowBottom}>
+        <span className={styles.meta}>{revision.createdByEmail ?? "—"}</span>
+        {!isCurrent ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className={styles.restoreButton}
+            disabled={pending}
+            onClick={handleRestore}
+          >
+            {pending ? <Loader2Icon className={styles.spinner} /> : null}
+            Restore
+          </Button>
+        ) : null}
+      </div>
     </li>
   );
 }
@@ -71,26 +84,26 @@ export function RevisionHistoryPanel({
   revisions: RevisionHistoryItem[];
 }) {
   return (
-    <details className={styles.disclosure}>
-      <summary className={styles.trigger}>History ({revisions.length})</summary>
-      <Card className={styles.card}>
-        <CardContent>
-          {revisions.length === 0 ? (
-            <p className={styles.empty}>No revisions yet.</p>
-          ) : (
-            <ul className={styles.list}>
-              {revisions.map((revision) => (
-                <RevisionRow
-                  key={revision.id}
-                  entityType={entityType}
-                  entityId={entityId}
-                  revision={revision}
-                />
-              ))}
-            </ul>
-          )}
-        </CardContent>
-      </Card>
-    </details>
+    <div className={styles.panel}>
+      <div className={styles.header}>
+        <HistoryIcon className={styles.headerIcon} />
+        <h3 className={styles.headerTitle}>Revision History</h3>
+      </div>
+      {revisions.length === 0 ? (
+        <p className={styles.empty}>No revisions yet.</p>
+      ) : (
+        <ul className={styles.list}>
+          {revisions.map((revision, index) => (
+            <RevisionRow
+              key={revision.id}
+              entityType={entityType}
+              entityId={entityId}
+              revision={revision}
+              isCurrent={index === 0}
+            />
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
