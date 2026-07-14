@@ -3,13 +3,31 @@ import { PlusIcon } from "lucide-react";
 import { prisma } from "@portfolio/db/server";
 import { CreateSlugContentForm } from "@/components/admin/create-slug-content-form";
 import { StatusBadge } from "@/components/admin/status-badge";
+import { Pagination } from "@/components/admin/pagination";
 import { formatRelativeTime } from "@/lib/admin/format-relative-time";
 import { Card, CardContent } from "@/components/ui/card";
 import { createProjectAction } from "./actions";
 import styles from "./page.module.scss";
 
-export default async function AdminProjectsListPage() {
-  const projects = await prisma.project.findMany({ orderBy: { updatedAt: "desc" } });
+const PAGE_SIZE = 20;
+
+export default async function AdminProjectsListPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page } = await searchParams;
+  const currentPage = Math.max(1, Number(page) || 1);
+
+  const [projects, total] = await Promise.all([
+    prisma.project.findMany({
+      orderBy: { updatedAt: "desc" },
+      skip: (currentPage - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.project.count(),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <div className={styles.page}>
@@ -38,6 +56,8 @@ export default async function AdminProjectsListPage() {
           </ul>
         </CardContent>
       </Card>
+
+      <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/admin/projects" />
 
       <details className={styles.createDisclosure}>
         <summary className={styles.createTrigger}>
