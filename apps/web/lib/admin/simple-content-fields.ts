@@ -14,7 +14,6 @@ export type SimpleContentType =
   | "service"
   | "testimonial"
   | "author"
-  | "navigationItem"
   | "redirect";
 
 export interface SimpleContentSummary {
@@ -43,7 +42,6 @@ export const simpleContentSummaries: Record<
     secondary: (item.authorRole as string) || undefined,
   }),
   author: (item) => ({ primary: item.name as string, secondary: item.slug as string }),
-  navigationItem: (item) => ({ primary: item.label as string, secondary: item.href as string }),
   redirect: (item) => ({
     primary: `${item.fromPath as string} → ${item.toPath as string}`,
     secondary: (item.statusCode as number) === 308 ? "Permanent" : "Temporary",
@@ -82,11 +80,6 @@ export const authorFields: SimpleField[] = [
   { key: "imageUrl", label: "Image URL", type: "url" },
   { key: "bio", label: "Bio", type: "textarea" },
   { key: "sameAs", label: "Links", type: "tags" },
-];
-
-export const navigationItemFields: SimpleField[] = [
-  { key: "label", label: "Label", type: "text", required: true },
-  { key: "href", label: "Link", type: "text", required: true },
 ];
 
 export const redirectFields: SimpleField[] = [

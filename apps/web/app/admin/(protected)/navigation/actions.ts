@@ -19,12 +19,14 @@ export async function createNavigationItemAction(
 ): Promise<ActionResult> {
   try {
     const user = await requireEditor();
-    const count = await prisma.navigationItem.count();
+    const parentId = values.parentId ? String(values.parentId) : null;
+    const count = await prisma.navigationItem.count({ where: { parentId } });
     const created = await prisma.navigationItem.create({
       data: {
         locale: "en",
         label: String(values.label ?? ""),
         href: String(values.href ?? ""),
+        parentId,
         order: count,
       },
     });
@@ -67,10 +69,15 @@ export async function updateNavigationItemAction(
   }
 }
 
+// Children have no ON DELETE CASCADE at the DB level for the self-relation,
+// so they're removed explicitly, in the same transaction, before the parent.
 export async function deleteNavigationItemAction(id: string): Promise<ActionResult> {
   try {
     const user = await requireEditor();
-    await prisma.navigationItem.delete({ where: { id } });
+    await prisma.$transaction([
+      prisma.navigationItem.deleteMany({ where: { parentId: id } }),
+      prisma.navigationItem.delete({ where: { id } }),
+    ]);
     await logAudit({
       userId: user.id,
       action: "navigationItem.deleted",
@@ -84,12 +91,17 @@ export async function deleteNavigationItemAction(id: string): Promise<ActionResu
   }
 }
 
-export async function reorderNavigationItemAction(orderedIds: string[]): Promise<ActionResult> {
+// Scoped to one sibling group (top-level items, or one parent's children) —
+// reordering a submenu never touches other groups' order values.
+export async function reorderNavigationItemAction(
+  parentId: string | null,
+  orderedIds: string[],
+): Promise<ActionResult> {
   try {
     await requireEditor();
     await prisma.$transaction(
       orderedIds.map((id, index) =>
-        prisma.navigationItem.update({ where: { id }, data: { order: index } }),
+        prisma.navigationItem.update({ where: { id, parentId }, data: { order: index } }),
       ),
     );
     revalidatePath("/");
