@@ -7,7 +7,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 // archived content and anything under /admin is structurally excluded by
 // this query, not filtered out after the fact.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [pages, projects, posts] = await Promise.all([
+  const [pages, projects, posts, authors] = await Promise.all([
     prisma.page.findMany({
       where: { status: "PUBLISHED", OR: [{ seo: null }, { seo: { noindex: false } }] },
       select: { slug: true, locale: true, updatedAt: true },
@@ -20,6 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       where: { status: "PUBLISHED", OR: [{ seo: null }, { seo: { noindex: false } }] },
       select: { slug: true, locale: true, updatedAt: true },
     }),
+    prisma.author.findMany({ select: { slug: true } }),
   ]);
 
   const pageEntries = pages.map((page) => ({
@@ -43,11 +44,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
+  const authorEntries = authors.map((author) => ({
+    url: `${siteUrl}/authors/${author.slug}`,
+    changeFrequency: "monthly" as const,
+    priority: 0.3,
+  }));
+
   // Index/listing pages, not tied to any single row's updatedAt.
   const indexEntries = [
     { url: `${siteUrl}/projects`, changeFrequency: "weekly" as const, priority: 0.6 },
     { url: `${siteUrl}/blog`, changeFrequency: "weekly" as const, priority: 0.5 },
   ];
 
-  return [...pageEntries, ...projectEntries, ...postEntries, ...indexEntries];
+  return [...pageEntries, ...projectEntries, ...postEntries, ...authorEntries, ...indexEntries];
 }

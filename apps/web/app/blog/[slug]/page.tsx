@@ -77,7 +77,14 @@ export default async function PostDetailPage({
         <h1 className="font-heading mt-8 text-4xl font-semibold tracking-tight">{post.title}</h1>
 
         <p className="mt-4 font-mono text-xs text-muted-foreground">
-          {post.author ? `${post.author.name} · ` : null}
+          {post.author ? (
+            <>
+              <a href={`/authors/${post.author.slug}`} className="text-primary hover:underline">
+                {post.author.name}
+              </a>{" "}
+              ·{" "}
+            </>
+          ) : null}
           {post.publishedAt ? formatDate(post.publishedAt) : formatDate(post.createdAt)}
         </p>
 
