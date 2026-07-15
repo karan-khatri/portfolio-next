@@ -2,8 +2,11 @@ import { createHash, randomBytes, scryptSync, timingSafeEqual } from "node:crypt
 import { prisma } from "./client";
 
 const SCRYPT_KEYLEN = 64;
-const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
-const INVITE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+const INVITE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const LOGIN_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+const LOGIN_RATE_LIMIT_MAX_ATTEMPTS = 5;
+const DUMMY_PASSWORD_HASH = `${"0".repeat(32)}:${"0".repeat(128)}`;
 
 export function hashPassword(password: string): string {
   const salt = randomBytes(16).toString("hex");
@@ -20,11 +23,22 @@ export function verifyPassword(password: string, stored: string): boolean {
   return timingSafeEqual(candidate, expected);
 }
 
-// Session tokens are 256 bits of CSPRNG entropy already, so a fast
-// cryptographic hash (not scrypt) is the right tool here — scrypt's slowness
-// exists to blunt brute-forcing low-entropy secrets like passwords, and
-// would only add latency to every authenticated request without a matching
-// security benefit for a token this large.
+export async function isLoginRateLimited(email: string): Promise<boolean> {
+  const windowStart = new Date(Date.now() - LOGIN_RATE_LIMIT_WINDOW_MS);
+  const recentFailures = await prisma.loginAttempt.count({
+    where: { email, success: false, createdAt: { gte: windowStart } },
+  });
+  return recentFailures >= LOGIN_RATE_LIMIT_MAX_ATTEMPTS;
+}
+
+export async function verifyLoginCredentials(email: string, password: string) {
+  const user = await prisma.user.findUnique({ where: { email } });
+  const valid = verifyPassword(password, user?.passwordHash ?? DUMMY_PASSWORD_HASH);
+  const success = Boolean(user) && valid;
+  await prisma.loginAttempt.create({ data: { email, success } });
+  return success ? user : null;
+}
+
 function hashToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
 }
@@ -44,9 +58,6 @@ export async function destroySessionToken(token: string) {
   await prisma.session.deleteMany({ where: { tokenHash } });
 }
 
-// A user's "current role" is whichever assignment's window covers now() —
-// not a cached/scalar value — so a timed grant expiring requires no
-// separate cleanup job: the next lookup simply stops finding it.
 export async function getActiveRoleAssignment(userId: string) {
   const now = new Date();
   return prisma.userRoleAssignment.findFirst({
@@ -72,9 +83,6 @@ export async function verifySessionToken(token: string) {
   return { ...session.user, role: activeRole?.role.name ?? null };
 }
 
-// Every non-permanent role grant must carry an expiry; a permanent role
-// (ADMIN) must not. Enforced here so both the invite flow and any future
-// direct role-assignment path share one rule instead of duplicating it.
 async function assertRoleTimeFrame(roleId: string, expiresAt: Date | null) {
   const role = await prisma.role.findUniqueOrThrow({ where: { id: roleId } });
   if (role.isPermanent && expiresAt) {
@@ -103,9 +111,6 @@ export async function assignRole(params: {
   });
 }
 
-// Doesn't delete the row — sets its expiry to now, same spirit as
-// unpublishEntity not deleting Revisions: the grant/revoke history stays
-// intact for audit purposes, it just stops resolving as "active".
 export async function revokeRole(assignmentId: string) {
   return prisma.userRoleAssignment.update({
     where: { id: assignmentId },

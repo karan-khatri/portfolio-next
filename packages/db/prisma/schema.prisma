@@ -7,14 +7,6 @@ datasource db {
   provider = "postgresql"
 }
 
-// ---------------------------------------------------------------------------
-// Auth / RBAC
-// ---------------------------------------------------------------------------
-
-// A real table, not an enum: roles are data (admin-manageable, extensible)
-// rather than a fixed set baked into the schema. `isPermanent` marks the
-// one role (ADMIN) that's exempt from the "every grant must have an
-// expiry" rule enforced in the domain layer (packages/db/src/auth.ts).
 model Role {
   id          String   @id @default(cuid())
   name        String   @unique
@@ -26,10 +18,6 @@ model Role {
   inviteTokens InviteToken[]
 }
 
-// The actual timed grant. A user's "current role" is resolved by querying
-// for the most recent assignment whose window includes now() — see
-// getActiveRoleAssignment() in packages/db/src/auth.ts — rather than a
-// scalar column, so a role can expire without any separate cleanup job.
 model UserRoleAssignment {
   id          String    @id @default(cuid())
   userId      String
@@ -37,7 +25,7 @@ model UserRoleAssignment {
   roleId      String
   role        Role      @relation(fields: [roleId], references: [id])
   startsAt    DateTime  @default(now())
-  expiresAt   DateTime? // only null when role.isPermanent — enforced in app code
+  expiresAt   DateTime?
   grantedById String?
   grantedBy   User?     @relation("RoleGrantedBy", fields: [grantedById], references: [id])
   createdAt   DateTime  @default(now())
@@ -79,22 +67,31 @@ model InviteToken {
   email         String
   roleId        String
   role          Role      @relation(fields: [roleId], references: [id])
-  roleExpiresAt DateTime? // the grant's expiry once accepted — only null for a permanent role
+  roleExpiresAt DateTime?
   invitedById   String
   invitedBy     User      @relation("SentInvites", fields: [invitedById], references: [id])
-  expiresAt     DateTime // the invite link's own expiry, unrelated to roleExpiresAt
+  expiresAt     DateTime
   acceptedAt    DateTime?
   createdAt     DateTime  @default(now())
 
   @@index([email])
 }
 
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  email     String
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  @@index([email, createdAt])
+}
+
 model AuditLog {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
-  action    String // e.g. "project.publish", "redirect.create"
-  entity    String // e.g. "Project"
+  action    String
+  entity    String
   entityId  String
   metadata  Json?
   createdAt DateTime @default(now())
@@ -103,10 +100,6 @@ model AuditLog {
   @@index([userId])
 }
 
-// ---------------------------------------------------------------------------
-// Shared enums / content status
-// ---------------------------------------------------------------------------
-
 enum ContentStatus {
   DRAFT
   SCHEDULED
@@ -114,9 +107,6 @@ enum ContentStatus {
   ARCHIVED
 }
 
-// entityType/entityId is a lightweight polymorphic reference (Page, Project,
-// or Post) rather than a real FK — Prisma has no native polymorphic
-// relation, and these three models don't share a table to point at.
 model Revision {
   id          String        @id @default(cuid())
   entityType  String
@@ -144,11 +134,6 @@ model PreviewToken {
   @@index([entityType, entityId])
 }
 
-// ---------------------------------------------------------------------------
-// SEO / cross-cutting content concerns
-// ---------------------------------------------------------------------------
-
-// Reused 1:1 by Page / Project / Post via a nullable back-relation.
 model Seo {
   id              String   @id @default(cuid())
   metaTitle       String?
@@ -176,8 +161,8 @@ model Redirect {
 model Media {
   id           String   @id @default(cuid())
   url          String
-  width        Int? // null for non-image files (e.g. a resume PDF)
-  height       Int? // null for non-image files (e.g. a resume PDF)
+  width        Int?
+  height       Int?
   blurDataUrl  String?
   altText      String?
   decorative   Boolean  @default(false)
@@ -201,10 +186,6 @@ model Author {
   sameAs   String[]
   posts    Post[]
 }
-
-// ---------------------------------------------------------------------------
-// Section registry (drives the homepage / page composer)
-// ---------------------------------------------------------------------------
 
 enum SectionType {
   HERO
@@ -244,16 +225,12 @@ model SectionInstance {
   type      SectionType
   order     Int
   enabled   Boolean     @default(true)
-  content   Json // validated against the section type's schema at write time
+  content   Json
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
   @@index([pageId, order])
 }
-
-// ---------------------------------------------------------------------------
-// Domain content
-// ---------------------------------------------------------------------------
 
 model Project {
   id                 String        @id @default(cuid())
@@ -262,7 +239,7 @@ model Project {
   translationGroupId String
   title              String
   excerpt            String?
-  body               String? // rendered HTML / MDX output
+  body               String?
   coverImageId       String?
   coverImage         Media?        @relation("ProjectCoverImage", fields: [coverImageId], references: [id])
   codeRepository     String?
@@ -272,7 +249,7 @@ model Project {
   status             ContentStatus @default(DRAFT)
   publishedAt        DateTime?
   featured           Boolean       @default(false)
-  featuredOrder      Int? // only meaningful when featured — position within the featured/slider set
+  featuredOrder      Int?
   seoId              String?       @unique
   seo                Seo?          @relation(fields: [seoId], references: [id])
   createdAt          DateTime      @default(now())
@@ -330,7 +307,7 @@ model Skill {
   locale   String
   name     String
   category String?
-  level    Int? // 1-5
+  level    Int?
   order    Int    @default(0)
 }
 

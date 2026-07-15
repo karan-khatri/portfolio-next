@@ -1,6 +1,11 @@
 import { cookies } from "next/headers";
 import { StatusCodes } from "http-status-codes";
-import { prisma, verifyPassword, createSession, getActiveRoleAssignment } from "@portfolio/db/server";
+import {
+  isLoginRateLimited,
+  verifyLoginCredentials,
+  createSession,
+  getActiveRoleAssignment,
+} from "@portfolio/db/server";
 import { SESSION_COOKIE } from "@/lib/auth/constants";
 import { apiSuccess, apiError } from "@/lib/api/response";
 
@@ -13,8 +18,14 @@ export async function POST(request: Request) {
     return apiError("Email and password are required", { status: StatusCodes.BAD_REQUEST });
   }
 
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user || !verifyPassword(password, user.passwordHash)) {
+  if (await isLoginRateLimited(email)) {
+    return apiError("Too many attempts. Try again later.", {
+      status: StatusCodes.TOO_MANY_REQUESTS,
+    });
+  }
+
+  const user = await verifyLoginCredentials(email, password);
+  if (!user) {
     return apiError("Invalid credentials", { status: StatusCodes.UNAUTHORIZED });
   }
 
