@@ -1,6 +1,9 @@
 packages:
   - "apps/*"
   - "packages/*"
+overrides:
+  postcss: ">=8.5.10"
+  "@hono/node-server": ">=1.19.13"
 allowBuilds:
   '@parcel/watcher': true
   '@prisma/engines': true
