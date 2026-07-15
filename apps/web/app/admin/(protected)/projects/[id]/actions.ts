@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import {
+  prisma,
   saveDraft,
   publishRevision,
   unpublishEntity,
@@ -101,6 +102,35 @@ export async function unpublishAction(projectId: string): Promise<ComposerAction
     return {};
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Could not unpublish" };
+  }
+}
+
+// Featured/order live directly on the row, not the draft/publish revision
+// flow — curation (what shows in the Featured/Slider set, and in what
+// order) is a structural concern, not versioned content.
+export async function toggleFeaturedAction(
+  projectId: string,
+  featured: boolean,
+): Promise<{ error?: string }> {
+  try {
+    await requireEditor();
+    if (featured) {
+      const count = await prisma.project.count({ where: { featured: true } });
+      await prisma.project.update({
+        where: { id: projectId },
+        data: { featured: true, featuredOrder: count },
+      });
+    } else {
+      await prisma.project.update({
+        where: { id: projectId },
+        data: { featured: false, featuredOrder: null },
+      });
+    }
+    revalidatePath("/");
+    revalidatePath("/admin/projects");
+    return {};
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Could not update" };
   }
 }
 

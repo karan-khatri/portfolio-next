@@ -2,6 +2,7 @@ import type { ProjectsContent } from "@portfolio/sections";
 import { SectionShell } from "./section-shell";
 import { EmptyState } from "./empty-state";
 import { ProjectCard, type ProjectCardItem } from "./project-card";
+import { ProjectSlider } from "./project-slider";
 
 export type ProjectListItem = ProjectCardItem;
 
@@ -16,6 +17,9 @@ export function ProjectsSection({
   headingLevel: 2 | 3;
   items: ProjectListItem[];
 }) {
+  const emptyMessage =
+    content.displayMode === "list" ? "No projects published yet." : "No featured projects yet.";
+
   return (
     <SectionShell
       eyebrow="Projects"
@@ -25,7 +29,9 @@ export function ProjectsSection({
       subheading={content.subheading}
     >
       {items.length === 0 ? (
-        <EmptyState message="No projects published yet." />
+        <EmptyState message={emptyMessage} />
+      ) : content.displayMode === "slider" ? (
+        <ProjectSlider items={items} />
       ) : (
         <ul className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {items.map((project, index) => (

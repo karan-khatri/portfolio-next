@@ -17,3 +17,9 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+.featuredField {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}

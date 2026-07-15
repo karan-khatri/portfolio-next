@@ -5,6 +5,7 @@ import { CreateSlugContentForm } from "@/components/admin/create-slug-content-fo
 import { StatusBadge } from "@/components/admin/status-badge";
 import { Pagination } from "@/components/admin/pagination";
 import { SearchInput } from "@/components/admin/search-input";
+import { FeaturedProjectsPanel } from "@/components/admin/featured-projects-panel";
 import { formatRelativeTime } from "@/lib/admin/format-relative-time";
 import { Card, CardContent } from "@/components/ui/card";
 import { createProjectAction } from "./actions";
@@ -23,7 +24,7 @@ export default async function AdminProjectsListPage({
 
   const where = query ? { title: { contains: query, mode: "insensitive" as const } } : {};
 
-  const [projects, total] = await Promise.all([
+  const [projects, total, featuredProjects] = await Promise.all([
     prisma.project.findMany({
       where,
       orderBy: { updatedAt: "desc" },
@@ -31,6 +32,11 @@ export default async function AdminProjectsListPage({
       take: PAGE_SIZE,
     }),
     prisma.project.count({ where }),
+    prisma.project.findMany({
+      where: { featured: true },
+      orderBy: { featuredOrder: "asc" },
+      select: { id: true, title: true, slug: true },
+    }),
   ]);
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
@@ -40,6 +46,8 @@ export default async function AdminProjectsListPage({
         <h1 className={styles.heading}>Projects</h1>
         <SearchInput basePath="/admin/projects" initialQuery={query} placeholder="Search projects…" />
       </div>
+
+      <FeaturedProjectsPanel items={featuredProjects} />
 
       <Card>
         <CardContent className={styles.listContent}>

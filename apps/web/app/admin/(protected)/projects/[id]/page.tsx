@@ -73,6 +73,7 @@ export default async function ProjectEditorRoute({
         codeRepository,
         liveUrl,
         programmingLanguages,
+        featured: project.featured,
       }}
       seo={{
         metaTitle: project.seo?.metaTitle ?? null,

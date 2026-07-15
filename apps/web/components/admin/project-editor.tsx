@@ -10,6 +10,7 @@ import {
   publishAction,
   unpublishAction,
   createPreviewAction,
+  toggleFeaturedAction,
   type ProjectFormInput,
 } from "@/app/admin/(protected)/projects/[id]/actions";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { TagInput } from "@/components/admin/tag-input";
 import { MediaPicker } from "@/components/admin/media-picker";
@@ -44,6 +46,7 @@ interface ProjectEditorInitial {
   codeRepository: string;
   liveUrl: string;
   programmingLanguages: string[];
+  featured: boolean;
 }
 
 export function ProjectEditor({
@@ -70,8 +73,10 @@ export function ProjectEditor({
   const [codeRepository, setCodeRepository] = useState(initial.codeRepository);
   const [liveUrl, setLiveUrl] = useState(initial.liveUrl);
   const [programmingLanguages, setProgrammingLanguages] = useState(initial.programmingLanguages);
+  const [featured, setFeatured] = useState(initial.featured);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [togglingFeatured, startTogglingFeatured] = useTransition();
 
   // Re-sync when the server re-fetches (e.g. after restoring an older
   // revision via <RevisionHistoryPanel>, which calls router.refresh() from
@@ -86,6 +91,7 @@ export function ProjectEditor({
     setCodeRepository(initial.codeRepository);
     setLiveUrl(initial.liveUrl);
     setProgrammingLanguages(initial.programmingLanguages);
+    setFeatured(initial.featured);
   }, [initial]);
 
   function toInput(): ProjectFormInput {
@@ -146,6 +152,21 @@ export function ProjectEditor({
     toast.success("Copied preview link");
   }
 
+  // Featured is a curation flag on the row itself, not draft/publish content
+  // — it takes effect immediately, independent of Save draft/Publish.
+  function handleToggleFeatured(next: boolean) {
+    setFeatured(next);
+    startTogglingFeatured(async () => {
+      const result = await toggleFeaturedAction(projectId, next);
+      if (result.error) {
+        toast.error(result.error);
+        setFeatured(!next);
+      } else {
+        toast.success(next ? "Marked as featured" : "Removed from featured");
+      }
+    });
+  }
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
@@ -182,6 +203,17 @@ export function ProjectEditor({
               </div>
               <TagInput label="Tags" value={tags} onChange={setTags} placeholder="Type a tag, press Enter" />
               <MediaPicker label="Cover image" value={coverImage} onChange={setCoverImage} />
+              <div className={styles.featuredField}>
+                <Switch
+                  id="project-featured"
+                  checked={featured}
+                  disabled={togglingFeatured}
+                  onCheckedChange={handleToggleFeatured}
+                />
+                <Label htmlFor="project-featured">
+                  Featured — include in the Home page&rsquo;s Featured/Slider set
+                </Label>
+              </div>
             </CardContent>
           </Card>
 

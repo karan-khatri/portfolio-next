@@ -5,6 +5,13 @@ import type { SectionType } from "@portfolio/db";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { MediaPicker } from "@/components/admin/media-picker";
 import { MediaUrlField } from "@/components/admin/media-url-field";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
@@ -99,6 +106,27 @@ export function SectionForm({
                 value={typeof value === "string" ? value : ""}
                 onChange={(url) => setField(field.key, url)}
               />
+            </div>
+          );
+        }
+        if (field.type === "select") {
+          const options = field.options ?? [];
+          const currentValue = typeof value === "string" ? value : (options[0]?.value ?? "");
+          return (
+            <div key={field.key} className={`${styles.field} ${styles.fieldWide}`}>
+              <Label htmlFor={fieldId}>{field.label}</Label>
+              <Select value={currentValue} onValueChange={(next) => setField(field.key, next ?? "")}>
+                <SelectTrigger id={fieldId}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {options.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           );
         }

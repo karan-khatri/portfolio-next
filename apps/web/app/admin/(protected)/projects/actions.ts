@@ -43,3 +43,38 @@ export async function createProjectAction(
   revalidatePath("/admin/projects");
   redirect(`/admin/projects/${project.id}`);
 }
+
+export async function reorderFeaturedProjectsAction(
+  orderedIds: string[],
+): Promise<{ error?: string }> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return { error: "Unauthorized" };
+    await prisma.$transaction(
+      orderedIds.map((id, index) =>
+        prisma.project.update({ where: { id, featured: true }, data: { featuredOrder: index } }),
+      ),
+    );
+    revalidatePath("/");
+    revalidatePath("/admin/projects");
+    return {};
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Could not reorder" };
+  }
+}
+
+export async function unfeatureProjectAction(projectId: string): Promise<{ error?: string }> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return { error: "Unauthorized" };
+    await prisma.project.update({
+      where: { id: projectId },
+      data: { featured: false, featuredOrder: null },
+    });
+    revalidatePath("/");
+    revalidatePath("/admin/projects");
+    return {};
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Could not update" };
+  }
+}

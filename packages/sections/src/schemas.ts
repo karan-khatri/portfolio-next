@@ -25,6 +25,11 @@ export const projectsContentSchema = z.object({
   subheading: z.string().optional(),
   projectIds: z.array(z.string()).optional(),
   limit: z.number().int().positive().max(50).optional(),
+  // "list" (default): every published project, newest first, capped by
+  // `limit`. "featured"/"slider" both pull the same hand-ordered
+  // featured=true set (see Project.featuredOrder) — just rendered as a
+  // static grid vs. a carousel.
+  displayMode: z.enum(["list", "featured", "slider"]).default("list"),
 });
 
 export const experienceContentSchema = z.object({

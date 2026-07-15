@@ -271,6 +271,8 @@ model Project {
   tags               Tag[]         @relation("ProjectTags")
   status             ContentStatus @default(DRAFT)
   publishedAt        DateTime?
+  featured           Boolean       @default(false)
+  featuredOrder      Int? // only meaningful when featured — position within the featured/slider set
   seoId              String?       @unique
   seo                Seo?          @relation(fields: [seoId], references: [id])
   createdAt          DateTime      @default(now())

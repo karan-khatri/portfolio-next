@@ -52,7 +52,7 @@ export const sectionRegistry = {
     type: SectionType.PROJECTS,
     label: "Projects",
     schema: projectsContentSchema,
-    defaultContent: () => ({ heading: "Projects", limit: 6 }),
+    defaultContent: () => ({ heading: "Projects", limit: 6, displayMode: "list" as const }),
     minHeight: "30rem",
     headingLevel: 2,
   }),

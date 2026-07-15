@@ -58,11 +58,16 @@ async function renderSection(section: RenderableSection, locale: string) {
       );
     }
     case SectionType.PROJECTS: {
-      const typed = content as { limit?: number };
+      const typed = content as { limit?: number; displayMode?: "list" | "featured" | "slider" };
+      const isCuratedMode = typed.displayMode === "featured" || typed.displayMode === "slider";
       const projects = await prisma.project.findMany({
-        where: { locale, status: "PUBLISHED" },
-        orderBy: { publishedAt: "desc" },
-        take: typed.limit ?? 6,
+        where: isCuratedMode
+          ? { locale, status: "PUBLISHED", featured: true }
+          : { locale, status: "PUBLISHED" },
+        orderBy: isCuratedMode ? { featuredOrder: "asc" } : { publishedAt: "desc" },
+        // A hand-curated featured/slider set shouldn't be silently truncated
+        // at the same default cap as "show my 6 latest" — only List gets one.
+        take: typed.limit ?? (isCuratedMode ? undefined : 6),
         select: {
           id: true,
           slug: true,

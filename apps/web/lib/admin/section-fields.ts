@@ -3,8 +3,10 @@ import { SectionType } from "@portfolio/db";
 export interface SectionField {
   key: string;
   label: string;
-  type: "text" | "textarea" | "richtext" | "email" | "number" | "image" | "file";
+  type: "text" | "textarea" | "richtext" | "email" | "number" | "image" | "file" | "select";
   required?: boolean;
+  // Only used by "select" fields.
+  options?: { value: string; label: string }[];
 }
 
 // Presentation-layer companion to @portfolio/sections' Zod schemas — kept
@@ -27,6 +29,16 @@ export const sectionFields: Record<SectionType, SectionField[]> = {
   [SectionType.PROJECTS]: [
     { key: "heading", label: "Heading", type: "text", required: true },
     { key: "subheading", label: "Subheading", type: "text" },
+    {
+      key: "displayMode",
+      label: "Display as",
+      type: "select",
+      options: [
+        { value: "list", label: "List — all published projects, newest first" },
+        { value: "featured", label: "Featured — your hand-picked, ordered set" },
+        { value: "slider", label: "Slider — the same featured set as a carousel" },
+      ],
+    },
     { key: "limit", label: "Max projects to show", type: "number" },
   ],
   [SectionType.EXPERIENCE]: [
