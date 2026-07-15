@@ -1,4 +1,4 @@
-import { ArrowRightIcon } from "lucide-react";
+import { ArrowRightIcon, FolderGit2Icon } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
 import type { SectionImage } from "./hero";
 
@@ -13,61 +13,75 @@ export interface ProjectCardItem {
   liveUrl: string | null;
 }
 
-// Shared by the Home page's Projects section and the /projects index page.
+// Shared by the Home page's Projects section (grid and slider modes) and the
+// /projects index page. Image-first: the cover photo is the hero element,
+// with the title overlaid on a gradient scrim at its bottom edge. Falls back
+// to a plain decorative panel — not a broken image — for projects that
+// don't have a cover yet.
 export function ProjectCard({ project, delay = 0 }: { project: ProjectCardItem; delay?: number }) {
   return (
     <Reveal delay={delay} className="h-full">
-      <div className="glass-panel glow-primary flex h-full flex-col rounded-xl p-6 transition-all duration-300 sm:p-8">
-        {project.coverImage ? (
-          <img
-            src={project.coverImage.url}
-            alt={project.coverImage.altText ?? ""}
-            className="mb-4 aspect-4/3 w-full rounded-lg object-cover"
-          />
-        ) : null}
-        <h3 className="font-heading text-xl font-medium">
-          <a href={`/projects/${project.slug}`} className="hover:underline">
-            {project.title}
-          </a>
-        </h3>
-        {project.excerpt ? (
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{project.excerpt}</p>
-        ) : null}
-        {project.tags.length > 0 ? (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {project.tags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full border border-border bg-white/5 px-3 py-1 font-mono text-xs text-primary"
+      <div className="glass-panel glow-primary group flex h-full flex-col overflow-hidden rounded-xl transition-all duration-300 hover:-translate-y-1">
+        <div className="relative aspect-16/10 w-full overflow-hidden bg-muted">
+          {project.coverImage ? (
+            <img
+              src={project.coverImage.url}
+              alt={project.coverImage.altText ?? ""}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <FolderGit2Icon className="size-10 text-muted-foreground/40" />
+            </div>
+          )}
+          <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-background/95 to-transparent" />
+          <h3 className="absolute inset-x-0 bottom-0 p-5 font-heading text-xl font-medium">
+            <a href={`/projects/${project.slug}`} className="hover:underline">
+              {project.title}
+            </a>
+          </h3>
+        </div>
+
+        <div className="flex flex-1 flex-col p-5 sm:p-6">
+          {project.excerpt ? (
+            <p className="text-sm leading-relaxed text-muted-foreground">{project.excerpt}</p>
+          ) : null}
+          {project.tags.length > 0 ? (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {project.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full border border-border bg-white/5 px-3 py-1 font-mono text-xs text-primary"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          ) : null}
+          <div className="mt-auto flex gap-4 pt-6">
+            {project.codeRepository ? (
+              <a
+                href={project.codeRepository}
+                target="_blank"
+                rel="noreferrer"
+                className="group/link flex items-center gap-2 font-mono text-xs text-primary"
               >
-                {tag}
-              </span>
-            ))}
+                View Repo
+                <ArrowRightIcon className="size-3.5 transition-transform group-hover/link:translate-x-1" />
+              </a>
+            ) : null}
+            {project.liveUrl ? (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="group/link flex items-center gap-2 font-mono text-xs text-primary"
+              >
+                Live site
+                <ArrowRightIcon className="size-3.5 transition-transform group-hover/link:translate-x-1" />
+              </a>
+            ) : null}
           </div>
-        ) : null}
-        <div className="mt-auto flex gap-4 pt-6">
-          {project.codeRepository ? (
-            <a
-              href={project.codeRepository}
-              target="_blank"
-              rel="noreferrer"
-              className="group flex items-center gap-2 font-mono text-xs text-primary"
-            >
-              View Repo
-              <ArrowRightIcon className="size-3.5 transition-transform group-hover:translate-x-1" />
-            </a>
-          ) : null}
-          {project.liveUrl ? (
-            <a
-              href={project.liveUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="group flex items-center gap-2 font-mono text-xs text-primary"
-            >
-              Live site
-              <ArrowRightIcon className="size-3.5 transition-transform group-hover:translate-x-1" />
-            </a>
-          ) : null}
         </div>
       </div>
     </Reveal>
