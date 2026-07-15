@@ -8,8 +8,10 @@ import {
 } from "@portfolio/db/server";
 import { sectionRegistry, validateSectionContent } from "@portfolio/sections";
 
-const ADMIN_EMAIL = "admin@example.com";
-const ADMIN_PASSWORD = "dev-password-change-me";
+// Real credentials belong in .env (gitignored), never hardcoded here — this
+// file is committed, and a public repo gets scraped for exactly this pattern.
+const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL ?? "admin@example.com";
+const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD ?? "dev-password-change-me";
 
 async function main() {
   const adminRole = await prisma.role.upsert({
@@ -56,7 +58,7 @@ async function main() {
 
   const heroContent = validateSectionContent(SectionType.HERO, {
     ...sectionRegistry[SectionType.HERO].defaultContent(),
-    heading: "Hi, I'm Kamlesh",
+    heading: "Hi, I'm Karan Kumar",
     subheading: "I build things for the web.",
   });
   const aboutContent = validateSectionContent(SectionType.ABOUT, {
