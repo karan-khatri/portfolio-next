@@ -3,7 +3,7 @@ import { SectionType } from "@portfolio/db";
 export interface SectionField {
   key: string;
   label: string;
-  type: "text" | "textarea" | "richtext" | "email" | "number" | "image";
+  type: "text" | "textarea" | "richtext" | "email" | "number" | "image" | "file";
   required?: boolean;
 }
 
@@ -58,7 +58,7 @@ export const sectionFields: Record<SectionType, SectionField[]> = {
   ],
   [SectionType.RESUME]: [
     { key: "heading", label: "Heading", type: "text", required: true },
-    { key: "fileUrl", label: "File URL", type: "text", required: true },
+    { key: "fileUrl", label: "File URL", type: "file", required: true },
     { key: "ctaLabel", label: "CTA label", type: "text" },
   ],
 };

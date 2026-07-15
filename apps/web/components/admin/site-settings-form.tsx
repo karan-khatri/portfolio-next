@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { MediaUrlField } from "@/components/admin/media-url-field";
 import { saveSiteSettingsAction } from "@/app/admin/(protected)/settings/actions";
 import type { SiteSettingsValues } from "@portfolio/db/server";
 import styles from "./site-settings-form.module.scss";
@@ -92,17 +93,13 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
         </div>
         <div className={styles.field}>
           <Label htmlFor="site-resume">Resume URL</Label>
-          <div className={styles.inputWrap}>
-            <FileTextIcon className={styles.inputIcon} />
-            <Input
-              id="site-resume"
-              type="url"
-              placeholder="Link to a hosted PDF, or upload one via Media"
-              className={styles.inputWithIcon}
-              value={resumeUrl}
-              onChange={(event) => setResumeUrl(event.target.value)}
-            />
-          </div>
+          <MediaUrlField
+            id="site-resume"
+            value={resumeUrl}
+            onChange={setResumeUrl}
+            placeholder="Link to a hosted PDF, or browse Media"
+            icon={<FileTextIcon />}
+          />
         </div>
       </section>
 

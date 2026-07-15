@@ -1,0 +1,76 @@
+.wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon {
+  position: absolute;
+  left: 0.75rem;
+  display: flex;
+  color: var(--muted-foreground);
+  pointer-events: none;
+
+  svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+}
+
+.inputWithIcon {
+  padding-left: 2.5rem !important;
+  font-family: var(--font-mono);
+}
+
+.dialogContent {
+  width: 100%;
+  max-width: 32rem;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.loading {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  max-height: 20rem;
+  overflow-y: auto;
+}
+
+.listItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: var(--ring);
+  }
+}
+
+.listItemName {
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.listItemUrl {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--muted-foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

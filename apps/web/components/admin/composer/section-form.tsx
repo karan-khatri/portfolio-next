@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MediaPicker } from "@/components/admin/media-picker";
+import { MediaUrlField } from "@/components/admin/media-url-field";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import type { MediaPickerValue } from "@/lib/admin/media";
 import styles from "./section-form.module.scss";
@@ -85,6 +86,18 @@ export function SectionForm({
                   setField(field.key, media?.id ?? "");
                   if (media) onResolveMedia(media);
                 }}
+              />
+            </div>
+          );
+        }
+        if (field.type === "file") {
+          return (
+            <div key={field.key} className={`${styles.field} ${styles.fieldWide}`}>
+              <Label htmlFor={fieldId}>{field.label}</Label>
+              <MediaUrlField
+                id={fieldId}
+                value={typeof value === "string" ? value : ""}
+                onChange={(url) => setField(field.key, url)}
               />
             </div>
           );
