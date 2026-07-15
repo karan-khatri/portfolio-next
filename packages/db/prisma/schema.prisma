@@ -176,8 +176,8 @@ model Redirect {
 model Media {
   id           String   @id @default(cuid())
   url          String
-  width        Int
-  height       Int
+  width        Int? // null for non-image files (e.g. a resume PDF)
+  height       Int? // null for non-image files (e.g. a resume PDF)
   blurDataUrl  String?
   altText      String?
   decorative   Boolean  @default(false)

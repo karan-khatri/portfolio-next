@@ -2,8 +2,8 @@ import { prisma } from "./client";
 
 export interface CreateMediaInput {
   url: string;
-  width: number;
-  height: number;
+  width?: number | null;
+  height?: number | null;
   blurDataUrl?: string | null;
   altText?: string | null;
   filename: string;
