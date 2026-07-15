@@ -86,3 +86,16 @@
   display: block;
   background: var(--muted);
 }
+
+.filePlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+}
+
+.fileIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--muted-foreground);
+}

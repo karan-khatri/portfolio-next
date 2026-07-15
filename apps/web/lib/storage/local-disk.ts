@@ -10,6 +10,7 @@ const EXTENSION_BY_MIME_TYPE: Record<string, string> = {
   "image/png": ".png",
   "image/webp": ".webp",
   "image/gif": ".gif",
+  "application/pdf": ".pdf",
 };
 
 // Dev-only stand-in: writes into apps/web/public/uploads and serves the

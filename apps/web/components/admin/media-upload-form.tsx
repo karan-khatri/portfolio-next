@@ -10,7 +10,23 @@ import { uploadMediaAction } from "@/app/admin/(protected)/media/actions";
 import type { MediaPickerValue } from "@/lib/admin/media";
 import styles from "./media-upload-form.module.scss";
 
-export function MediaUploadForm({ onUploaded }: { onUploaded: (media: MediaPickerValue) => void }) {
+const ACCEPT_BY_KIND = {
+  image: "image/jpeg,image/png,image/webp,image/gif",
+  any: "image/jpeg,image/png,image/webp,image/gif,application/pdf",
+} as const;
+
+const HINT_BY_KIND = {
+  image: "Click to browse — JPEG, PNG, WebP, GIF, up to 8MB",
+  any: "Click to browse — JPEG, PNG, WebP, GIF, or PDF, up to 8MB",
+} as const;
+
+export function MediaUploadForm({
+  onUploaded,
+  kind = "image",
+}: {
+  onUploaded: (media: MediaPickerValue) => void;
+  kind?: "image" | "any";
+}) {
   const fileInputId = useId();
   const altTextId = useId();
   const formRef = useRef<HTMLFormElement>(null);
@@ -25,7 +41,7 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (media: MediaPicke
       if (result.error) {
         toast.error(result.error);
       } else if (result.media) {
-        toast.success("Image uploaded");
+        toast.success("Uploaded");
         onUploaded(result.media);
         formRef.current?.reset();
         setFileName(null);
@@ -36,21 +52,19 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (media: MediaPicke
   return (
     <form ref={formRef} onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.field}>
-        <Label htmlFor={fileInputId}>Image</Label>
+        <Label htmlFor={fileInputId}>{kind === "any" ? "File" : "Image"}</Label>
         <label htmlFor={fileInputId} className={styles.fileTrigger}>
           <span className={styles.fileIconWrap}>
             <CloudUploadIcon className={styles.fileIcon} />
           </span>
           <span className={styles.fileTitle}>{fileName ?? "Upload media"}</span>
-          <span className={styles.fileHint}>
-            {fileName ? "Ready to upload" : "Click to browse — JPEG, PNG, WebP, GIF, up to 8MB"}
-          </span>
+          <span className={styles.fileHint}>{fileName ? "Ready to upload" : HINT_BY_KIND[kind]}</span>
         </label>
         <input
           id={fileInputId}
           name="file"
           type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif"
+          accept={ACCEPT_BY_KIND[kind]}
           required
           className={styles.fileInput}
           onChange={(event) => setFileName(event.target.files?.[0]?.name ?? null)}

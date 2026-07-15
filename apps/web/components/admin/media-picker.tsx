@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ImageIcon, XIcon } from "lucide-react";
+import { FileIcon, ImageIcon, XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -13,17 +13,34 @@ import {
 } from "@/components/ui/dialog";
 import { listMediaAction } from "@/app/admin/(protected)/media/actions";
 import { MediaUploadForm } from "./media-upload-form";
-import type { MediaPickerValue } from "@/lib/admin/media";
+import { isImageMedia, type MediaPickerValue } from "@/lib/admin/media";
 import styles from "./media-picker.module.scss";
+
+function MediaThumb({ item, className }: { item: MediaPickerValue; className: string }) {
+  if (!isImageMedia(item)) {
+    return (
+      <div className={`${className} ${styles.filePlaceholder}`}>
+        <FileIcon className={styles.fileIcon} />
+      </div>
+    );
+  }
+  return <img src={item.url} alt={item.altText ?? ""} className={className} />;
+}
 
 export function MediaPicker({
   label,
   value,
   onChange,
+  kind = "image",
 }: {
   label: string;
   value: MediaPickerValue | null;
   onChange: (value: MediaPickerValue | null) => void;
+  // "image" (default) is for actual image slots (cover images, Hero/About
+  // images) — the picker only offers uploaded images. "any" additionally
+  // surfaces non-image uploads (e.g. a resume PDF), for fields like Settings'
+  // Resume URL that link to a document rather than render one.
+  kind?: "image" | "any";
 }) {
   const [open, setOpen] = useState(false);
   const [media, setMedia] = useState<MediaPickerValue[] | null>(null);
@@ -32,6 +49,8 @@ export function MediaPicker({
     if (!open) return;
     listMediaAction().then(setMedia);
   }, [open]);
+
+  const selectable = media?.filter((item) => kind === "any" || isImageMedia(item)) ?? null;
 
   function handlePick(item: MediaPickerValue) {
     onChange(item);
@@ -49,7 +68,7 @@ export function MediaPicker({
       <Label>{label}</Label>
       {value ? (
         <div className={styles.preview}>
-          <img src={value.url} alt={value.altText ?? ""} className={styles.previewThumb} />
+          <MediaThumb item={value} className={styles.previewThumb} />
           <div className={styles.previewMeta}>
             <span className={styles.previewFilename}>{value.filename}</span>
             <div className={styles.previewActions}>
@@ -65,33 +84,29 @@ export function MediaPicker({
       ) : (
         <Button type="button" variant="outline" onClick={() => setOpen(true)}>
           <ImageIcon />
-          Choose image
+          {kind === "any" ? "Choose file" : "Choose image"}
         </Button>
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className={styles.dialogContent}>
           <DialogHeader>
-            <DialogTitle>Choose an image</DialogTitle>
-            <DialogDescription>Upload a new image or pick an existing one.</DialogDescription>
+            <DialogTitle>{kind === "any" ? "Choose a file" : "Choose an image"}</DialogTitle>
+            <DialogDescription>Upload a new file or pick an existing one.</DialogDescription>
           </DialogHeader>
 
-          <MediaUploadForm onUploaded={handleUploaded} />
+          <MediaUploadForm onUploaded={handleUploaded} kind={kind} />
 
-          {media === null ? (
+          {selectable === null ? (
             <p className={styles.loading}>Loading…</p>
-          ) : media.length === 0 ? (
-            <p className={styles.loading}>No images uploaded yet.</p>
+          ) : selectable.length === 0 ? (
+            <p className={styles.loading}>Nothing uploaded yet.</p>
           ) : (
             <ul className={styles.grid}>
-              {media.map((item) => (
+              {selectable.map((item) => (
                 <li key={item.id}>
-                  <button
-                    type="button"
-                    className={styles.gridItem}
-                    onClick={() => handlePick(item)}
-                  >
-                    <img src={item.url} alt={item.altText ?? ""} className={styles.gridThumb} />
+                  <button type="button" className={styles.gridItem} onClick={() => handlePick(item)}>
+                    <MediaThumb item={item} className={styles.gridThumb} />
                   </button>
                 </li>
               ))}

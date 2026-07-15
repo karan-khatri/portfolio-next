@@ -43,6 +43,21 @@
   }
 }
 
+.filePlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: var(--muted);
+}
+
+.fileIcon {
+  width: 2rem;
+  height: 2rem;
+  color: var(--muted-foreground);
+}
+
 .meta {
   display: flex;
   flex-direction: column;

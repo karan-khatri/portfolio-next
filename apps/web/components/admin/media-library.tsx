@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { AlertTriangleIcon, Trash2Icon } from "lucide-react";
+import { AlertTriangleIcon, FileIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -17,7 +17,7 @@ import {
 import { deleteMediaAction, getMediaUsageAction } from "@/app/admin/(protected)/media/actions";
 import { MediaUploadForm } from "./media-upload-form";
 import { formatBytes } from "@/lib/admin/format-bytes";
-import type { MediaPickerValue } from "@/lib/admin/media";
+import { isImageMedia, type MediaPickerValue } from "@/lib/admin/media";
 import type { MediaUsageCounts } from "@portfolio/db/server";
 import styles from "./media-library.module.scss";
 
@@ -122,23 +122,30 @@ export function MediaLibrary({ initialMedia }: { initialMedia: MediaPickerValue[
     <div className={styles.library}>
       <Card>
         <CardContent>
-          <MediaUploadForm onUploaded={handleUploaded} />
+          <MediaUploadForm onUploaded={handleUploaded} kind="any" />
         </CardContent>
       </Card>
 
       {media.length === 0 ? (
-        <p className={styles.empty}>No images uploaded yet.</p>
+        <p className={styles.empty}>No files uploaded yet.</p>
       ) : (
         <ul className={styles.grid}>
           {media.map((item) => (
             <li key={item.id} className={styles.cell}>
-              <img src={item.url} alt={item.altText ?? ""} className={styles.thumb} />
+              {isImageMedia(item) ? (
+                <img src={item.url} alt={item.altText ?? ""} className={styles.thumb} />
+              ) : (
+                <div className={styles.filePlaceholder}>
+                  <FileIcon className={styles.fileIcon} />
+                </div>
+              )}
               <div className={styles.meta}>
                 <span className={styles.filename} title={item.filename}>
                   {item.filename}
                 </span>
                 <span className={styles.dims}>
-                  {item.width}×{item.height} · {formatBytes(item.sizeBytes)}
+                  {item.width && item.height ? `${item.width}×${item.height} · ` : ""}
+                  {formatBytes(item.sizeBytes)}
                 </span>
               </div>
               <Button

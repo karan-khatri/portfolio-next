@@ -14,7 +14,9 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { storage } from "@/lib/storage";
 import { toMediaPickerValue, type MediaPickerValue } from "@/lib/admin/media";
 
-const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const DOCUMENT_TYPES = new Set(["application/pdf"]);
+const ALLOWED_TYPES = new Set([...IMAGE_TYPES, ...DOCUMENT_TYPES]);
 const MAX_BYTES = 8 * 1024 * 1024;
 
 export interface UploadMediaResult {
@@ -35,26 +37,35 @@ export async function uploadMediaAction(formData: FormData): Promise<UploadMedia
     const file = formData.get("file");
     if (!(file instanceof File)) return { error: "No file provided" };
     if (!ALLOWED_TYPES.has(file.type)) {
-      return { error: "Unsupported file type. Use JPEG, PNG, WebP, or GIF." };
+      return { error: "Unsupported file type. Use JPEG, PNG, WebP, GIF, or PDF." };
     }
     if (file.size > MAX_BYTES) return { error: "File is larger than 8MB." };
 
     const altTextRaw = formData.get("altText");
     const altText = typeof altTextRaw === "string" ? altTextRaw.trim() || null : null;
     const buffer = Buffer.from(await file.arrayBuffer());
+    const isImage = IMAGE_TYPES.has(file.type);
 
-    const metadata = await sharp(buffer).metadata();
-    if (!metadata.width || !metadata.height) return { error: "Could not read image dimensions." };
+    let width: number | null = null;
+    let height: number | null = null;
+    let blurDataUrl: string | null = null;
 
-    const blurBuffer = await sharp(buffer).resize(16).webp({ quality: 40 }).toBuffer();
-    const blurDataUrl = `data:image/webp;base64,${blurBuffer.toString("base64")}`;
+    if (isImage) {
+      const metadata = await sharp(buffer).metadata();
+      if (!metadata.width || !metadata.height) return { error: "Could not read image dimensions." };
+      width = metadata.width;
+      height = metadata.height;
+
+      const blurBuffer = await sharp(buffer).resize(16).webp({ quality: 40 }).toBuffer();
+      blurDataUrl = `data:image/webp;base64,${blurBuffer.toString("base64")}`;
+    }
 
     const stored = await storage.upload({ buffer, filename: file.name, contentType: file.type });
 
     const media = await createMedia({
       url: stored.url,
-      width: metadata.width,
-      height: metadata.height,
+      width,
+      height,
       blurDataUrl,
       altText,
       filename: file.name,
