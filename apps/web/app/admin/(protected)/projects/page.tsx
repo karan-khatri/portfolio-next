@@ -4,6 +4,7 @@ import { prisma } from "@portfolio/db/server";
 import { CreateSlugContentForm } from "@/components/admin/create-slug-content-form";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { Pagination } from "@/components/admin/pagination";
+import { SearchInput } from "@/components/admin/search-input";
 import { formatRelativeTime } from "@/lib/admin/format-relative-time";
 import { Card, CardContent } from "@/components/ui/card";
 import { createProjectAction } from "./actions";
@@ -14,24 +15,31 @@ const PAGE_SIZE = 20;
 export default async function AdminProjectsListPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; q?: string }>;
 }) {
-  const { page } = await searchParams;
+  const { page, q } = await searchParams;
   const currentPage = Math.max(1, Number(page) || 1);
+  const query = q?.trim() ?? "";
+
+  const where = query ? { title: { contains: query, mode: "insensitive" as const } } : {};
 
   const [projects, total] = await Promise.all([
     prisma.project.findMany({
+      where,
       orderBy: { updatedAt: "desc" },
       skip: (currentPage - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
     }),
-    prisma.project.count(),
+    prisma.project.count({ where }),
   ]);
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.heading}>Projects</h1>
+      <div className={styles.headerRow}>
+        <h1 className={styles.heading}>Projects</h1>
+        <SearchInput basePath="/admin/projects" initialQuery={query} placeholder="Search projects…" />
+      </div>
 
       <Card>
         <CardContent className={styles.listContent}>
@@ -52,12 +60,21 @@ export default async function AdminProjectsListPage({
                 </Link>
               </li>
             ))}
-            {projects.length === 0 ? <li className={styles.empty}>No projects yet.</li> : null}
+            {projects.length === 0 ? (
+              <li className={styles.empty}>
+                {query ? "No projects match your search." : "No projects yet."}
+              </li>
+            ) : null}
           </ul>
         </CardContent>
       </Card>
 
-      <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/admin/projects" />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        basePath="/admin/projects"
+        query={{ q: query }}
+      />
 
       <details className={styles.createDisclosure}>
         <summary className={styles.createTrigger}>

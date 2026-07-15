@@ -19,14 +19,18 @@ export async function createMedia(input: CreateMediaInput) {
 // `skip`/`take` are optional so existing callers (e.g. the MediaPicker
 // dialog, which wants every image to choose from) keep getting the full,
 // unpaginated list — only the admin Media library page passes them.
-export async function listMedia(options?: { skip?: number; take?: number }) {
+export async function listMedia(options?: { skip?: number; take?: number; query?: string }) {
+  const where = options?.query
+    ? { filename: { contains: options.query, mode: "insensitive" as const } }
+    : {};
   const [items, total] = await Promise.all([
     prisma.media.findMany({
+      where,
       orderBy: { createdAt: "desc" },
       skip: options?.skip,
       take: options?.take,
     }),
-    prisma.media.count(),
+    prisma.media.count({ where }),
   ]);
   return { items, total };
 }

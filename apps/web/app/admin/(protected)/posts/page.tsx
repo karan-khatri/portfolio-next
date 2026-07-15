@@ -4,6 +4,7 @@ import { prisma } from "@portfolio/db/server";
 import { CreateSlugContentForm } from "@/components/admin/create-slug-content-form";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { Pagination } from "@/components/admin/pagination";
+import { SearchInput } from "@/components/admin/search-input";
 import { formatRelativeTime } from "@/lib/admin/format-relative-time";
 import { Card, CardContent } from "@/components/ui/card";
 import { createPostAction } from "./actions";
@@ -14,24 +15,31 @@ const PAGE_SIZE = 20;
 export default async function AdminPostsListPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; q?: string }>;
 }) {
-  const { page } = await searchParams;
+  const { page, q } = await searchParams;
   const currentPage = Math.max(1, Number(page) || 1);
+  const query = q?.trim() ?? "";
+
+  const where = query ? { title: { contains: query, mode: "insensitive" as const } } : {};
 
   const [posts, total] = await Promise.all([
     prisma.post.findMany({
+      where,
       orderBy: { updatedAt: "desc" },
       skip: (currentPage - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
     }),
-    prisma.post.count(),
+    prisma.post.count({ where }),
   ]);
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.heading}>Posts</h1>
+      <div className={styles.headerRow}>
+        <h1 className={styles.heading}>Posts</h1>
+        <SearchInput basePath="/admin/posts" initialQuery={query} placeholder="Search posts…" />
+      </div>
 
       <Card>
         <CardContent className={styles.listContent}>
@@ -52,12 +60,14 @@ export default async function AdminPostsListPage({
                 </Link>
               </li>
             ))}
-            {posts.length === 0 ? <li className={styles.empty}>No posts yet.</li> : null}
+            {posts.length === 0 ? (
+              <li className={styles.empty}>{query ? "No posts match your search." : "No posts yet."}</li>
+            ) : null}
           </ul>
         </CardContent>
       </Card>
 
-      <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/admin/posts" />
+      <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/admin/posts" query={{ q: query }} />
 
       <details className={styles.createDisclosure}>
         <summary className={styles.createTrigger}>

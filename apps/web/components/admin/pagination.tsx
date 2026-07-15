@@ -8,14 +8,26 @@ export function Pagination({
   currentPage,
   totalPages,
   basePath,
+  query,
 }: {
   currentPage: number;
   totalPages: number;
   basePath: string;
+  // Extra query params (e.g. the current search term) to carry across
+  // page links, so paging through filtered results doesn't drop the filter.
+  query?: Record<string, string | undefined>;
 }) {
   if (totalPages <= 1) return null;
 
-  const pageHref = (page: number) => (page <= 1 ? basePath : `${basePath}?page=${page}`);
+  function pageHref(page: number) {
+    const params = new URLSearchParams();
+    for (const [key, val] of Object.entries(query ?? {})) {
+      if (val) params.set(key, val);
+    }
+    if (page > 1) params.set("page", String(page));
+    const qs = params.toString();
+    return qs ? `${basePath}?${qs}` : basePath;
+  }
 
   return (
     <nav aria-label="Pagination" className={styles.nav}>
