@@ -1,1 +1,1 @@
-export * from "./generated/client";
+export { SectionType } from "./generated/client";
