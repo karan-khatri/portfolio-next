@@ -6,6 +6,7 @@ overrides:
   "@hono/node-server": ">=1.19.13"
 allowBuilds:
   '@parcel/watcher': true
+  '@portfolio/db': true
   '@prisma/engines': true
   esbuild: true
   prisma: true
