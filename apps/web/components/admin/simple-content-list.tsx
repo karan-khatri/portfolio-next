@@ -269,6 +269,11 @@ export function SimpleContentList({
   const router = useRouter();
   const [orderedItems, setOrderedItems] = useState(items);
   const [creating, startCreating] = useTransition();
+  // Bumped after every successful create to remount <SimpleContentForm> with
+  // a fresh key — its fields are seeded from `initialValues` only once (on
+  // mount), so without this the "Add new" form kept showing the
+  // just-submitted values instead of clearing.
+  const [createKey, setCreateKey] = useState(0);
 
   useEffect(() => {
     setOrderedItems(items);
@@ -288,6 +293,7 @@ export function SimpleContentList({
       if (result.error) toast.error(result.error);
       else {
         toast.success("Added");
+        setCreateKey((key) => key + 1);
         router.refresh();
       }
     });
@@ -323,6 +329,7 @@ export function SimpleContentList({
         </summary>
         <div className={styles.createBody}>
           <SimpleContentForm
+            key={createKey}
             idPrefix="new"
             fields={fields}
             initialValues={{}}

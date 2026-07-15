@@ -137,6 +137,7 @@ function NavigationItemCard({
   const [pending, startTransition] = useTransition();
   const [creatingChild, startCreatingChild] = useTransition();
   const [children, setChildren] = useState(item.children);
+  const [createChildKey, setCreateChildKey] = useState(0);
 
   useEffect(() => setChildren(item.children), [item.children]);
 
@@ -165,6 +166,7 @@ function NavigationItemCard({
       if (result.error) toast.error(result.error);
       else {
         toast.success("Added");
+        setCreateChildKey((key) => key + 1);
         onChanged();
       }
     });
@@ -237,6 +239,7 @@ function NavigationItemCard({
               </summary>
               <div className={styles.createBody}>
                 <LinkForm
+                  key={createChildKey}
                   idPrefix={`${item.id}-new-child`}
                   initial={{ label: "", href: "" }}
                   submitLabel="Add"
@@ -256,6 +259,7 @@ export function NavigationManager({ items }: { items: NavigationItemWithChildren
   const router = useRouter();
   const [orderedItems, setOrderedItems] = useState(items);
   const [creating, startCreating] = useTransition();
+  const [createKey, setCreateKey] = useState(0);
 
   useEffect(() => setOrderedItems(items), [items]);
 
@@ -279,6 +283,7 @@ export function NavigationManager({ items }: { items: NavigationItemWithChildren
       if (result.error) toast.error(result.error);
       else {
         toast.success("Added");
+        setCreateKey((key) => key + 1);
         router.refresh();
       }
     });
@@ -304,6 +309,7 @@ export function NavigationManager({ items }: { items: NavigationItemWithChildren
         </summary>
         <div className={styles.createBody}>
           <LinkForm
+            key={createKey}
             idPrefix="new"
             initial={{ label: "", href: "" }}
             submitLabel="Add"
