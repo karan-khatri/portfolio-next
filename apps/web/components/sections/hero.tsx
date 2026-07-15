@@ -6,8 +6,8 @@ import { SectionHeading } from "./heading";
 
 export interface SectionImage {
   url: string;
-  width: number;
-  height: number;
+  width: number | null;
+  height: number | null;
   blurDataUrl: string | null;
   altText: string | null;
 }
@@ -68,8 +68,8 @@ export function HeroSection({
           <img
             src={image.url}
             alt={image.altText ?? ""}
-            width={image.width}
-            height={image.height}
+            width={image.width ?? undefined}
+            height={image.height ?? undefined}
             className="glass-panel w-full rounded-lg object-cover shadow-2xl"
           />
         ) : (

@@ -48,8 +48,8 @@ export function AboutSection({
             <img
               src={image.url}
               alt={image.altText ?? ""}
-              width={image.width}
-              height={image.height}
+              width={image.width ?? undefined}
+              height={image.height ?? undefined}
               className="glass-panel aspect-square w-full rounded-2xl object-cover lg:aspect-4/3"
             />
           </Reveal>
