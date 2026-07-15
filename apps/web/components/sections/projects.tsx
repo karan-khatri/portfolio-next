@@ -33,7 +33,7 @@ export function ProjectsSection({
       ) : content.displayMode === "slider" ? (
         <ProjectSlider items={items} />
       ) : (
-        <ul className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {items.map((project, index) => (
             <li key={project.id}>
               <ProjectCard project={project} delay={Math.min(index * 0.05, 0.3)} />
