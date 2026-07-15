@@ -13,3 +13,6 @@ packages/db/src/generated
 apps/web/public/uploads
 .DS_Store
 npm-debug.log*
+
+# Local-only agent guidance, not for the public repo
+/CLAUDE.md
