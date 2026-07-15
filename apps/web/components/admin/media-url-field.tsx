@@ -61,7 +61,6 @@ export function MediaUrlField({
       {icon ? <span className={styles.icon}>{icon}</span> : null}
       <Input
         id={id}
-        type="url"
         placeholder={placeholder}
         className={icon ? styles.inputWithIcon : undefined}
         value={value}
