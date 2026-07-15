@@ -8,10 +8,17 @@ import {
 } from "@portfolio/db/server";
 import { sectionRegistry, validateSectionContent } from "@portfolio/sections";
 
-// Real credentials belong in .env (gitignored), never hardcoded here — this
-// file is committed, and a public repo gets scraped for exactly this pattern.
 const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL ?? "admin@example.com";
 const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD ?? "dev-password-change-me";
+
+const isLocalDatabase = /localhost|127\.0\.0\.1/.test(process.env.DATABASE_URL ?? "");
+if (!isLocalDatabase && !process.env.SEED_ADMIN_EMAIL) {
+  throw new Error(
+    "DATABASE_URL doesn't look local, but SEED_ADMIN_EMAIL isn't set — refusing to seed a " +
+      "remote database with the public default admin@example.com / dev-password-change-me " +
+      "credentials. Set SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD explicitly.",
+  );
+}
 
 async function main() {
   const adminRole = await prisma.role.upsert({
