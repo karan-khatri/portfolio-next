@@ -23,6 +23,7 @@ import {
   HelpCircleIcon,
 } from "lucide-react";
 import { initialsFromEmail } from "@/lib/admin/initials";
+import { useBodyThemeClass } from "@/lib/use-body-theme-class";
 import styles from "./admin-shell.module.scss";
 
 const NAV_GROUPS = [
@@ -68,6 +69,7 @@ export function AdminShell({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  useBodyThemeClass("theme-admin");
 
   const currentLabel =
     [...ALL_NAV_ITEMS]

@@ -1,3 +1,5 @@
+"use client";
+
 import { LayoutDashboardIcon } from "lucide-react";
 import {
   Card,
@@ -6,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useBodyThemeClass } from "@/lib/use-body-theme-class";
 import styles from "./auth-shell.module.scss";
 
 export function AuthShell({
@@ -17,6 +20,8 @@ export function AuthShell({
   description?: string;
   children: React.ReactNode;
 }) {
+  useBodyThemeClass("theme-admin");
+
   return (
     <main className={`theme-admin ${styles.page}`}>
       <div className={styles.glow} aria-hidden="true" />
