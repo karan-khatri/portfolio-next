@@ -26,22 +26,18 @@ test.describe("admin content: draft, publish, unpublish a project", () => {
 
     await page.waitForURL(/\/admin\/projects\/[a-z0-9]+$/);
 
-    // Save a draft first.
     await page.getByRole("button", { name: "Save draft" }).click();
     await expect(page.getByText("Draft saved", { exact: true })).toBeVisible();
 
-    // Not live yet.
     const publicResponseBeforePublish = await page.request.get(`/projects/${SLUG}`);
     expect(publicResponseBeforePublish.status()).toBe(404);
 
-    // Publish makes it live.
     await page.getByRole("button", { name: "Publish", exact: true }).click();
     await expect(page.getByText("Published", { exact: true })).toBeVisible();
 
     await page.goto(`/projects/${SLUG}`);
     await expect(page.locator("h1")).toHaveText("E2E Admin Content Project");
 
-    // Unpublish takes it back down.
     const project = await prisma.project.findFirstOrThrow({ where: { slug: SLUG } });
     await page.goto(`/admin/projects/${project.id}`);
     await page.getByRole("button", { name: "Unpublish" }).click();
