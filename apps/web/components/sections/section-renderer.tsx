@@ -65,8 +65,6 @@ async function renderSection(section: RenderableSection, locale: string) {
           ? { locale, status: "PUBLISHED", featured: true }
           : { locale, status: "PUBLISHED" },
         orderBy: isCuratedMode ? { featuredOrder: "asc" } : { publishedAt: "desc" },
-        // A hand-curated featured/slider set shouldn't be silently truncated
-        // at the same default cap as "show my 6 latest" — only List gets one.
         take: typed.limit ?? (isCuratedMode ? undefined : 6),
         select: {
           id: true,
@@ -221,10 +219,6 @@ export interface SectionNavItem {
   children?: SectionNavItem[];
 }
 
-// Shared by SiteHeader (nav links) and SectionRenderer itself, so both
-// agree on ordering/labels instead of re-deriving them independently.
-// Hero is excluded — the nav wordmark already links to the top of the page,
-// so listing it again as its own nav item is redundant chrome.
 export function getSectionNavItems(sections: RenderableSection[]): SectionNavItem[] {
   return enabledSections(sections)
     .filter((section) => section.type !== SectionType.HERO)

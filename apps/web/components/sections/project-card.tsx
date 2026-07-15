@@ -13,11 +13,6 @@ export interface ProjectCardItem {
   liveUrl: string | null;
 }
 
-// Shared by the Home page's Projects section (grid and slider modes) and the
-// /projects index page. Image-first: the cover photo is the hero element,
-// with the title overlaid on a gradient scrim at its bottom edge. Falls back
-// to a plain decorative panel — not a broken image — for projects that
-// don't have a cover yet.
 export function ProjectCard({ project, delay = 0 }: { project: ProjectCardItem; delay?: number }) {
   return (
     <Reveal delay={delay} className="h-full">

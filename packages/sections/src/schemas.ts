@@ -1,11 +1,5 @@
 import { z } from "zod";
 
-// Each section type's content is presentation config for that instance.
-// Where a section pulls from its own domain table (Experience, Skill,
-// Service, Testimonial, Project, Post), the schema only carries heading
-// copy + an optional cap on how many rows to show — the rows themselves
-// stay in their own tables so they're editable independent of layout.
-
 export const heroContentSchema = z.object({
   heading: z.string().min(1),
   subheading: z.string().optional(),
@@ -25,10 +19,6 @@ export const projectsContentSchema = z.object({
   subheading: z.string().optional(),
   projectIds: z.array(z.string()).optional(),
   limit: z.number().int().positive().max(50).optional(),
-  // "list" (default): every published project, newest first, capped by
-  // `limit`. "featured"/"slider" both pull the same hand-ordered
-  // featured=true set (see Project.featuredOrder) — just rendered as a
-  // static grid vs. a carousel.
   displayMode: z.enum(["list", "featured", "slider"]).default("list"),
 });
 

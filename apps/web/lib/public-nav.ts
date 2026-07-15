@@ -3,10 +3,6 @@ import { getSectionNavItems, type SectionNavItem } from "@/components/sections/s
 
 const LOCALE = "en";
 
-// Shared by every public route (Home, Project/Post/Page detail) — the header
-// nav always reflects either the configured NavigationItem list, or (when
-// none is configured) Home's own section headings, regardless of which page
-// is currently being viewed, so navigation never dead-ends on a detail page.
 export async function getPublicNav(): Promise<{
   navItems: SectionNavItem[];
   settings: SiteSettingsValues;

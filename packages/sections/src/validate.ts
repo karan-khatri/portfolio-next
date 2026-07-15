@@ -11,9 +11,6 @@ export class SectionValidationError extends Error {
   }
 }
 
-// Every write path (admin composer, seed scripts, imports) must run content
-// through this before it reaches SectionInstance.content — the Json column
-// has no schema of its own, so this is the only enforcement point.
 export function validateSectionContent(
   type: SectionType,
   content: unknown,

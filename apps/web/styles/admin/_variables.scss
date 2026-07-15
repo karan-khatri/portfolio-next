@@ -1,4 +1,3 @@
-// Layout
 $sidebar-width: 15rem;
 $sidebar-width-collapsed: 4rem;
 $breakpoint-collapse: 64rem;
@@ -8,9 +7,6 @@ $row-height-md: 2.75rem;
 $row-height-sm: 2rem;
 $revision-sidebar-width: 18rem;
 
-// Semantic status colors, matching the Obsidian theme's scheme (published =
-// primary teal, draft = neutral outline, scheduled = amber, archived =
-// destructive) — consumed by status-badge.module.scss via [data-status].
 $status-published: var(--primary);
 $status-draft: var(--outline);
 $status-scheduled: #f59e0b;

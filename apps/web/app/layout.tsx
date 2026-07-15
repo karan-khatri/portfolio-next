@@ -7,8 +7,6 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
-// Public-site-only brand fonts (see .theme-site in globals.css) — the admin
-// keeps Geist untouched. Self-hosted via next/font, no external CDN <link>.
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   weight: ["500", "600", "700"],

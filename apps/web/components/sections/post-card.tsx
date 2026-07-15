@@ -10,7 +10,6 @@ export interface PostCardItem {
   coverImage: SectionImage | null;
 }
 
-// Shared by the Home page's Blog section and the /blog index page.
 export function PostCard({ post, delay = 0 }: { post: PostCardItem; delay?: number }) {
   return (
     <Reveal delay={delay} className="h-full">

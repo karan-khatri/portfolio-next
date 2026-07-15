@@ -2,9 +2,6 @@ import { prisma } from "./client";
 import { logAudit } from "./audit";
 import type { ContentStatus, SectionType } from "./generated/client";
 
-// Lightweight polymorphic key — Page/Project/Post don't share a table, so
-// Revision/PreviewToken reference them by (entityType, entityId) pairs
-// rather than a real foreign key.
 export type EntityType = "Page" | "Project" | "Post";
 
 export interface PageSectionInput {
@@ -25,20 +22,14 @@ export interface FlatRevisionData {
   body?: string | null;
   coverImageId?: string | null;
   tagIds?: string[];
-  // Project-only
   codeRepository?: string | null;
   liveUrl?: string | null;
   programmingLanguages?: string[];
-  // Post-only
   authorId?: string | null;
 }
 
 export type RevisionData = PageRevisionData | FlatRevisionData;
 
-// Callers are responsible for validating section content against
-// @portfolio/sections' registry schemas *before* calling this — this
-// package has no dependency on @portfolio/sections (which itself depends
-// on this package for the SectionType enum) to avoid a circular reference.
 export async function saveDraft(params: {
   entityType: EntityType;
   entityId: string;
@@ -184,7 +175,7 @@ export async function unpublishEntity(params: {
   });
 }
 
-const PREVIEW_TTL_MS = 60 * 60 * 1000; // 1 hour
+const PREVIEW_TTL_MS = 60 * 60 * 1000;
 
 export async function createPreviewToken(params: {
   entityType: EntityType;

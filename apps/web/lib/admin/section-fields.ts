@@ -5,14 +5,9 @@ export interface SectionField {
   label: string;
   type: "text" | "textarea" | "richtext" | "email" | "number" | "image" | "file" | "select";
   required?: boolean;
-  // Only used by "select" fields.
   options?: { value: string; label: string }[];
 }
 
-// Presentation-layer companion to @portfolio/sections' Zod schemas — kept
-// here rather than in that package because "how a field should render as a
-// form control" is an admin-app UX concern, not part of the content
-// contract itself.
 export const sectionFields: Record<SectionType, SectionField[]> = {
   [SectionType.HERO]: [
     { key: "heading", label: "Heading", type: "text", required: true },
@@ -75,10 +70,6 @@ export const sectionFields: Record<SectionType, SectionField[]> = {
   ],
 };
 
-// These section types only hold display config (heading/subheading/limit) —
-// the actual list items live in their own tables, managed on a dedicated
-// admin page. The composer surfaces that link so "why are there only two
-// fields here" doesn't read as broken.
 export const sectionDataSource: Partial<Record<SectionType, { label: string; href: string }>> = {
   [SectionType.PROJECTS]: { label: "Projects", href: "/admin/projects" },
   [SectionType.EXPERIENCE]: { label: "Experience", href: "/admin/experience" },

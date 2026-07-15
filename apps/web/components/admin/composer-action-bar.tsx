@@ -5,10 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import styles from "./composer-action-bar.module.scss";
 
-// Shared by every draft/publish/preview/unpublish content editor (Page,
-// Project, Post) — one place for the button hierarchy (Publish primary,
-// Save draft/Preview secondary, Unpublish visually separated) and the
-// sticky-in-flow positioning fix the sidebar migration required.
 export function ComposerActionBar({
   pending,
   onSaveDraft,

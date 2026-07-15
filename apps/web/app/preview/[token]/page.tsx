@@ -10,9 +10,6 @@ import { MotionProvider } from "@/components/motion/motion-provider";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
-// Draft content must never be cached or crawled — every request re-resolves
-// the token, and the noindex here backs up the robots.ts disallow (defense
-// in depth: a disallow alone doesn't stop indexing of an already-shared URL).
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {

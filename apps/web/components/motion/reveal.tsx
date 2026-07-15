@@ -2,9 +2,6 @@
 
 import { m, useReducedMotion } from "framer-motion";
 
-// Opacity/transform only — compositor-safe, zero layout reflow. Never wraps
-// the Hero (LCP element must render immediately, unanimated). Relies on an
-// ancestor MotionProvider for the LazyMotion feature bundle.
 export function Reveal({
   children,
   delay = 0,

@@ -18,10 +18,6 @@ export interface ApiErrorBody {
 
 export type ApiResponseBody<T> = ApiSuccessBody<T> | ApiErrorBody;
 
-// Every app/api/** route handler should return through one of these two
-// helpers instead of calling NextResponse.json directly, so every response
-// on the wire has the same { success, message, data } / { success, message,
-// error } shape regardless of which route produced it.
 export function apiSuccess<T>(
   data: T,
   message = "OK",

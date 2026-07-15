@@ -2,8 +2,6 @@ import Link from "next/link";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import styles from "./pagination.module.scss";
 
-// Admin-side pagination (SCSS module, matches .theme-admin). See
-// components/pagination.tsx for the Tailwind public-site equivalent.
 export function Pagination({
   currentPage,
   totalPages,
@@ -13,8 +11,6 @@ export function Pagination({
   currentPage: number;
   totalPages: number;
   basePath: string;
-  // Extra query params (e.g. the current search term) to carry across
-  // page links, so paging through filtered results doesn't drop the filter.
   query?: Record<string, string | undefined>;
 }) {
   if (totalPages <= 1) return null;

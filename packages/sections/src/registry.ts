@@ -18,10 +18,7 @@ export interface SectionDefinition<TContent = unknown> {
   label: string;
   schema: z.ZodType<TContent>;
   defaultContent: () => TContent;
-  // Reserves layout space so streamed-in data never shifts the page (CLS).
   minHeight: string;
-  // Sections author at most one heading level below the page's own h1;
-  // the renderer increments this for any section that nests sub-sections.
   headingLevel: 2 | 3;
 }
 

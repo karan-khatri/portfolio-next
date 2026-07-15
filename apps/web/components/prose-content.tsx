@@ -1,12 +1,5 @@
 import DOMPurify from "isomorphic-dompurify";
 
-// Body fields (Project/Post, About) predate the RichTextEditor and may still
-// hold plain text saved before that migration — blank-line-separated
-// paragraphs with no markup at all. Rendered as-is through
-// dangerouslySetInnerHTML, those newlines would collapse into one run-on
-// paragraph (HTML doesn't preserve whitespace). Detecting "no tags at all"
-// and upgrading to real <p> tags first keeps that legacy content readable
-// without a data migration.
 function upgradeLegacyPlainText(value: string): string {
   if (/<[a-z][\s\S]*>/i.test(value)) return value;
   return value
@@ -16,11 +9,6 @@ function upgradeLegacyPlainText(value: string): string {
     .join("");
 }
 
-// Renders Project/Post/About `body` HTML (authored via the admin
-// RichTextEditor, Tiptap's StarterKit output) sanitized against XSS. No
-// @tailwindcss/typography plugin in this app, so heading/list/quote/code
-// spacing is a handful of arbitrary-variant utility overrides here rather
-// than a new dependency.
 export function ProseContent({ html, className }: { html: string; className?: string }) {
   const clean = DOMPurify.sanitize(upgradeLegacyPlainText(html));
   if (!clean) return null;

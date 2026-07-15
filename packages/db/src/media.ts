@@ -16,9 +16,6 @@ export async function createMedia(input: CreateMediaInput) {
   return prisma.media.create({ data: input });
 }
 
-// `skip`/`take` are optional so existing callers (e.g. the MediaPicker
-// dialog, which wants every image to choose from) keep getting the full,
-// unpaginated list — only the admin Media library page passes them.
 export async function listMedia(options?: { skip?: number; take?: number; query?: string }) {
   const where = options?.query
     ? { filename: { contains: options.query, mode: "insensitive" as const } }
@@ -46,9 +43,6 @@ export interface MediaUsageCounts {
   postCovers: number;
 }
 
-// Best-effort usage check for the delete-confirm warning — covers every
-// relation backed by a real FK. Hero/About images live inside a page
-// section's JSON content blob (no FK), so they can't be counted here.
 export async function getMediaUsageCounts(mediaId: string): Promise<MediaUsageCounts> {
   const [seo, projectCovers, postCovers] = await Promise.all([
     prisma.seo.count({ where: { ogImageId: mediaId } }),
@@ -58,8 +52,6 @@ export async function getMediaUsageCounts(mediaId: string): Promise<MediaUsageCo
   return { seo, projectCovers, postCovers };
 }
 
-// Relies on the Media relations already being ON DELETE SET NULL at the DB
-// level — no manual unlinking needed before this.
 export async function deleteMediaRow(id: string) {
   return prisma.media.delete({ where: { id } });
 }

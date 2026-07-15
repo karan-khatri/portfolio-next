@@ -36,10 +36,6 @@ export function MediaPicker({
   label: string;
   value: MediaPickerValue | null;
   onChange: (value: MediaPickerValue | null) => void;
-  // "image" (default) is for actual image slots (cover images, Hero/About
-  // images) — the picker only offers uploaded images. "any" additionally
-  // surfaces non-image uploads (e.g. a resume PDF), for fields like Settings'
-  // Resume URL that link to a document rather than render one.
   kind?: "image" | "any";
 }) {
   const [open, setOpen] = useState(false);

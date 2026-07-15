@@ -3,13 +3,6 @@ import { MotionProvider } from "@/components/motion/motion-provider";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
-// Shared wrapper for every published public route (Home, Project/Post/Page
-// detail): the .theme-site scope, skip link, header/footer chrome, and the
-// motion provider around the scrollable content. Lifted out of app/page.tsx
-// so new detail routes don't each hand-roll the same markup. The preview
-// route (app/preview/[token]/page.tsx) intentionally keeps its own version —
-// it has different chrome (draft banner, no real settings) not worth forcing
-// through this component.
 export function PublicShell({
   title,
   navItems,

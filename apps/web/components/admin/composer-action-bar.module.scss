@@ -1,7 +1,5 @@
 @use "../../styles/admin/mixins" as mix;
 
-// Sticky-in-flow, not fixed — stays inside the main editor column (next to
-// the fixed revision-history sidebar on wide viewports), not the viewport.
 .actionBar {
   position: sticky;
   bottom: 0;

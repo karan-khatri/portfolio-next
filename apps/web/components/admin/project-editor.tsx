@@ -78,10 +78,6 @@ export function ProjectEditor({
   const [pending, startTransition] = useTransition();
   const [togglingFeatured, startTogglingFeatured] = useTransition();
 
-  // Re-sync when the server re-fetches (e.g. after restoring an older
-  // revision via <RevisionHistoryPanel>, which calls router.refresh() from
-  // a sibling component) — useState's initial value only applies on mount,
-  // so without this the form would keep showing stale content.
   useEffect(() => {
     setTitle(initial.title);
     setExcerpt(initial.excerpt);
@@ -152,8 +148,6 @@ export function ProjectEditor({
     toast.success("Copied preview link");
   }
 
-  // Featured is a curation flag on the row itself, not draft/publish content
-  // — it takes effect immediately, independent of Save draft/Publish.
   function handleToggleFeatured(next: boolean) {
     setFeatured(next);
     startTogglingFeatured(async () => {

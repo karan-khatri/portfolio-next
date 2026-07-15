@@ -8,11 +8,6 @@ export interface SiteSettingsValues {
   resumeUrl: string | null;
 }
 
-// Ships with zero migration risk: no SiteSetting rows need to exist yet,
-// these are exactly today's hardcoded values in app/layout.tsx (the three
-// social/resume fields have no prior hardcoded value — they default to
-// null so the header/footer/contact sections can conditionally hide them
-// until the user actually sets one).
 const DEFAULTS: SiteSettingsValues = {
   title: "Portfolio",
   description: "Portfolio site",
@@ -47,10 +42,6 @@ export async function getSiteSettings(): Promise<SiteSettingsValues> {
 }
 
 export async function upsertSiteSettings(values: SiteSettingsValues): Promise<void> {
-  // SiteSetting.value is a non-nullable Json column — Prisma's typed API
-  // rejects a bare `null` there (it's ambiguous with a JSON `null` literal),
-  // so absent optional fields are stored as "" rather than reaching for the
-  // Prisma.JsonNull sentinel; readString() already treats "" as absent.
   const entries: [string, string][] = [
     [TITLE_KEY, values.title],
     [DESCRIPTION_KEY, values.description],

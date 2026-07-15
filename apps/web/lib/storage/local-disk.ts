@@ -13,12 +13,6 @@ const EXTENSION_BY_MIME_TYPE: Record<string, string> = {
   "application/pdf": ".pdf",
 };
 
-// Dev-only stand-in: writes into apps/web/public/uploads and serves the
-// result at /uploads/<file>. Vercel's serverless functions have a
-// READ-ONLY filesystem outside /tmp, so this adapter will NOT work once
-// deployed there. Swap the `storage` export in ./index.ts for a Vercel
-// Blob (or S3/R2) adapter implementing the same StorageAdapter interface
-// before shipping — no other call site needs to change.
 export class LocalDiskStorageAdapter implements StorageAdapter {
   async upload({
     buffer,

@@ -34,8 +34,6 @@ async function linkSeoId(entityType: SeoEntityType, entityId: string, seoId: str
   }
 }
 
-// Saved immediately, not through the Revision system — metadata doesn't
-// need preview-before-publish semantics the way body content does.
 export async function upsertSeo(params: {
   entityType: SeoEntityType;
   entityId: string;

@@ -16,11 +16,6 @@ import { MediaUploadForm } from "./media-upload-form";
 import { isImageMedia, type MediaPickerValue } from "@/lib/admin/media";
 import styles from "./media-url-field.module.scss";
 
-// A plain URL text field (for pasting an external link) plus a "browse
-// Media" button — for settings that store a bare URL string rather than a
-// Media relation (e.g. Site Settings' Resume URL). Picking or uploading a
-// file here just copies its `url` into the text field; nothing keeps the
-// two in sync afterwards, matching how the field is stored (a plain string).
 export function MediaUrlField({
   id,
   value,

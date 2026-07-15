@@ -5,9 +5,6 @@ import { XIcon } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import styles from "./tag-input.module.scss";
 
-// Plain pill input — type, then Enter or comma to add; click a pill's X (or
-// Backspace on an empty draft) to remove. No autocomplete/combobox
-// dependency; deliberately simple for a field this secondary.
 export function TagInput({
   label,
   value,

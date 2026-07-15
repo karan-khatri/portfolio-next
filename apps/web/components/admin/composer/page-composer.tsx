@@ -59,10 +59,6 @@ export function PageComposer({
   const [resolvedMedia, setResolvedMedia] = useState(initialResolvedMedia);
   const [newSectionType, setNewSectionType] = useState<SectionType>(ALL_SECTION_TYPES[0]);
 
-  // Re-sync when the server re-fetches (e.g. after restoring an older
-  // revision via <RevisionHistoryPanel>, which calls router.refresh() from
-  // a sibling component) — useState's initial value only applies on mount,
-  // so without this the form would keep showing stale content.
   useEffect(() => {
     setTitle(initialTitle);
     setSections(initialSections);

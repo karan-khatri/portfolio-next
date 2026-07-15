@@ -1,9 +1,5 @@
 import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
 
-// Public-site pagination (Tailwind, matches .theme-site). See
-// components/admin/pagination.tsx for the SCSS-module admin equivalent —
-// admin UI never uses Tailwind utility classes, so these stay separate
-// components sharing the same prop shape rather than one shared component.
 export function Pagination({
   currentPage,
   totalPages,

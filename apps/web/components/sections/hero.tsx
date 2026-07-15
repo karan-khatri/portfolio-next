@@ -12,10 +12,6 @@ export interface SectionImage {
   altText: string | null;
 }
 
-// Never wrapped in <Reveal> — this is the LCP element and must render
-// immediately, unanimated. Bypasses SectionShell (which assumes a single
-// linear column) since the reference layout is a two-column split with a
-// decorative terminal mockup on the right.
 export function HeroSection({
   id,
   content,

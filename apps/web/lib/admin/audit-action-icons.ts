@@ -7,8 +7,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-// Audit actions are written as "${entityType}.${verb}" (see
-// packages/db/src/cms.ts) — only the verb determines the icon.
 const ICON_BY_VERB: Record<string, LucideIcon> = {
   draft_saved: PencilIcon,
   publish: SendIcon,

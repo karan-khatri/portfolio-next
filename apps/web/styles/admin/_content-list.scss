@@ -1,8 +1,3 @@
-// Shared by every "list of items with a status badge + create disclosure"
-// admin route (Pages/Projects/Posts) — @include once at the top level of
-// each route's own .module.scss so every route still gets its own locally
-// scoped classes (CSS Modules), without three copies of the same 100+
-// lines of SCSS to keep in sync.
 @mixin content-list-styles {
   .page {
     display: flex;

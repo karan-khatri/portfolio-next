@@ -7,8 +7,6 @@ import { getPublicNav } from "@/lib/public-nav";
 
 const LOCALE = "en";
 
-// "home" is reserved for `/` (app/page.tsx) — a Page with that slug is never
-// rendered again at /home, matching sitemap.ts's own special-casing of it.
 async function getStandalonePage(slug: string[]) {
   if (slug.length !== 1 || slug[0] === "home") return null;
   return prisma.page.findFirst({
@@ -36,10 +34,6 @@ export async function generateMetadata({
   };
 }
 
-// Only reached for paths that don't match any more-specific route (admin/,
-// api/, preview/, projects/, blog/, and / all take priority automatically).
-// Node runtime, so it can query Postgres directly — unlike proxy.ts, which
-// is edge-only.
 export default async function CatchAllPage({
   params,
 }: {

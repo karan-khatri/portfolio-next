@@ -11,9 +11,6 @@ export async function listRevisions(entityType: EntityType, entityId: string, li
   });
 }
 
-// Restoring never overwrites the live entity directly — it saves the old
-// revision's data as a *new* draft, so the existing preview -> publish flow
-// still applies before anything actually goes live.
 export async function restoreRevision(params: {
   entityType: EntityType;
   entityId: string;

@@ -3,9 +3,6 @@ import { prisma } from "@portfolio/db/server";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
-// Only published, indexable rows ever reach this list — draft/scheduled/
-// archived content and anything under /admin is structurally excluded by
-// this query, not filtered out after the fact.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [pages, projects, posts, authors] = await Promise.all([
     prisma.page.findMany({
@@ -50,7 +47,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.3,
   }));
 
-  // Index/listing pages, not tied to any single row's updatedAt.
   const indexEntries = [
     { url: `${siteUrl}/projects`, changeFrequency: "weekly" as const, priority: 0.6 },
     { url: `${siteUrl}/blog`, changeFrequency: "weekly" as const, priority: 0.5 },

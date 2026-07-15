@@ -177,11 +177,6 @@ export function RichTextEditor({
     },
   });
 
-  // Resync when the value changes from *outside* the editor (revision
-  // restore re-fetching server data) — comparing against the editor's own
-  // current HTML avoids clobbering the user's cursor/selection on every
-  // keystroke, since onUpdate above would otherwise make `value` change on
-  // every render too.
   useEffect(() => {
     if (!editor) return;
     if (value !== editor.getHTML()) {

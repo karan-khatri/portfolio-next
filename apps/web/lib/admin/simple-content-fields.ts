@@ -3,8 +3,6 @@ export interface SimpleField {
   label: string;
   type: "text" | "textarea" | "number" | "date" | "url" | "tags" | "boolean";
   required?: boolean;
-  // "boolean" fields render as a Switch; this is the label shown next to it
-  // (falls back to `label` when omitted).
   booleanLabel?: string;
 }
 
@@ -21,10 +19,6 @@ export interface SimpleContentSummary {
   secondary?: string;
 }
 
-// Colocated with the field configs (rather than passed in from each server
-// page.tsx as a prop) because a plain function can't cross the Server->Client
-// component boundary — only the type key does, and this module resolves it
-// client-side.
 export const simpleContentSummaries: Record<
   SimpleContentType,
   (item: Record<string, unknown>) => SimpleContentSummary

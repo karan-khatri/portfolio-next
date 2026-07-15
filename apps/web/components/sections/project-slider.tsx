@@ -4,9 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { ProjectCard, type ProjectCardItem } from "./project-card";
 
-// Native scroll-snap carousel (not a framer-motion drag reimplementation) —
-// touch/trackpad scrolling and keyboard scrolling work for free, arrows and
-// dots just call scrollTo on the same track.
 export function ProjectSlider({ items }: { items: ProjectCardItem[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);

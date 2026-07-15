@@ -13,9 +13,6 @@ export interface CreateSlugContentState {
 
 const initialState: CreateSlugContentState = {};
 
-// Shared by Page/Project/Post — all three need the identical
-// slug+locale+title creation form, differing only in which server action
-// they call and the submit button's label.
 export function CreateSlugContentForm({
   action,
   submitLabel,

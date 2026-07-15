@@ -8,9 +8,6 @@ function slugify(name: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-// Turns typed tag names into real Tag rows (upsert-by-slug) and returns
-// their ids, so a draft can store plain strings while the live relation
-// (set at publish time) always points at real rows.
 export async function resolveTagIds(names: string[]): Promise<string[]> {
   const unique = [...new Set(names.map((name) => name.trim()).filter(Boolean))];
 
