@@ -53,8 +53,8 @@ export default async function AdminDashboardPage() {
         </h2>
         <div className={styles.statGrid}>
           <StatCard title="Pages" icon={FileTextIcon} counts={pages} href="/admin/pages" />
-          <StatCard title="Projects" icon={FolderKanbanIcon} counts={projects} href="/admin/pages" />
-          <StatCard title="Posts" icon={NewspaperIcon} counts={posts} href="/admin/pages" />
+          <StatCard title="Projects" icon={FolderKanbanIcon} counts={projects} href="/admin/projects" />
+          <StatCard title="Posts" icon={NewspaperIcon} counts={posts} href="/admin/posts" />
         </div>
       </section>
 
