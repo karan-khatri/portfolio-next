@@ -43,5 +43,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
-  return [...pageEntries, ...projectEntries, ...postEntries];
+  // Index/listing pages, not tied to any single row's updatedAt.
+  const indexEntries = [
+    { url: `${siteUrl}/projects`, changeFrequency: "weekly" as const, priority: 0.6 },
+    { url: `${siteUrl}/blog`, changeFrequency: "weekly" as const, priority: 0.5 },
+  ];
+
+  return [...pageEntries, ...projectEntries, ...postEntries, ...indexEntries];
 }
