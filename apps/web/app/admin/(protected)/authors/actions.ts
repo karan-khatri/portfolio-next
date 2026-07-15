@@ -1,16 +1,10 @@
 "use server";
 
 import { prisma, logAudit } from "@portfolio/db/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireEditor } from "@/lib/auth/require-admin";
 
 export interface ActionResult {
   error?: string;
-}
-
-async function requireEditor() {
-  const user = await getCurrentUser();
-  if (!user) throw new Error("Unauthorized");
-  return user;
 }
 
 function toAuthorData(values: Record<string, unknown>) {

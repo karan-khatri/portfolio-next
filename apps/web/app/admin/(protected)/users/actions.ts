@@ -2,16 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { assignRole, revokeRole, logAudit } from "@portfolio/db/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireAdminRole } from "@/lib/auth/require-admin";
 
 export interface ActionResult {
   error?: string;
-}
-
-async function requireAdminRole() {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") throw new Error("Unauthorized");
-  return user;
 }
 
 export async function assignRoleAction(

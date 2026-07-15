@@ -9,7 +9,7 @@ import {
   resolveTagIds,
   type FlatRevisionData,
 } from "@portfolio/db/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireEditor } from "@/lib/auth/require-admin";
 
 export interface ComposerActionResult {
   error?: string;
@@ -24,12 +24,6 @@ export interface PostFormInput {
   tags: string[];
   coverImageId: string | null;
   authorId: string | null;
-}
-
-async function requireEditor() {
-  const user = await getCurrentUser();
-  if (!user) throw new Error("Unauthorized");
-  return user;
 }
 
 async function buildData(input: PostFormInput): Promise<FlatRevisionData> {

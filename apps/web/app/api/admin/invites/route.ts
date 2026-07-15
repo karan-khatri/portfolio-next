@@ -1,15 +1,14 @@
 import { StatusCodes } from "http-status-codes";
 import { createInvite, prisma } from "@portfolio/db/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireAdminRole } from "@/lib/auth/require-admin";
 import { apiSuccess, apiError } from "@/lib/api/response";
 
 export async function POST(request: Request) {
-  const currentUser = await getCurrentUser();
-  if (!currentUser) {
+  let currentUser;
+  try {
+    currentUser = await requireAdminRole();
+  } catch {
     return apiError("Unauthorized", { status: StatusCodes.UNAUTHORIZED });
-  }
-  if (currentUser.role !== "ADMIN") {
-    return apiError("Only admins can send invites", { status: StatusCodes.FORBIDDEN });
   }
 
   const body = await request.json().catch(() => null);
@@ -29,10 +28,6 @@ export async function POST(request: Request) {
     return apiError("Unknown role", { status: StatusCodes.BAD_REQUEST });
   }
 
-  // Pass the client's intent through as-is (don't silently normalize a
-  // mismatch away) — createInvite's assertRoleTimeFrame is the single
-  // source of truth for "permanent roles can't have an expiry, everything
-  // else must," and it rejects a bad combination with a clear error.
   const roleExpiresAt = expiresInDays
     ? new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000)
     : null;

@@ -10,7 +10,7 @@ import {
   type PageSectionInput,
 } from "@portfolio/db/server";
 import { validateSectionContent, SectionValidationError } from "@portfolio/sections";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireEditor } from "@/lib/auth/require-admin";
 
 export interface ComposerActionResult {
   error?: string;
@@ -26,12 +26,6 @@ function buildValidatedData(title: string, sections: PageSectionInput[]): PageRe
       content: validateSectionContent(section.type, section.content),
     })),
   };
-}
-
-async function requireEditor() {
-  const user = await getCurrentUser();
-  if (!user) throw new Error("Unauthorized");
-  return user;
 }
 
 export async function saveDraftAction(

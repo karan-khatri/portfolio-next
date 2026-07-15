@@ -2,17 +2,15 @@
 
 import { revalidatePath } from "next/cache";
 import { upsertSiteSettings, logAudit, type SiteSettingsValues } from "@portfolio/db/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireEditor } from "@/lib/auth/require-admin";
 
 export interface ActionResult {
   error?: string;
 }
 
 export async function saveSiteSettingsAction(values: SiteSettingsValues): Promise<ActionResult> {
-  const user = await getCurrentUser();
-  if (!user) return { error: "Unauthorized" };
-
   try {
+    const user = await requireEditor();
     await upsertSiteSettings(values);
     await logAudit({ userId: user.id, action: "siteSettings.updated", entity: "SiteSetting", entityId: "site" });
     revalidatePath("/");

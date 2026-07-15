@@ -10,7 +10,7 @@ import {
   logAudit,
   type MediaUsageCounts,
 } from "@portfolio/db/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireEditor } from "@/lib/auth/require-admin";
 import { storage } from "@/lib/storage";
 import { toMediaPickerValue, type MediaPickerValue } from "@/lib/admin/media";
 
@@ -22,12 +22,6 @@ const MAX_BYTES = 8 * 1024 * 1024;
 export interface UploadMediaResult {
   error?: string;
   media?: MediaPickerValue;
-}
-
-async function requireEditor() {
-  const user = await getCurrentUser();
-  if (!user) throw new Error("Unauthorized");
-  return user;
 }
 
 export async function uploadMediaAction(formData: FormData): Promise<UploadMediaResult> {

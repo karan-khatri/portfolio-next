@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@portfolio/db/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireEditor } from "@/lib/auth/require-admin";
 
 export interface CreatePageState {
   error?: string;
@@ -13,8 +13,9 @@ export async function createPageAction(
   _prevState: CreatePageState,
   formData: FormData,
 ): Promise<CreatePageState> {
-  const user = await getCurrentUser();
-  if (!user) {
+  try {
+    await requireEditor();
+  } catch {
     return { error: "Unauthorized" };
   }
 

@@ -10,7 +10,7 @@ import {
   resolveTagIds,
   type FlatRevisionData,
 } from "@portfolio/db/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireEditor } from "@/lib/auth/require-admin";
 
 export interface ComposerActionResult {
   error?: string;
@@ -27,12 +27,6 @@ export interface ProjectFormInput {
   codeRepository: string;
   liveUrl: string;
   programmingLanguages: string[];
-}
-
-async function requireEditor() {
-  const user = await getCurrentUser();
-  if (!user) throw new Error("Unauthorized");
-  return user;
 }
 
 async function buildData(input: ProjectFormInput): Promise<FlatRevisionData> {
@@ -105,9 +99,6 @@ export async function unpublishAction(projectId: string): Promise<ComposerAction
   }
 }
 
-// Featured/order live directly on the row, not the draft/publish revision
-// flow — curation (what shows in the Featured/Slider set, and in what
-// order) is a structural concern, not versioned content.
 export async function toggleFeaturedAction(
   projectId: string,
   featured: boolean,

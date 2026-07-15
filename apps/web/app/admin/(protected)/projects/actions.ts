@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@portfolio/db/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireEditor } from "@/lib/auth/require-admin";
 
 export interface CreateProjectState {
   error?: string;
@@ -13,8 +13,9 @@ export async function createProjectAction(
   _prevState: CreateProjectState,
   formData: FormData,
 ): Promise<CreateProjectState> {
-  const user = await getCurrentUser();
-  if (!user) {
+  try {
+    await requireEditor();
+  } catch {
     return { error: "Unauthorized" };
   }
 
@@ -48,8 +49,7 @@ export async function reorderFeaturedProjectsAction(
   orderedIds: string[],
 ): Promise<{ error?: string }> {
   try {
-    const user = await getCurrentUser();
-    if (!user) return { error: "Unauthorized" };
+    await requireEditor();
     await prisma.$transaction(
       orderedIds.map((id, index) =>
         prisma.project.update({ where: { id, featured: true }, data: { featuredOrder: index } }),
@@ -65,8 +65,7 @@ export async function reorderFeaturedProjectsAction(
 
 export async function unfeatureProjectAction(projectId: string): Promise<{ error?: string }> {
   try {
-    const user = await getCurrentUser();
-    if (!user) return { error: "Unauthorized" };
+    await requireEditor();
     await prisma.project.update({
       where: { id: projectId },
       data: { featured: false, featuredOrder: null },

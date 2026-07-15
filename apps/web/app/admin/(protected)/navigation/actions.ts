@@ -2,16 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma, logAudit } from "@portfolio/db/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireEditor } from "@/lib/auth/require-admin";
 
 export interface ActionResult {
   error?: string;
-}
-
-async function requireEditor() {
-  const user = await getCurrentUser();
-  if (!user) throw new Error("Unauthorized");
-  return user;
 }
 
 export async function createNavigationItemAction(
@@ -69,8 +63,6 @@ export async function updateNavigationItemAction(
   }
 }
 
-// Children have no ON DELETE CASCADE at the DB level for the self-relation,
-// so they're removed explicitly, in the same transaction, before the parent.
 export async function deleteNavigationItemAction(id: string): Promise<ActionResult> {
   try {
     const user = await requireEditor();
@@ -91,8 +83,6 @@ export async function deleteNavigationItemAction(id: string): Promise<ActionResu
   }
 }
 
-// Scoped to one sibling group (top-level items, or one parent's children) —
-// reordering a submenu never touches other groups' order values.
 export async function reorderNavigationItemAction(
   parentId: string | null,
   orderedIds: string[],
