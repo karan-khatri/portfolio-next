@@ -8,3 +8,4 @@ export * from "./seo";
 export * from "./media";
 export * from "./site-settings";
 export * from "./revisions";
+export * from "./bootstrap";
