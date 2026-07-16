@@ -1,4 +1,26 @@
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
+
+const ALLOWED_TAGS = [
+  "p",
+  "br",
+  "hr",
+  "strong",
+  "em",
+  "s",
+  "code",
+  "pre",
+  "blockquote",
+  "ul",
+  "ol",
+  "li",
+  "a",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+];
 
 function upgradeLegacyPlainText(value: string): string {
   if (/<[a-z][\s\S]*>/i.test(value)) return value;
@@ -10,7 +32,11 @@ function upgradeLegacyPlainText(value: string): string {
 }
 
 export function ProseContent({ html, className }: { html: string; className?: string }) {
-  const clean = DOMPurify.sanitize(upgradeLegacyPlainText(html));
+  const clean = sanitizeHtml(upgradeLegacyPlainText(html), {
+    allowedTags: ALLOWED_TAGS,
+    allowedAttributes: { a: ["href", "target", "rel"] },
+    allowedSchemes: ["http", "https", "mailto"],
+  });
   if (!clean) return null;
 
   return (

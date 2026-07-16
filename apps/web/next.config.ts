@@ -2,7 +2,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@portfolio/db", "@portfolio/sections"],
-  serverExternalPackages: ["isomorphic-dompurify", "jsdom"],
   experimental: {
     serverActions: { bodySizeLimit: "10mb" },
   },
