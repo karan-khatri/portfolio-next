@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "seed": "tsx --env-file=.env scripts/seed.ts",
+    "seed": "tsx scripts/seed.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {
