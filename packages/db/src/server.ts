@@ -1,4 +1,4 @@
-export * from "./generated/client";
+export { SectionType } from "./generated/client";
 export * from "./client";
 export * from "./auth";
 export * from "./cms";

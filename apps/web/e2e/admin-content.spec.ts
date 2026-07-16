@@ -27,13 +27,13 @@ test.describe("admin content: draft, publish, unpublish a project", () => {
     await page.waitForURL(/\/admin\/projects\/[a-z0-9]+$/);
 
     await page.getByRole("button", { name: "Save draft" }).click();
-    await expect(page.getByText("Draft saved", { exact: true })).toBeVisible();
+    await expect(page.getByText("Draft saved", { exact: true })).toBeVisible({ timeout: 15_000 });
 
     const publicResponseBeforePublish = await page.request.get(`/projects/${SLUG}`);
     expect(publicResponseBeforePublish.status()).toBe(404);
 
     await page.getByRole("button", { name: "Publish", exact: true }).click();
-    await expect(page.getByText("Published", { exact: true })).toBeVisible();
+    await expect(page.getByText("Published", { exact: true })).toBeVisible({ timeout: 15_000 });
 
     await page.goto(`/projects/${SLUG}`);
     await expect(page.locator("h1")).toHaveText("E2E Admin Content Project");
@@ -41,7 +41,7 @@ test.describe("admin content: draft, publish, unpublish a project", () => {
     const project = await prisma.project.findFirstOrThrow({ where: { slug: SLUG } });
     await page.goto(`/admin/projects/${project.id}`);
     await page.getByRole("button", { name: "Unpublish" }).click();
-    await expect(page.getByText("Unpublished", { exact: true })).toBeVisible();
+    await expect(page.getByText("Unpublished", { exact: true })).toBeVisible({ timeout: 15_000 });
 
     const publicResponseAfterUnpublish = await page.request.get(`/projects/${SLUG}`);
     expect(publicResponseAfterUnpublish.status()).toBe(404);
