@@ -17,11 +17,10 @@ function buildConnectionString(): string | undefined {
 
 const adapter = new PrismaPg({
   connectionString: buildConnectionString(),
+  max: 1,
   ...(caCert ? { ssl: { ca: caCert, rejectUnauthorized: true } } : {}),
 });
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
 
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
-}
+globalForPrisma.prisma = prisma;
