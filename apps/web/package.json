@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "pnpm": {
-    "supportedArchitectures": {
-      "os": ["current", "linux"],
-      "cpu": ["current", "x64"]
+    "overrides": {
+      "sharp": "^0.33.5",
+      "@img/sharp-linux-x64": "^0.33.5"
     }
   },
   "scripts": {
