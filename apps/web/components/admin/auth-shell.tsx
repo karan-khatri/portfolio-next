@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useBodyThemeClass } from "@/lib/use-body-theme-class";
+import { ThemeToggle } from "@/components/theme-toggle";
 import styles from "./auth-shell.module.scss";
 
 export function AuthShell({
@@ -24,6 +25,7 @@ export function AuthShell({
 
   return (
     <main className={`theme-admin ${styles.page}`}>
+      <ThemeToggle className={styles.themeToggle} iconClassName={styles.themeToggleIcon} />
       <div className={styles.glow} aria-hidden="true" />
       <div className={styles.frame}>
         <div className={styles.badgeRow}>

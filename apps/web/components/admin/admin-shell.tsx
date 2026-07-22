@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { initialsFromEmail } from "@/lib/admin/initials";
 import { useBodyThemeClass } from "@/lib/use-body-theme-class";
+import { ThemeToggle } from "@/components/theme-toggle";
 import styles from "./admin-shell.module.scss";
 
 const NAV_GROUPS = [
@@ -135,6 +136,7 @@ export function AdminShell({
               <SearchIcon className={styles.searchIcon} />
               <input className={styles.searchInput} placeholder="Search…" type="text" readOnly />
             </div>
+            <ThemeToggle className={styles.iconButton} iconClassName={styles.topbarIcon} />
             <button type="button" className={styles.iconButton} aria-label="Notifications">
               <BellIcon className={styles.topbarIcon} />
               <span className={styles.iconDot} aria-hidden="true" />

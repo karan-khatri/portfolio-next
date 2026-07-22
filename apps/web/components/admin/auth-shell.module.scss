@@ -9,6 +9,36 @@
   overflow: hidden;
 }
 
+.themeToggle {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    background: var(--surface-high);
+    color: var(--primary);
+  }
+}
+
+.themeToggleIcon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
 .glow {
   position: absolute;
   top: 50%;

@@ -117,27 +117,28 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-/* Public site only — dark "terminal/AI-engineer" brand, independent of the
-   admin's next-themes light/dark toggle. Applied via `.theme-site` on the
-   homepage's outer wrapper, never on <html>, so /admin/** is unaffected. */
+/* Public site only — "terminal/AI-engineer" brand, with a light and dark
+   variant toggled via next-themes' `.dark` class on <html>. Applied via
+   `.theme-site` on the homepage's outer wrapper, never on <html> itself,
+   so /admin/** picks up its own `.theme-admin` palette independently. */
 .theme-site {
-  --background: oklch(0.16 0.02 240);
-  --foreground: oklch(0.93 0.015 230);
-  --card: oklch(0.2 0.025 240 / 80%);
+  --background: oklch(0.98 0.005 240);
+  --foreground: oklch(0.22 0.02 240);
+  --card: oklch(0.995 0.003 240 / 85%);
   --card-foreground: var(--foreground);
-  --popover: oklch(0.2 0.025 240);
+  --popover: oklch(0.995 0.003 240);
   --popover-foreground: var(--foreground);
-  --primary: oklch(0.87 0.15 175);
-  --primary-foreground: oklch(0.16 0.03 180);
-  --secondary: oklch(0.8 0.13 290);
-  --secondary-foreground: oklch(0.16 0.04 290);
-  --muted: oklch(0.24 0.02 240);
-  --muted-foreground: oklch(0.68 0.03 235);
-  --accent: oklch(0.87 0.15 175);
-  --accent-foreground: oklch(0.16 0.03 180);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.87 0.15 175 / 50%);
+  --primary: oklch(0.5 0.14 175);
+  --primary-foreground: oklch(0.98 0.01 175);
+  --secondary: oklch(0.55 0.12 290);
+  --secondary-foreground: oklch(0.98 0.01 290);
+  --muted: oklch(0.94 0.01 240);
+  --muted-foreground: oklch(0.45 0.02 235);
+  --accent: oklch(0.5 0.14 175);
+  --accent-foreground: oklch(0.98 0.01 175);
+  --border: oklch(0 0 0 / 8%);
+  --input: oklch(0 0 0 / 10%);
+  --ring: oklch(0.5 0.14 175 / 50%);
 
   /* Brand fonts, scoped here so only the public site picks them up —
      next/font variables are declared in layout.tsx and available globally,
@@ -161,12 +162,34 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+.dark .theme-site {
+  --background: oklch(0.16 0.02 240);
+  --foreground: oklch(0.93 0.015 230);
+  --card: oklch(0.2 0.025 240 / 80%);
+  --popover: oklch(0.2 0.025 240);
+  --primary: oklch(0.87 0.15 175);
+  --primary-foreground: oklch(0.16 0.03 180);
+  --secondary: oklch(0.8 0.13 290);
+  --secondary-foreground: oklch(0.16 0.04 290);
+  --muted: oklch(0.24 0.02 240);
+  --muted-foreground: oklch(0.68 0.03 235);
+  --accent: oklch(0.87 0.15 175);
+  --accent-foreground: oklch(0.16 0.03 180);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.87 0.15 175 / 50%);
+}
+
 /* Glass-panel + dot-grid decorative treatment shared across the redesigned
    sections — plain CSS since these are visual textures, not theme tokens
    another component needs to consume via Tailwind utilities. */
 .theme-site {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(0, 0, 0, 0.035) 1px, transparent 1px);
   background-size: 24px 24px;
+}
+
+.dark .theme-site {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
 }
 
 .theme-site .glass-panel {
@@ -176,15 +199,14 @@
 }
 
 .theme-site .glow-primary:hover {
-  box-shadow: 0 0 20px oklch(0.87 0.15 175 / 20%);
-  border-color: oklch(0.87 0.15 175 / 40%);
+  box-shadow: 0 0 20px color-mix(in oklch, var(--primary) 20%, transparent);
+  border-color: color-mix(in oklch, var(--primary) 40%, transparent);
 }
 
-/* Admin only — dark "Obsidian" Material-3-flavored theme, independent of
-   next-themes (no light/dark toggle exists in the admin UI today, so this
-   is unconditionally applied, like .theme-site is for the public site).
-   Applied on AdminShell's and AuthShell's root elements, never on <html>,
-   so the public site is unaffected. */
+/* Admin only — "Obsidian" Material-3-flavored theme, with a light and dark
+   variant toggled via next-themes' `.dark` class on <html>, same mechanism
+   as `.theme-site`. Applied on AdminShell's and AuthShell's root elements,
+   never on <html>, so the public site is unaffected. */
 .theme-admin {
   /* Elements with no explicit `color`/`background` of their own inherit
      the *computed* value from the nearest ancestor that declares one —
@@ -196,31 +218,34 @@
   background: var(--background);
   color: var(--foreground);
 
-  --background: #0f141a;
-  --foreground: #dfe2ec;
-  --card: #1c2027;
+  --background: #f7f9fa;
+  --foreground: #14181d;
+  --card: #ffffff;
   --card-foreground: var(--foreground);
-  --popover: #262a32;
+  --popover: #ffffff;
   --popover-foreground: var(--foreground);
-  --primary: #48f6e2;
-  --primary-foreground: #003732;
-  --secondary: #384951;
-  --secondary-foreground: #a6b8c1;
-  --muted: #181c23;
-  --muted-foreground: #bacac6;
-  --accent: #00d9c6;
-  --accent-foreground: #003732;
-  --destructive: #ffb4ab;
-  --border: #3b4a47;
-  --input: #0b0e14;
-  --ring: #48f6e2;
+  --primary: #0f8a7d;
+  --primary-foreground: #f2fffd;
+  --secondary: #e3ebee;
+  --secondary-foreground: #2c3a40;
+  --muted: #eef2f3;
+  --muted-foreground: #5b6b70;
+  --accent: #0f8a7d;
+  --accent-foreground: #f2fffd;
+  --destructive: #b3261e;
+  --border: #dde3e5;
+  --input: #e7ebec;
+  --ring: #0f8a7d;
 
   /* Surface tiers beyond shadcn's base set — used for sidebar/topbar/hover
      backgrounds that need to sit between --background and --card. */
-  --surface-lowest: #0a0e15;
-  --surface-high: #262a32;
-  --surface-highest: #31353d;
-  --outline: #849490;
+  --surface-lowest: #eef2f3;
+  --surface-high: #e9edee;
+  --surface-highest: #e0e5e6;
+  --outline: #6b7a7e;
+
+  /* Status-badge accent that isn't part of shadcn's base token set. */
+  --status-scheduled: #b45309;
 
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains-mono);
@@ -236,9 +261,37 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+.dark .theme-admin {
+  --background: #0f141a;
+  --foreground: #dfe2ec;
+  --card: #1c2027;
+  --popover: #262a32;
+  --primary: #48f6e2;
+  --primary-foreground: #003732;
+  --secondary: #384951;
+  --secondary-foreground: #a6b8c1;
+  --muted: #181c23;
+  --muted-foreground: #bacac6;
+  --accent: #00d9c6;
+  --accent-foreground: #003732;
+  --destructive: #ffb4ab;
+  --border: #3b4a47;
+  --input: #0b0e14;
+  --ring: #48f6e2;
+  --surface-lowest: #0a0e15;
+  --surface-high: #262a32;
+  --surface-highest: #31353d;
+  --outline: #849490;
+  --status-scheduled: #f59e0b;
+}
+
 .theme-admin {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px);
   background-size: 32px 32px;
+}
+
+.dark .theme-admin {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
 }
 
 .theme-admin .glass-panel {

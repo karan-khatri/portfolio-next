@@ -9,5 +9,5 @@ $revision-sidebar-width: 18rem;
 
 $status-published: var(--primary);
 $status-draft: var(--outline);
-$status-scheduled: #f59e0b;
+$status-scheduled: var(--status-scheduled);
 $status-archived: var(--destructive);
