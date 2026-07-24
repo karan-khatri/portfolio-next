@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { HistoryIcon, Loader2Icon } from "lucide-react";
+import { LuHistory, LuLoaderCircle } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { formatRelativeTime } from "@/lib/admin/format-relative-time";
@@ -65,7 +65,7 @@ function RevisionRow({
             disabled={pending}
             onClick={handleRestore}
           >
-            {pending ? <Loader2Icon className={styles.spinner} /> : null}
+            {pending ? <LuLoaderCircle className={styles.spinner} /> : null}
             Restore
           </Button>
         ) : null}
@@ -86,7 +86,7 @@ export function RevisionHistoryPanel({
   return (
     <div className={styles.panel}>
       <div className={styles.header}>
-        <HistoryIcon className={styles.headerIcon} />
+        <LuHistory className={styles.headerIcon} />
         <h3 className={styles.headerTitle}>Revision History</h3>
       </div>
       {revisions.length === 0 ? (

@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2Icon } from "lucide-react";
+import { LuLoaderCircle } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import styles from "./composer-action-bar.module.scss";
@@ -24,7 +24,7 @@ export function ComposerActionBar({
         Publish
       </Button>
       <Button type="button" variant="outline" onClick={onSaveDraft} disabled={pending}>
-        {pending ? <Loader2Icon className={styles.spinner} /> : null}
+        {pending ? <LuLoaderCircle className={styles.spinner} /> : null}
         Save draft
       </Button>
       <Button type="button" variant="ghost" onClick={onPreview} disabled={pending}>

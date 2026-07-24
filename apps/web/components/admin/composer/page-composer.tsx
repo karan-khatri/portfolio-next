@@ -4,7 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowLeftIcon, CopyIcon, ExternalLinkIcon, PlusIcon } from "lucide-react";
+import { LuArrowLeft, LuCopy, LuExternalLink, LuPlus } from "react-icons/lu";
 import type { SectionType } from "@portfolio/db";
 import { sectionRegistry } from "@portfolio/sections";
 import { SectionListEditor } from "./section-list";
@@ -160,7 +160,7 @@ export function PageComposer({
     <div className={styles.page}>
       <div className={styles.header}>
         <Link href="/admin/pages" className={styles.backLink}>
-          <ArrowLeftIcon className={styles.backIcon} />
+          <LuArrowLeft className={styles.backIcon} />
           Pages
         </Link>
         <div className={styles.titleRow}>
@@ -209,7 +209,7 @@ export function PageComposer({
               </SelectContent>
             </Select>
             <Button type="button" variant="outline" onClick={addSection}>
-              <PlusIcon />
+              <LuPlus />
               Add section
             </Button>
           </div>
@@ -218,10 +218,10 @@ export function PageComposer({
             <div className={styles.previewBox}>
               <a href={previewUrl} target="_blank" rel="noreferrer" className={styles.previewLink}>
                 {previewUrl}
-                <ExternalLinkIcon className={styles.previewIcon} />
+                <LuExternalLink className={styles.previewIcon} />
               </a>
               <Button type="button" variant="ghost" size="icon-sm" onClick={copyPreviewLink}>
-                <CopyIcon />
+                <LuCopy />
               </Button>
             </div>
           ) : null}

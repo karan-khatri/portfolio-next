@@ -4,7 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Reorder, useDragControls } from "framer-motion";
 import { toast } from "sonner";
-import { GripVerticalIcon, Loader2Icon, PlusIcon, Trash2Icon } from "lucide-react";
+import { LuGripVertical, LuLoaderCircle, LuPlus, LuTrash2 } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,7 +58,7 @@ function LinkForm({
         <Input id={`${idPrefix}-href`} value={href} onChange={(e) => setHref(e.target.value)} required />
       </div>
       <Button type="submit" size="sm" disabled={pending}>
-        {pending ? <Loader2Icon className={styles.spinner} /> : null}
+        {pending ? <LuLoaderCircle className={styles.spinner} /> : null}
         {submitLabel}
       </Button>
     </form>
@@ -98,7 +98,7 @@ function ChildRow({ item, onChanged }: { item: NavigationItemRow; onChanged: () 
             className={styles.dragHandle}
             aria-label="Drag to reorder"
           >
-            <GripVerticalIcon className={styles.dragIcon} />
+            <LuGripVertical className={styles.dragIcon} />
           </button>
           <span className={styles.summaryText}>
             <span className={styles.primary}>{item.label}</span>
@@ -115,7 +115,7 @@ function ChildRow({ item, onChanged }: { item: NavigationItemRow; onChanged: () 
             disabled={pending}
             aria-label="Delete"
           >
-            <Trash2Icon />
+            <LuTrash2 />
           </Button>
         </summary>
         <div className={styles.childBody}>
@@ -192,7 +192,7 @@ function NavigationItemCard({
             className={styles.dragHandle}
             aria-label="Drag to reorder"
           >
-            <GripVerticalIcon className={styles.dragIcon} />
+            <LuGripVertical className={styles.dragIcon} />
           </button>
           <span className={styles.summaryText}>
             <span className={styles.primary}>{item.label}</span>
@@ -209,7 +209,7 @@ function NavigationItemCard({
             disabled={pending}
             aria-label="Delete"
           >
-            <Trash2Icon />
+            <LuTrash2 />
           </Button>
         </summary>
         <div className={styles.itemBody}>
@@ -234,7 +234,7 @@ function NavigationItemCard({
 
             <details className={styles.createChildDisclosure}>
               <summary className={styles.createTrigger}>
-                <PlusIcon className={styles.createIcon} />
+                <LuPlus className={styles.createIcon} />
                 Add sub-link
               </summary>
               <div className={styles.createBody}>
@@ -304,7 +304,7 @@ export function NavigationManager({ items }: { items: NavigationItemWithChildren
 
       <details className={styles.createDisclosure}>
         <summary className={styles.createTrigger}>
-          <PlusIcon className={styles.createIcon} />
+          <LuPlus className={styles.createIcon} />
           Add link
         </summary>
         <div className={styles.createBody}>

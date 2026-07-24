@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Reorder, useDragControls } from "framer-motion";
-import { GripVerticalIcon, InfoIcon, Trash2Icon } from "lucide-react";
+import { LuGripVertical, LuInfo, LuTrash2 } from "react-icons/lu";
 import { sectionRegistry } from "@portfolio/sections";
 import { SectionForm } from "./section-form";
 import type { ComposerSection } from "./types";
@@ -55,7 +55,7 @@ function SortableSectionItem({
           className={styles.dragHandle}
           aria-label="Drag to reorder"
         >
-          <GripVerticalIcon className={styles.dragIcon} />
+          <LuGripVertical className={styles.dragIcon} />
         </button>
 
         <div className={styles.body}>
@@ -76,13 +76,13 @@ function SortableSectionItem({
                 </Label>
               </div>
               <Button type="button" variant="ghost" size="icon-sm" onClick={onRemove}>
-                <Trash2Icon />
+                <LuTrash2 />
               </Button>
             </div>
           </div>
           {dataSource ? (
             <p className={styles.dataSourceNote}>
-              <InfoIcon className={styles.typeIcon} />
+              <LuInfo className={styles.typeIcon} />
               Heading only — the list itself comes from{" "}
               <Link href={dataSource.href} className={styles.dataSourceLink}>
                 {dataSource.label}
