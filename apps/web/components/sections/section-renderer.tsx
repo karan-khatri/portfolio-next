@@ -4,12 +4,15 @@ import { HeroSection } from "./hero";
 import { AboutSection } from "./about";
 import { ProjectsSection } from "./projects";
 import { ExperienceSection } from "./experience";
+import { EducationSection } from "./education";
 import { SkillsSection } from "./skills";
+import { LanguagesSection } from "./languages";
 import { ServicesSection } from "./services";
 import { TestimonialsSection } from "./testimonials";
 import { BlogSection } from "./blog";
 import { ContactSection } from "./contact";
 import { ResumeSection } from "./resume";
+import { NowSection } from "./now";
 
 export interface RenderableSection {
   id: string;
@@ -17,6 +20,15 @@ export interface RenderableSection {
   order: number;
   enabled: boolean;
   content: unknown;
+}
+
+function slugifyHeading(heading: string, fallback: string): string {
+  const slug = heading
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug || fallback;
 }
 
 async function resolveSectionImage(imageId: unknown) {
@@ -31,7 +43,10 @@ async function resolveSectionImage(imageId: unknown) {
 async function renderSection(section: RenderableSection, locale: string) {
   const def = sectionRegistry[section.type];
   const content = def.schema.parse(section.content);
-  const headingId = `section-${section.id}`;
+  const headingId = slugifyHeading(
+    (content as { heading: string }).heading,
+    `section-${section.id}`,
+  );
   const headingLevel = def.headingLevel;
 
   switch (section.type) {
@@ -113,6 +128,29 @@ async function renderSection(section: RenderableSection, locale: string) {
         />
       );
     }
+    case SectionType.EDUCATION: {
+      const items = await prisma.education.findMany({
+        where: { locale },
+        orderBy: { order: "asc" },
+        select: {
+          id: true,
+          institution: true,
+          degree: true,
+          location: true,
+          startDate: true,
+          endDate: true,
+          description: true,
+        },
+      });
+      return (
+        <EducationSection
+          id={headingId}
+          content={content as never}
+          headingLevel={headingLevel}
+          items={items}
+        />
+      );
+    }
     case SectionType.SKILLS: {
       const items = await prisma.skill.findMany({
         where: { locale },
@@ -121,6 +159,21 @@ async function renderSection(section: RenderableSection, locale: string) {
       });
       return (
         <SkillsSection
+          id={headingId}
+          content={content as never}
+          headingLevel={headingLevel}
+          items={items}
+        />
+      );
+    }
+    case SectionType.LANGUAGES: {
+      const items = await prisma.language.findMany({
+        where: { locale },
+        orderBy: { order: "asc" },
+        select: { id: true, name: true, proficiency: true },
+      });
+      return (
+        <LanguagesSection
           id={headingId}
           content={content as never}
           headingLevel={headingLevel}
@@ -192,12 +245,24 @@ async function renderSection(section: RenderableSection, locale: string) {
           headingLevel={headingLevel}
           githubUrl={settings.githubUrl}
           linkedinUrl={settings.linkedinUrl}
+          upworkUrl={settings.upworkUrl}
+          fiverrUrl={settings.fiverrUrl}
+          instagramUrl={settings.instagramUrl}
+          location={settings.location}
         />
       );
     }
     case SectionType.RESUME:
       return (
         <ResumeSection
+          id={headingId}
+          content={content as never}
+          headingLevel={headingLevel}
+        />
+      );
+    case SectionType.NOW:
+      return (
+        <NowSection
           id={headingId}
           content={content as never}
           headingLevel={headingLevel}
@@ -225,7 +290,8 @@ export function getSectionNavItems(sections: RenderableSection[]): SectionNavIte
     .map((section) => {
       const def = sectionRegistry[section.type];
       const content = def.schema.parse(section.content) as { heading: string };
-      return { id: `section-${section.id}`, label: content.heading, href: `#section-${section.id}` };
+      const slug = slugifyHeading(content.heading, `section-${section.id}`);
+      return { id: slug, label: content.heading, href: `#${slug}` };
     });
 }
 
@@ -241,13 +307,10 @@ export async function SectionRenderer({
   const rendered = await Promise.all(
     enabled.map(async (section) => {
       const def = sectionRegistry[section.type];
+      const content = def.schema.parse(section.content) as { heading?: string };
       const body = await renderSection(section, locale);
       return (
-        <section
-          key={section.id}
-          aria-labelledby={`section-${section.id}`}
-          style={{ minHeight: def.minHeight }}
-        >
+        <section key={section.id} aria-label={content.heading} style={{ minHeight: def.minHeight }}>
           {body}
         </section>
       );
