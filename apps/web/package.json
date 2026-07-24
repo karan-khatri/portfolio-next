@@ -4,8 +4,15 @@
   "private": true,
   "pnpm": {
     "supportedArchitectures": {
-      "os": ["linux", "current"],
-      "cpu": ["x64", "arm64", "current"]
+      "os": [
+        "linux",
+        "current"
+      ],
+      "cpu": [
+        "x64",
+        "arm64",
+        "current"
+      ]
     },
     "onlyBuiltDependencies": [
       "sharp"
@@ -25,8 +32,18 @@
     "@img/sharp-linux-x64": "^0.33.3",
     "@portfolio/db": "workspace:*",
     "@portfolio/sections": "workspace:*",
+    "@tiptap/extension-color": "^3.27.4",
+    "@tiptap/extension-highlight": "^3.27.4",
+    "@tiptap/extension-image": "^3.27.4",
     "@tiptap/extension-link": "^3.27.4",
     "@tiptap/extension-placeholder": "^3.27.4",
+    "@tiptap/extension-subscript": "^3.27.4",
+    "@tiptap/extension-superscript": "^3.27.4",
+    "@tiptap/extension-table": "^3.27.4",
+    "@tiptap/extension-task-item": "^3.27.4",
+    "@tiptap/extension-task-list": "^3.27.4",
+    "@tiptap/extension-text-align": "^3.27.4",
+    "@tiptap/extension-text-style": "^3.27.4",
     "@tiptap/pm": "^3.27.4",
     "@tiptap/react": "^3.27.4",
     "@tiptap/starter-kit": "^3.27.4",
@@ -36,11 +53,11 @@
     "framer-motion": "^12.42.2",
     "geist": "^1.7.2",
     "http-status-codes": "^2.3.0",
-    "lucide-react": "^1.24.0",
     "next": "^16.2.10",
     "next-themes": "^0.4.6",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "react-icons": "^5.7.0",
     "sanitize-html": "^2.17.6",
     "server-only": "^0.0.1",
     "shadcn": "^4.13.0",
