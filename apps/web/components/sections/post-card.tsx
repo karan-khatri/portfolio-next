@@ -1,5 +1,4 @@
-import { ArrowUpRightIcon } from "lucide-react";
-import { Reveal } from "@/components/motion/reveal";
+import { LuArrowUpRight } from "react-icons/lu";
 import type { SectionImage } from "./hero";
 
 export interface PostCardItem {
@@ -10,9 +9,8 @@ export interface PostCardItem {
   coverImage: SectionImage | null;
 }
 
-export function PostCard({ post, delay = 0 }: { post: PostCardItem; delay?: number }) {
+export function PostCard({ post }: { post: PostCardItem }) {
   return (
-    <Reveal delay={delay} className="h-full">
       <a
         href={`/blog/${post.slug}`}
         className="glass-panel glow-primary group flex h-full flex-col rounded-xl p-6 transition-all duration-300 sm:p-8"
@@ -26,7 +24,7 @@ export function PostCard({ post, delay = 0 }: { post: PostCardItem; delay?: numb
         ) : null}
         <span className="flex items-start justify-between gap-2 font-heading text-xl font-medium">
           {post.title}
-          <ArrowUpRightIcon className="size-4 shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          <LuArrowUpRight className="size-4 shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </span>
         {post.excerpt ? (
           <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
@@ -34,6 +32,5 @@ export function PostCard({ post, delay = 0 }: { post: PostCardItem; delay?: numb
           </p>
         ) : null}
       </a>
-    </Reveal>
   );
 }

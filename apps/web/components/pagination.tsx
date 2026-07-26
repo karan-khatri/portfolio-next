@@ -1,4 +1,4 @@
-import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
+import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
 
 export function Pagination({
   currentPage,
@@ -20,12 +20,12 @@ export function Pagination({
           href={pageHref(currentPage - 1)}
           className="group flex items-center gap-2 font-mono text-xs text-primary"
         >
-          <ArrowLeftIcon className="size-3.5 transition-transform group-hover:-translate-x-1" />
+          <LuArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-1" />
           Prev
         </a>
       ) : (
         <span className="flex items-center gap-2 font-mono text-xs text-muted-foreground/40">
-          <ArrowLeftIcon className="size-3.5" />
+          <LuArrowLeft className="size-3.5" />
           Prev
         </span>
       )}
@@ -40,12 +40,12 @@ export function Pagination({
           className="group flex items-center gap-2 font-mono text-xs text-primary"
         >
           Next
-          <ArrowRightIcon className="size-3.5 transition-transform group-hover:translate-x-1" />
+          <LuArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
         </a>
       ) : (
         <span className="flex items-center gap-2 font-mono text-xs text-muted-foreground/40">
           Next
-          <ArrowRightIcon className="size-3.5" />
+          <LuArrowRight className="size-3.5" />
         </span>
       )}
     </nav>

@@ -1,5 +1,6 @@
 import type { SectionNavItem } from "@/components/sections/section-renderer";
 import { ThemeToggle } from "@/components/theme-toggle";
+import Link from "next/link";
 
 export function SiteHeader({
   title,
@@ -12,13 +13,13 @@ export function SiteHeader({
 }) {
   return (
     <header className="fixed top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-lg">
-      <div className="mx-auto flex h-20 w-full max-w-6xl items-center justify-between px-6 sm:px-8 lg:px-12">
-        <a
-          href="#top"
+      <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-6 sm:px-8 lg:px-12">
+        <Link
+          href="/"
           className="font-heading text-lg font-bold tracking-tight text-primary"
         >
           {title}
-        </a>
+        </Link>
         <nav className="hidden gap-8 md:flex">
           {navItems.map((item) =>
             item.children && item.children.length > 0 ? (
