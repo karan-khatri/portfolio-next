@@ -160,7 +160,7 @@ export function SkillsDiagram({
       </div>
 
       {/* Orbit layout */}
-      <div className="relative justify-center items-center w-full min-h-96 hidden md:flex">
+      <div className="relative justify-center items-center w-full min-h-80 hidden md:flex">
         <div className="relative mx-auto">
           <CenterOrb label={centerLabel ?? "Tech Stack"} subtitle={centerSubtitle} />
         </div>

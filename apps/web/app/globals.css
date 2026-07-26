@@ -332,19 +332,19 @@
 @keyframes float-down-up {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translateY(-8px);
   }
   50% {
-    transform: translateY(15px);
+    transform: translateY(8px);
   }
 }
 
 @keyframes float-up-down {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translateY(8px);
   }
   50% {
-    transform: translateY(-15px);
+    transform: translateY(-8px);
   }
 }
