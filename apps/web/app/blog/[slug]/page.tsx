@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ArrowLeftIcon } from "lucide-react";
+import { LuArrowLeft } from "react-icons/lu";
 import { prisma } from "@portfolio/db/server";
 import { PublicShell } from "@/components/public-shell";
 import { getPublicNav } from "@/lib/public-nav";
@@ -62,7 +62,7 @@ export default async function PostDetailPage({
           href="/"
           className="group inline-flex items-center gap-2 font-mono text-xs text-primary"
         >
-          <ArrowLeftIcon className="size-3.5 transition-transform group-hover:-translate-x-1" />
+          <LuArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-1" />
           Back home
         </a>
 

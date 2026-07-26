@@ -1,5 +1,4 @@
 import type { ServicesContent } from "@portfolio/sections";
-import { Reveal } from "@/components/motion/reveal";
 import { SectionShell } from "./section-shell";
 import { EmptyState } from "./empty-state";
 
@@ -23,10 +22,12 @@ export function ServicesSection({
   return (
     <SectionShell
       eyebrow="Services"
-      headingId={id}
+      id={id}
       headingLevel={headingLevel}
       heading={content.heading}
       subheading={content.subheading}
+      showEyebrow={content.showEyebrow}
+      headingAlign={content.headingAlign}
     >
       {items.length === 0 ? (
         <EmptyState message="No services listed yet." />
@@ -34,7 +35,6 @@ export function ServicesSection({
         <ul className="grid gap-6 sm:grid-cols-3">
           {items.map((item, index) => (
             <li key={item.id}>
-              <Reveal delay={Math.min(index * 0.05, 0.3)} className="h-full">
                 <div className="glass-panel glow-primary h-full rounded-xl p-6 transition-all duration-300">
                   <span className="font-mono text-xs text-primary">
                     {String(index + 1).padStart(2, "0")}
@@ -46,7 +46,6 @@ export function ServicesSection({
                     </p>
                   ) : null}
                 </div>
-              </Reveal>
             </li>
           ))}
         </ul>

@@ -52,7 +52,7 @@ export default async function BlogIndexPage({
       githubUrl={settings.githubUrl}
       linkedinUrl={settings.linkedinUrl}
     >
-      <div className="mx-auto w-full max-w-6xl px-6 py-20 sm:px-8 lg:px-12">
+      <div className="mx-auto w-full max-w-7xl px-6 py-20 sm:px-8 lg:px-12">
         <span className="mb-4 block font-mono text-xs text-primary">// writing</span>
         <h1 className="font-heading text-4xl font-semibold tracking-tight sm:text-5xl">
           All posts
@@ -66,9 +66,9 @@ export default async function BlogIndexPage({
             <EmptyState message="No posts published yet." />
           ) : (
             <ul className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {posts.map((post, index) => (
+              {posts.map((post) => (
                 <li key={post.id}>
-                  <PostCard post={post} delay={Math.min(index * 0.05, 0.3)} />
+                  <PostCard post={post} />
                 </li>
               ))}
             </ul>

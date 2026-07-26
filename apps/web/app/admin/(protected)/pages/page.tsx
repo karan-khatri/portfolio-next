@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PlusIcon } from "lucide-react";
+import { LuPlus } from "react-icons/lu";
 import { prisma } from "@portfolio/db/server";
 import { CreateSlugContentForm } from "@/components/admin/create-slug-content-form";
 import { StatusBadge } from "@/components/admin/status-badge";
@@ -71,7 +71,7 @@ export default async function AdminPagesListPage({
 
       <details className={styles.createDisclosure}>
         <summary className={styles.createTrigger}>
-          <PlusIcon className={styles.createIcon} />
+          <LuPlus className={styles.createIcon} />
           New page
         </summary>
         <div className={styles.createBody}>

@@ -55,7 +55,7 @@ export default async function ProjectsIndexPage({
       githubUrl={settings.githubUrl}
       linkedinUrl={settings.linkedinUrl}
     >
-      <div className="mx-auto w-full max-w-6xl px-6 py-20 sm:px-8 lg:px-12">
+      <div className="mx-auto w-full max-w-7xl px-6 py-20 sm:px-8 lg:px-12">
         <span className="mb-4 block font-mono text-xs text-primary">// projects</span>
         <h1 className="font-heading text-4xl font-semibold tracking-tight sm:text-5xl">
           All projects
@@ -69,11 +69,10 @@ export default async function ProjectsIndexPage({
             <EmptyState message="No projects published yet." />
           ) : (
             <ul className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {projects.map((project, index) => (
+              {projects.map((project) => (
                 <li key={project.id}>
                   <ProjectCard
                     project={{ ...project, tags: project.tags.map((tag) => tag.name) }}
-                    delay={Math.min(index * 0.05, 0.3)}
                   />
                 </li>
               ))}

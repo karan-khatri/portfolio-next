@@ -1,6 +1,6 @@
 import type { ExperienceContent } from "@portfolio/sections";
-import { Reveal } from "@/components/motion/reveal";
 import { formatDateRange } from "@/lib/format-date";
+import { ProseContent } from "@/components/prose-content";
 import { SectionShell } from "./section-shell";
 import { EmptyState } from "./empty-state";
 
@@ -27,10 +27,12 @@ export function ExperienceSection({
   return (
     <SectionShell
       eyebrow="Experience"
-      headingId={id}
+      id={id}
       headingLevel={headingLevel}
       heading={content.heading}
       subheading={content.subheading}
+      showEyebrow={content.showEyebrow}
+      headingAlign={content.headingAlign}
     >
       {items.length === 0 ? (
         <EmptyState message="No experience listed yet." />
@@ -40,8 +42,7 @@ export function ExperienceSection({
           <ul className="space-y-12">
             {items.map((item, index) => (
               <li key={item.id} className="relative pl-12 md:pl-20">
-                <Reveal delay={Math.min(index * 0.05, 0.3)}>
-                  <span className="absolute top-2 left-3.25 z-10 size-2.5 rounded-full bg-primary shadow-[0_0_10px_var(--ring)] md:left-7.25" />
+                <span className="absolute top-0 left-3 z-10 size-2.5 rounded-full bg-primary shadow-[0_0_10px_var(--ring)] md:left-7.25" />
                   <div className="glass-panel glow-primary rounded-xl p-6 transition-all duration-300">
                     <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
                       <div>
@@ -53,12 +54,9 @@ export function ExperienceSection({
                       </span>
                     </div>
                     {item.description ? (
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {item.description}
-                      </p>
+                      <ProseContent html={item.description} className="text-muted-foreground" />
                     ) : null}
                   </div>
-                </Reveal>
               </li>
             ))}
           </ul>

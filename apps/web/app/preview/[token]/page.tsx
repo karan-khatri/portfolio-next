@@ -6,7 +6,6 @@ import {
   type FlatRevisionData,
 } from "@portfolio/db/server";
 import { SectionRenderer, getSectionNavItems } from "@/components/sections/section-renderer";
-import { MotionProvider } from "@/components/motion/motion-provider";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
@@ -59,11 +58,9 @@ export default async function PreviewPage({
           Skip to content
         </a>
         <SiteHeader title={data.title} navItems={navItems} />
-        <MotionProvider>
-          <main id="main-content">
-            <SectionRenderer sections={sections} locale="en" />
-          </main>
-        </MotionProvider>
+        <main id="main-content">
+          <SectionRenderer sections={sections} locale="en" />
+        </main>
         <SiteFooter title={data.title} />
       </div>
     );
@@ -83,25 +80,23 @@ export default async function PreviewPage({
           Skip to content
         </a>
         <SiteHeader title={data.title} navItems={[]} />
-        <MotionProvider>
-          <main id="main-content">
-            <article className="mx-auto w-full max-w-3xl px-6 py-20 sm:px-8 lg:px-12">
-              <h1 className="text-4xl font-semibold tracking-tight">{data.title}</h1>
-              {data.excerpt ? (
-                <p className="mt-4 text-lg text-muted-foreground">{data.excerpt}</p>
-              ) : null}
-              {paragraphs.length > 0 ? (
-                <div className="mt-8 space-y-4">
-                  {paragraphs.map((paragraph, index) => (
-                    <p key={index} className="text-lg leading-relaxed text-foreground/90">
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-              ) : null}
-            </article>
-          </main>
-        </MotionProvider>
+        <main id="main-content">
+          <article className="mx-auto w-full max-w-3xl px-6 py-20 sm:px-8 lg:px-12">
+            <h1 className="text-4xl font-semibold tracking-tight">{data.title}</h1>
+            {data.excerpt ? (
+              <p className="mt-4 text-lg text-muted-foreground">{data.excerpt}</p>
+            ) : null}
+            {paragraphs.length > 0 ? (
+              <div className="mt-8 space-y-4">
+                {paragraphs.map((paragraph, index) => (
+                  <p key={index} className="text-lg leading-relaxed text-foreground/90">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            ) : null}
+          </article>
+        </main>
         <SiteFooter title={data.title} />
       </div>
     );

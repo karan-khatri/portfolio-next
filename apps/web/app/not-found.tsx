@@ -1,4 +1,4 @@
-import { ArrowLeftIcon } from "lucide-react";
+import { LuArrowLeft } from "react-icons/lu";
 import { PublicShell } from "@/components/public-shell";
 import { getPublicNav } from "@/lib/public-nav";
 
@@ -22,7 +22,7 @@ export default async function NotFound() {
           Nothing lives at this address — the page may have been unpublished or the link is wrong.
         </p>
         <a href="/" className="group mt-8 inline-flex items-center gap-2 font-mono text-xs text-primary">
-          <ArrowLeftIcon className="size-3.5 transition-transform group-hover:-translate-x-1" />
+          <LuArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-1" />
           Back home
         </a>
       </div>

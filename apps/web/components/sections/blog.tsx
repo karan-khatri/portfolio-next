@@ -19,18 +19,20 @@ export function BlogSection({
   return (
     <SectionShell
       eyebrow="Writing"
-      headingId={id}
+      id={id}
       headingLevel={headingLevel}
       heading={content.heading}
       subheading={content.subheading}
+      showEyebrow={content.showEyebrow}
+      headingAlign={content.headingAlign}
     >
       {items.length === 0 ? (
         <EmptyState message="No posts published yet." />
       ) : (
         <ul className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {items.map((post, index) => (
+          {items.map((post) => (
             <li key={post.id}>
-              <PostCard post={post} delay={Math.min(index * 0.05, 0.3)} />
+              <PostCard post={post} />
             </li>
           ))}
         </ul>

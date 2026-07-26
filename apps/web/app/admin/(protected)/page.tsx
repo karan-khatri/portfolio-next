@@ -1,4 +1,4 @@
-import { FileTextIcon, FolderKanbanIcon, NewspaperIcon } from "lucide-react";
+import { LuFileText, LuFolderKanban, LuNewspaper } from "react-icons/lu";
 import { prisma } from "@portfolio/db/server";
 import { InvitesPanel } from "@/components/admin/invites-panel";
 import { StatCard } from "@/components/admin/stat-card";
@@ -52,9 +52,9 @@ export default async function AdminDashboardPage() {
           Content status
         </h2>
         <div className={styles.statGrid}>
-          <StatCard title="Pages" icon={FileTextIcon} counts={pages} href="/admin/pages" />
-          <StatCard title="Projects" icon={FolderKanbanIcon} counts={projects} href="/admin/projects" />
-          <StatCard title="Posts" icon={NewspaperIcon} counts={posts} href="/admin/posts" />
+          <StatCard title="Pages" icon={LuFileText} counts={pages} href="/admin/pages" />
+          <StatCard title="Projects" icon={LuFolderKanban} counts={projects} href="/admin/projects" />
+          <StatCard title="Posts" icon={LuNewspaper} counts={posts} href="/admin/posts" />
         </div>
       </section>
 

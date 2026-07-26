@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
+import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
 import { prisma } from "@portfolio/db/server";
 import { PublicShell } from "@/components/public-shell";
 import { getPublicNav } from "@/lib/public-nav";
@@ -59,11 +59,11 @@ export default async function ProjectDetailPage({
     >
       <article className="mx-auto w-full max-w-3xl px-6 py-20 sm:px-8 lg:px-12">
         <a
-          href="/"
+          href="/projects"
           className="group inline-flex items-center gap-2 font-mono text-xs text-primary"
         >
-          <ArrowLeftIcon className="size-3.5 transition-transform group-hover:-translate-x-1" />
-          Back home
+          <LuArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-1" />
+          Back to Projects
         </a>
 
         {project.coverImage ? (
@@ -74,7 +74,8 @@ export default async function ProjectDetailPage({
           />
         ) : null}
 
-        <h1 className="font-heading mt-8 text-4xl font-semibold tracking-tight">
+        <span className="mt-8 block font-mono text-xs text-primary">// case study</span>
+        <h1 className="font-heading mt-4 text-4xl font-semibold tracking-tight">
           {project.title}
         </h1>
         {project.excerpt ? (
@@ -104,7 +105,7 @@ export default async function ProjectDetailPage({
                 className="group flex items-center gap-2 font-mono text-xs text-primary"
               >
                 View Repo
-                <ArrowRightIcon className="size-3.5 transition-transform group-hover:translate-x-1" />
+                <LuArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
               </a>
             ) : null}
             {project.liveUrl ? (
@@ -115,7 +116,7 @@ export default async function ProjectDetailPage({
                 className="group flex items-center gap-2 font-mono text-xs text-primary"
               >
                 Live site
-                <ArrowRightIcon className="size-3.5 transition-transform group-hover:translate-x-1" />
+                <LuArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
               </a>
             ) : null}
           </div>
