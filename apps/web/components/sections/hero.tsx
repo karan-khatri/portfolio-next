@@ -1,5 +1,5 @@
 import type { HeroContent } from "@portfolio/sections";
-import { ArrowRightIcon } from "lucide-react";
+import { LuArrowRight } from "react-icons/lu";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SectionHeading } from "./heading";
@@ -17,19 +17,20 @@ export function HeroSection({
   content,
   headingLevel,
   image,
-}: {
+}: Readonly<{
   id: string;
   content: HeroContent;
   headingLevel: 2 | 3;
   image: SectionImage | null;
-}) {
+}>) {
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-6xl flex-col items-center gap-12 px-6 py-20 sm:px-8 lg:flex-row lg:px-12">
+    <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-7xl flex-col items-center gap-12 px-6 py-20 sm:px-8 lg:flex-row lg:px-12">
       <div className="flex w-full flex-col gap-6 lg:w-1/2">
         <span className="inline-flex items-center gap-2 font-mono text-sm text-primary">
           <span className="text-secondary opacity-70">~</span>
+          {" "}
           $ whoami
-          <span className="inline-block h-4 w-2 animate-pulse bg-primary" />
+          <span className="inline-block h-4 w-2 bg-primary animate-pulse" />
         </span>
         <SectionHeading id={id} level={headingLevel} size="display">
           {content.heading}
@@ -48,11 +49,11 @@ export function HeroSection({
             )}
           >
             {content.ctaLabel}
-            <ArrowRightIcon />
+            <LuArrowRight />
           </a>
         ) : null}
         <div className="mt-2 flex items-center gap-3">
-          <span className="size-2 animate-pulse rounded-full bg-primary" />
+          <span className="size-2 rounded-full bg-primary animate-pulse" />
           <span className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
             Open to remote roles
           </span>
@@ -61,13 +62,20 @@ export function HeroSection({
 
       <div className="w-full lg:w-1/2">
         {image ? (
-          <img
-            src={image.url}
-            alt={image.altText ?? ""}
-            width={image.width ?? undefined}
-            height={image.height ?? undefined}
-            className="glass-panel w-full rounded-lg object-cover shadow-2xl"
-          />
+          <div className="group relative mx-auto aspect-square w-full max-w-md">
+            <div className="absolute inset-0 rotate-3 rounded-2xl transition-transform duration-500 ease-out group-hover:rotate-0">
+              <div className="absolute inset-0 rounded-2xl border-2 border-primary/30 bg-card/20 shadow-2xl" />
+            </div>
+            <div className="absolute inset-0 -rotate-3 overflow-hidden rounded-2xl shadow-2xl transition-transform duration-500 ease-out group-hover:rotate-0">
+              <img
+                src={image.url}
+                alt={image.altText ?? ""}
+                width={image.width ?? undefined}
+                height={image.height ?? undefined}
+                className="h-full w-full object-cover grayscale transition-all duration-500 ease-out group-hover:grayscale-0"
+              />
+            </div>
+          </div>
         ) : (
           <div className="glass-panel w-full overflow-hidden rounded-lg shadow-2xl">
             <div className="flex h-10 items-center gap-2 border-b border-border/50 bg-card/50 px-4">
@@ -90,6 +98,7 @@ export function HeroSection({
               {"\n"}
               {"    "}
               <span className="text-secondary">return</span> llm.generate(
+              {" "}
               <span className="text-accent">f&quot;Context: {"{context}"}\nPrompt: {"{prompt}"}&quot;</span>
               ){"\n\n"}
               <span className="text-muted-foreground"># Awaiting input...</span>

@@ -1,5 +1,4 @@
 import type { SectionNavItem } from "@/components/sections/section-renderer";
-import { MotionProvider } from "@/components/motion/motion-provider";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
@@ -10,14 +9,14 @@ export function PublicShell({
   githubUrl,
   linkedinUrl,
   children,
-}: {
+}: Readonly<{
   title: string;
   navItems: SectionNavItem[];
   resumeUrl?: string | null;
   githubUrl?: string | null;
   linkedinUrl?: string | null;
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <div id="top" className="theme-site min-h-screen bg-background text-foreground">
       <a
@@ -27,11 +26,9 @@ export function PublicShell({
         Skip to content
       </a>
       <SiteHeader title={title} navItems={navItems} resumeUrl={resumeUrl} />
-      <MotionProvider>
-        <main id="main-content" className="pt-20">
-          {children}
-        </main>
-      </MotionProvider>
+      <main id="main-content" className="pt-20">
+        {children}
+      </main>
       <SiteFooter title={title} githubUrl={githubUrl} linkedinUrl={linkedinUrl} />
     </div>
   );
