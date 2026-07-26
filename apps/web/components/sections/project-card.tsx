@@ -17,7 +17,16 @@ export function ProjectCard({ project }: { project: ProjectCardItem }) {
   const hasLinks = Boolean(project.codeRepository || project.liveUrl);
 
   return (
-      <div className="glass-panel glow-primary group flex h-full flex-col overflow-hidden rounded-xl transition-all duration-300">
+      <div className="glass-panel glow-primary group relative flex h-full flex-col overflow-hidden rounded-xl transition-all duration-300">
+        {/* Stretched-link overlay: makes the whole card navigate to the project,
+            while the icon links below sit above it (relative + higher z-index)
+            so they keep working as independent, separately-clickable targets. */}
+        <a
+          href={`/projects/${project.slug}`}
+          className="absolute inset-0 z-10"
+          aria-label={project.title}
+        />
+
         <div className="relative aspect-16/10 w-full overflow-hidden bg-muted">
           {project.coverImage ? (
             <img
@@ -32,13 +41,14 @@ export function ProjectCard({ project }: { project: ProjectCardItem }) {
           )}
           <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-background/95 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 p-5">
-            <h3 className="min-w-0 flex-1 truncate font-heading text-xl font-medium" title={project.title}>
-              <a href={`/projects/${project.slug}`} className="hover:underline">
-                {project.title}
-              </a>
+            <h3
+              className="min-w-0 flex-1 truncate font-heading text-xl font-medium group-hover:underline"
+              title={project.title}
+            >
+              {project.title}
             </h3>
             {hasLinks ? (
-              <div className="flex shrink-0 items-center gap-1">
+              <div className="relative z-20 flex shrink-0 items-center gap-1">
                 {project.codeRepository ? (
                   <a
                     href={project.codeRepository}
