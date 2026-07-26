@@ -1,7 +1,8 @@
 import type { SkillsContent } from "@portfolio/sections";
-import { Reveal } from "@/components/motion/reveal";
+import { TechMarquee } from "@/components/tech-marquee";
 import { SectionShell } from "./section-shell";
 import { EmptyState } from "./empty-state";
+import { SkillsDiagram } from "./skills-diagram";
 
 export interface SkillListItem {
   id: string;
@@ -54,18 +55,42 @@ export function SkillsSection({
 }) {
   const { ungrouped, grouped } = groupByCategory(items);
 
+  const diagramClusterItems = [
+    content.diagramTopLeftItems,
+    content.diagramBottomLeftItems,
+    content.diagramTopRightItems,
+    content.diagramBottomRightItems,
+  ];
+  const showDiagram = content.showDiagram && diagramClusterItems.some((cluster) => cluster.length > 0);
+
   return (
     <SectionShell
       eyebrow="Stack"
-      headingId={id}
+      id={id}
       headingLevel={headingLevel}
       heading={content.heading}
       subheading={content.subheading}
+      showEyebrow={content.showEyebrow}
+      headingAlign={content.headingAlign}
     >
-      {items.length === 0 ? (
+      <TechMarquee />
+      {showDiagram ? (
+        <SkillsDiagram
+          centerLabel={content.diagramCenterLabel}
+          centerSubtitle={content.diagramCenterSubtitle}
+          topLeftTitle={content.diagramTopLeftTitle}
+          topLeftItems={content.diagramTopLeftItems}
+          bottomLeftTitle={content.diagramBottomLeftTitle}
+          bottomLeftItems={content.diagramBottomLeftItems}
+          topRightTitle={content.diagramTopRightTitle}
+          topRightItems={content.diagramTopRightItems}
+          bottomRightTitle={content.diagramBottomRightTitle}
+          bottomRightItems={content.diagramBottomRightItems}
+        />
+      ) : items.length === 0 ? (
         <EmptyState message="No skills listed yet." />
       ) : (
-        <Reveal className="space-y-8">
+        <div className="mt-10 space-y-8">
           {ungrouped.length > 0 ? <SkillTileList items={ungrouped} /> : null}
           {[...grouped.entries()].map(([category, categoryItems]) => (
             <div key={category} className="space-y-3">
@@ -75,7 +100,7 @@ export function SkillsSection({
               <SkillTileList items={categoryItems} />
             </div>
           ))}
-        </Reveal>
+        </div>
       )}
     </SectionShell>
   );

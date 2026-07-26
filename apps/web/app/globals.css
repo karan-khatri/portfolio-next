@@ -305,9 +305,46 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground overflow-x-hidden;
   }
   html {
-    @apply font-sans;
+    @apply font-sans scroll-smooth;
+  }
+}
+
+/* Tech-stack marquee — pure CSS, no animation library. The track renders its
+   item list doubled back-to-back so translateX(-50%) is exactly one loop —
+   spacing between items must come from each item's own margin, not a flex
+   `gap`, since `gap` only sits between elements and would throw off the
+   halfway math by half a gap-width, causing a visible jump each cycle. */
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Used in pairs on the skills orbit diagram: a top/bottom cluster pair
+   applies one of each so they visibly converge, then a quarter-turn later
+   the opposite pair (using the other keyframe) is diverging. */
+@keyframes float-down-up {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(15px);
+  }
+}
+
+@keyframes float-up-down {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
   }
 }
