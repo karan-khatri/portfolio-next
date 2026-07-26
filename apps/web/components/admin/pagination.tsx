@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import styles from "./pagination.module.scss";
 
 export function Pagination({
@@ -29,12 +29,12 @@ export function Pagination({
     <nav aria-label="Pagination" className={styles.nav}>
       {currentPage > 1 ? (
         <Link href={pageHref(currentPage - 1)} className={styles.link}>
-          <ChevronLeftIcon className={styles.icon} />
+          <LuChevronLeft className={styles.icon} />
           Prev
         </Link>
       ) : (
         <span className={styles.linkDisabled}>
-          <ChevronLeftIcon className={styles.icon} />
+          <LuChevronLeft className={styles.icon} />
           Prev
         </span>
       )}
@@ -46,12 +46,12 @@ export function Pagination({
       {currentPage < totalPages ? (
         <Link href={pageHref(currentPage + 1)} className={styles.link}>
           Next
-          <ChevronRightIcon className={styles.icon} />
+          <LuChevronRight className={styles.icon} />
         </Link>
       ) : (
         <span className={styles.linkDisabled}>
           Next
-          <ChevronRightIcon className={styles.icon} />
+          <LuChevronRight className={styles.icon} />
         </span>
       )}
     </nav>

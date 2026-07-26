@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FileIcon, ImageIcon, XIcon } from "lucide-react";
+import { LuFile, LuImage, LuX } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -20,7 +20,7 @@ function MediaThumb({ item, className }: { item: MediaPickerValue; className: st
   if (!isImageMedia(item)) {
     return (
       <div className={`${className} ${styles.filePlaceholder}`}>
-        <FileIcon className={styles.fileIcon} />
+        <LuFile className={styles.fileIcon} />
       </div>
     );
   }
@@ -72,14 +72,14 @@ export function MediaPicker({
                 Change
               </Button>
               <Button type="button" variant="ghost" size="icon-sm" onClick={() => onChange(null)}>
-                <XIcon />
+                <LuX />
               </Button>
             </div>
           </div>
         </div>
       ) : (
         <Button type="button" variant="outline" onClick={() => setOpen(true)}>
-          <ImageIcon />
+          <LuImage />
           {kind === "any" ? "Choose file" : "Choose image"}
         </Button>
       )}

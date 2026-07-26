@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { AlertTriangleIcon, FileIcon, Trash2Icon } from "lucide-react";
+import { LuTriangleAlert, LuFile, LuTrash2 } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -73,7 +73,7 @@ function DeleteMediaDialog({
           <DialogDescription>This action cannot be undone.</DialogDescription>
         </DialogHeader>
         <div className={styles.usageWarning}>
-          <AlertTriangleIcon className={styles.usageWarningIcon} />
+          <LuTriangleAlert className={styles.usageWarningIcon} />
           <span className={styles.usageWarningText}>
             {usage ? (
               <>
@@ -136,7 +136,7 @@ export function MediaLibrary({ initialMedia }: { initialMedia: MediaPickerValue[
                 <img src={item.url} alt={item.altText ?? ""} className={styles.thumb} />
               ) : (
                 <div className={styles.filePlaceholder}>
-                  <FileIcon className={styles.fileIcon} />
+                  <LuFile className={styles.fileIcon} />
                 </div>
               )}
               <div className={styles.meta}>
@@ -156,7 +156,7 @@ export function MediaLibrary({ initialMedia }: { initialMedia: MediaPickerValue[
                 aria-label={`Delete ${item.filename}`}
                 onClick={() => setDeleteTarget(item)}
               >
-                <Trash2Icon />
+                <LuTrash2 />
               </Button>
             </li>
           ))}

@@ -4,7 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowLeftIcon, CopyIcon, ExternalLinkIcon } from "lucide-react";
+import { LuArrowLeft, LuCopy, LuExternalLink } from "react-icons/lu";
 import {
   saveDraftAction,
   publishAction,
@@ -149,7 +149,7 @@ export function PostEditor({
     <div className={styles.page}>
       <div className={styles.header}>
         <Link href="/admin/posts" className={styles.backLink}>
-          <ArrowLeftIcon className={styles.backIcon} />
+          <LuArrowLeft className={styles.backIcon} />
           Posts
         </Link>
         <div className={styles.titleRow}>
@@ -202,10 +202,10 @@ export function PostEditor({
             <div className={styles.previewBox}>
               <a href={previewUrl} target="_blank" rel="noreferrer" className={styles.previewLink}>
                 {previewUrl}
-                <ExternalLinkIcon className={styles.previewIcon} />
+                <LuExternalLink className={styles.previewIcon} />
               </a>
               <Button type="button" variant="ghost" size="icon-sm" onClick={copyPreviewLink}>
-                <CopyIcon />
+                <LuCopy />
               </Button>
             </div>
           ) : null}

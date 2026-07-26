@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowRightIcon, Loader2Icon, LockIcon, MailIcon } from "lucide-react";
+import { LuArrowRight, LuLoaderCircle, LuLock, LuMail } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,7 +43,7 @@ export function LoginForm() {
       <div className={styles.field}>
         <Label htmlFor="email">Email</Label>
         <div className={styles.inputWrap}>
-          <MailIcon className={styles.inputIcon} />
+          <LuMail className={styles.inputIcon} />
           <Input
             id="email"
             type="email"
@@ -58,7 +58,7 @@ export function LoginForm() {
       <div className={styles.field}>
         <Label htmlFor="password">Password</Label>
         <div className={styles.inputWrap}>
-          <LockIcon className={styles.inputIcon} />
+          <LuLock className={styles.inputIcon} />
           <Input
             id="password"
             type="password"
@@ -71,9 +71,9 @@ export function LoginForm() {
         </div>
       </div>
       <Button type="submit" disabled={submitting} className={styles.submit}>
-        {submitting ? <Loader2Icon className={styles.spinner} /> : null}
+        {submitting ? <LuLoaderCircle className={styles.spinner} /> : null}
         {submitting ? "Signing in…" : "Sign in"}
-        {!submitting ? <ArrowRightIcon className={styles.submitIcon} /> : null}
+        {!submitting ? <LuArrowRight className={styles.submitIcon} /> : null}
       </Button>
     </form>
   );

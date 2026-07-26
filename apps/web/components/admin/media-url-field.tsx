@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FolderOpenIcon } from "lucide-react";
+import { LuFolderOpen } from "react-icons/lu";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -62,7 +62,7 @@ export function MediaUrlField({
         onChange={(event) => onChange(event.target.value)}
       />
       <Button type="button" variant="outline" size="icon-sm" onClick={() => setOpen(true)} aria-label="Browse media">
-        <FolderOpenIcon />
+        <LuFolderOpen />
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>

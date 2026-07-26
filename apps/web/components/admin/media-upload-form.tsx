@@ -2,7 +2,7 @@
 
 import { useId, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { CloudUploadIcon, Loader2Icon } from "lucide-react";
+import { LuCloudUpload, LuLoaderCircle } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -55,7 +55,7 @@ export function MediaUploadForm({
         <Label htmlFor={fileInputId}>{kind === "any" ? "File" : "Image"}</Label>
         <label htmlFor={fileInputId} className={styles.fileTrigger}>
           <span className={styles.fileIconWrap}>
-            <CloudUploadIcon className={styles.fileIcon} />
+            <LuCloudUpload className={styles.fileIcon} />
           </span>
           <span className={styles.fileTitle}>{fileName ?? "Upload media"}</span>
           <span className={styles.fileHint}>{fileName ? "Ready to upload" : HINT_BY_KIND[kind]}</span>
@@ -75,7 +75,7 @@ export function MediaUploadForm({
         <Input id={altTextId} name="altText" placeholder="Describe the image for screen readers" />
       </div>
       <Button type="submit" disabled={pending}>
-        {pending ? <Loader2Icon className={styles.spinner} /> : null}
+        {pending ? <LuLoaderCircle className={styles.spinner} /> : null}
         {pending ? "Uploading…" : "Upload"}
       </Button>
     </form>
