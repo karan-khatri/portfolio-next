@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboardIcon } from "lucide-react";
+import { LuLayoutDashboard } from "react-icons/lu";
 import {
   Card,
   CardContent,
@@ -30,7 +30,7 @@ export function AuthShell({
       <div className={styles.frame}>
         <div className={styles.badgeRow}>
           <span className={styles.badge}>
-            <LayoutDashboardIcon className={styles.badgeIcon} />
+            <LuLayoutDashboard className={styles.badgeIcon} />
           </span>
         </div>
         <Card className={styles.card}>

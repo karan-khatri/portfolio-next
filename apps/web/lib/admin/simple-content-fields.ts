@@ -1,14 +1,16 @@
 export interface SimpleField {
   key: string;
   label: string;
-  type: "text" | "textarea" | "number" | "date" | "url" | "tags" | "boolean";
+  type: "text" | "textarea" | "richtext" | "number" | "date" | "url" | "tags" | "boolean";
   required?: boolean;
   booleanLabel?: string;
 }
 
 export type SimpleContentType =
   | "experience"
+  | "education"
   | "skill"
+  | "language"
   | "service"
   | "testimonial"
   | "author"
@@ -26,9 +28,16 @@ export const simpleContentSummaries: Record<
   experience: (item) => ({
     primary: `${item.title as string} — ${item.company as string}`,
   }),
+  education: (item) => ({
+    primary: `${item.degree as string} — ${item.institution as string}`,
+  }),
   skill: (item) => ({
     primary: item.name as string,
     secondary: (item.category as string) || undefined,
+  }),
+  language: (item) => ({
+    primary: item.name as string,
+    secondary: item.proficiency as string,
   }),
   service: (item) => ({ primary: item.title as string }),
   testimonial: (item) => ({
@@ -47,13 +56,27 @@ export const experienceFields: SimpleField[] = [
   { key: "title", label: "Title", type: "text", required: true },
   { key: "startDate", label: "Start date", type: "date", required: true },
   { key: "endDate", label: "End date", type: "date" },
-  { key: "description", label: "Description", type: "textarea" },
+  { key: "description", label: "Description", type: "richtext" },
+];
+
+export const educationFields: SimpleField[] = [
+  { key: "institution", label: "Institution", type: "text", required: true },
+  { key: "degree", label: "Degree", type: "text", required: true },
+  { key: "location", label: "Location", type: "text" },
+  { key: "startDate", label: "Start date", type: "date", required: true },
+  { key: "endDate", label: "End date", type: "date" },
+  { key: "description", label: "Description", type: "richtext" },
 ];
 
 export const skillFields: SimpleField[] = [
   { key: "name", label: "Name", type: "text", required: true },
   { key: "category", label: "Category", type: "text" },
   { key: "level", label: "Level (1-5)", type: "number" },
+];
+
+export const languageFields: SimpleField[] = [
+  { key: "name", label: "Language", type: "text", required: true },
+  { key: "proficiency", label: "Proficiency", type: "text", required: true },
 ];
 
 export const serviceFields: SimpleField[] = [

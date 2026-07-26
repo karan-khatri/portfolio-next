@@ -3,25 +3,28 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  LayoutDashboardIcon,
-  FileTextIcon,
-  FolderKanbanIcon,
-  NewspaperIcon,
-  ImageIcon,
-  UserIcon,
-  BriefcaseIcon,
-  SparklesIcon,
-  WrenchIcon,
-  QuoteIcon,
-  LinkIcon,
-  ArrowRightLeftIcon,
-  SettingsIcon,
-  UsersIcon,
-  LogOutIcon,
-  SearchIcon,
-  BellIcon,
-  HelpCircleIcon,
-} from "lucide-react";
+  LuLayoutDashboard,
+  LuFileText,
+  LuFolderKanban,
+  LuNewspaper,
+  LuImage,
+  LuUser,
+  LuMail,
+  LuBriefcase,
+  LuGraduationCap,
+  LuSparkles,
+  LuLanguages,
+  LuWrench,
+  LuQuote,
+  LuLink,
+  LuArrowRightLeft,
+  LuSettings,
+  LuUsers,
+  LuLogOut,
+  LuSearch,
+  LuBell,
+  LuCircleHelp,
+} from "react-icons/lu";
 import { initialsFromEmail } from "@/lib/admin/initials";
 import { useBodyThemeClass } from "@/lib/use-body-theme-class";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -31,30 +34,33 @@ const NAV_GROUPS = [
   {
     label: "Content",
     items: [
-      { href: "/admin", label: "Dashboard", icon: LayoutDashboardIcon },
-      { href: "/admin/pages", label: "Pages", icon: FileTextIcon },
-      { href: "/admin/projects", label: "Projects", icon: FolderKanbanIcon },
-      { href: "/admin/posts", label: "Posts", icon: NewspaperIcon },
-      { href: "/admin/authors", label: "Authors", icon: UserIcon },
-      { href: "/admin/media", label: "Media", icon: ImageIcon },
+      { href: "/admin", label: "Dashboard", icon: LuLayoutDashboard },
+      { href: "/admin/pages", label: "Pages", icon: LuFileText },
+      { href: "/admin/projects", label: "Projects", icon: LuFolderKanban },
+      { href: "/admin/posts", label: "Posts", icon: LuNewspaper },
+      { href: "/admin/authors", label: "Authors", icon: LuUser },
+      { href: "/admin/media", label: "Media", icon: LuImage },
+      { href: "/admin/messages", label: "Messages", icon: LuMail },
     ],
   },
   {
     label: "Profile",
     items: [
-      { href: "/admin/experience", label: "Experience", icon: BriefcaseIcon },
-      { href: "/admin/skills", label: "Skills", icon: SparklesIcon },
-      { href: "/admin/services", label: "Services", icon: WrenchIcon },
-      { href: "/admin/testimonials", label: "Testimonials", icon: QuoteIcon },
+      { href: "/admin/experience", label: "Experience", icon: LuBriefcase },
+      { href: "/admin/education", label: "Education", icon: LuGraduationCap },
+      { href: "/admin/skills", label: "Skills", icon: LuSparkles },
+      { href: "/admin/languages", label: "Languages", icon: LuLanguages },
+      { href: "/admin/services", label: "Services", icon: LuWrench },
+      { href: "/admin/testimonials", label: "Testimonials", icon: LuQuote },
     ],
   },
   {
     label: "Site",
     items: [
-      { href: "/admin/navigation", label: "Navigation", icon: LinkIcon },
-      { href: "/admin/redirects", label: "Redirects", icon: ArrowRightLeftIcon },
-      { href: "/admin/settings", label: "Settings", icon: SettingsIcon },
-      { href: "/admin/users", label: "Users", icon: UsersIcon },
+      { href: "/admin/navigation", label: "Navigation", icon: LuLink },
+      { href: "/admin/redirects", label: "Redirects", icon: LuArrowRightLeft },
+      { href: "/admin/settings", label: "Settings", icon: LuSettings },
+      { href: "/admin/users", label: "Users", icon: LuUsers },
     ],
   },
 ];
@@ -122,7 +128,7 @@ export function AdminShell({
             {userEmail}
           </span>
           <button type="button" onClick={handleSignOut} className={styles.signOutButton}>
-            <LogOutIcon className={styles.navIcon} />
+            <LuLogOut className={styles.navIcon} />
             <span className={styles.navLabel}>Sign out</span>
           </button>
         </div>
@@ -133,16 +139,16 @@ export function AdminShell({
           <span className={styles.topbarTitle}>{currentLabel}</span>
           <div className={styles.topbarActions}>
             <div className={styles.searchWrap}>
-              <SearchIcon className={styles.searchIcon} />
+              <LuSearch className={styles.searchIcon} />
               <input className={styles.searchInput} placeholder="Search…" type="text" readOnly />
             </div>
             <ThemeToggle className={styles.iconButton} iconClassName={styles.topbarIcon} />
             <button type="button" className={styles.iconButton} aria-label="Notifications">
-              <BellIcon className={styles.topbarIcon} />
+              <LuBell className={styles.topbarIcon} />
               <span className={styles.iconDot} aria-hidden="true" />
             </button>
             <button type="button" className={styles.iconButton} aria-label="Help">
-              <HelpCircleIcon className={styles.topbarIcon} />
+              <LuCircleHelp className={styles.topbarIcon} />
             </button>
             <button type="button" className={styles.publishButton}>
               Publish Changes

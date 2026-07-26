@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2Icon } from "lucide-react";
+import { LuLoaderCircle } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -52,7 +52,7 @@ export function AcceptInviteForm({ token }: { token: string }) {
         />
       </div>
       <Button type="submit" disabled={submitting} className={styles.submit}>
-        {submitting ? <Loader2Icon className={styles.spinner} /> : null}
+        {submitting ? <LuLoaderCircle className={styles.spinner} /> : null}
         {submitting ? "Setting up…" : "Set password & sign in"}
       </Button>
     </form>

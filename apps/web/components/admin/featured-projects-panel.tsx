@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Reorder, useDragControls } from "framer-motion";
 import { toast } from "sonner";
-import { GripVerticalIcon, StarOffIcon } from "lucide-react";
+import { LuGripVertical, LuStarOff } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -43,7 +43,7 @@ function FeaturedRow({ item, onRemoved }: { item: FeaturedProjectItem; onRemoved
         className={styles.dragHandle}
         aria-label="Drag to reorder"
       >
-        <GripVerticalIcon className={styles.dragIcon} />
+        <LuGripVertical className={styles.dragIcon} />
       </button>
       <Link href={`/admin/projects/${item.id}`} className={styles.title}>
         {item.title}
@@ -57,7 +57,7 @@ function FeaturedRow({ item, onRemoved }: { item: FeaturedProjectItem; onRemoved
         onClick={handleRemove}
         aria-label="Remove from featured"
       >
-        <StarOffIcon />
+        <LuStarOff />
       </Button>
     </Reorder.Item>
   );

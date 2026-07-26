@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { CopyIcon, Loader2Icon } from "lucide-react";
+import { LuCopy, LuLoaderCircle } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -130,7 +130,7 @@ export function InvitesPanel({
           </div>
         ) : null}
         <Button type="submit" disabled={submitting}>
-          {submitting ? <Loader2Icon className={styles.spinner} /> : null}
+          {submitting ? <LuLoaderCircle className={styles.spinner} /> : null}
           {submitting ? "Sending…" : "Send invite"}
         </Button>
       </form>
@@ -139,7 +139,7 @@ export function InvitesPanel({
         <div className={styles.linkBox}>
           <span className={styles.linkText}>{lastInviteLink}</span>
           <Button type="button" variant="ghost" size="icon-sm" onClick={copyInviteLink}>
-            <CopyIcon />
+            <LuCopy />
           </Button>
         </div>
       ) : null}
