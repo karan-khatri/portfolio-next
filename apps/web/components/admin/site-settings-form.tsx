@@ -2,7 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { CodeIcon, Loader2Icon, BriefcaseIcon, FileTextIcon, SaveIcon } from "lucide-react";
+import { LuLoaderCircle, LuFileText, LuMapPin, LuSave } from "react-icons/lu";
+import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { SiUpwork, SiFiverr, SiInstagram } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +19,11 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
   const [description, setDescription] = useState(initial.description);
   const [githubUrl, setGithubUrl] = useState(initial.githubUrl ?? "");
   const [linkedinUrl, setLinkedinUrl] = useState(initial.linkedinUrl ?? "");
+  const [upworkUrl, setUpworkUrl] = useState(initial.upworkUrl ?? "");
+  const [fiverrUrl, setFiverrUrl] = useState(initial.fiverrUrl ?? "");
+  const [instagramUrl, setInstagramUrl] = useState(initial.instagramUrl ?? "");
   const [resumeUrl, setResumeUrl] = useState(initial.resumeUrl ?? "");
+  const [location, setLocation] = useState(initial.location ?? "");
   const [pending, startTransition] = useTransition();
 
   function handleReset() {
@@ -25,7 +31,11 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
     setDescription(initial.description);
     setGithubUrl(initial.githubUrl ?? "");
     setLinkedinUrl(initial.linkedinUrl ?? "");
+    setUpworkUrl(initial.upworkUrl ?? "");
+    setFiverrUrl(initial.fiverrUrl ?? "");
+    setInstagramUrl(initial.instagramUrl ?? "");
     setResumeUrl(initial.resumeUrl ?? "");
+    setLocation(initial.location ?? "");
   }
 
   function handleSubmit(event: React.FormEvent) {
@@ -36,7 +46,11 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
         description,
         githubUrl: githubUrl || null,
         linkedinUrl: linkedinUrl || null,
+        upworkUrl: upworkUrl || null,
+        fiverrUrl: fiverrUrl || null,
+        instagramUrl: instagramUrl || null,
         resumeUrl: resumeUrl || null,
+        location: location || null,
       });
       if (result.error) toast.error(result.error);
       else toast.success("Settings saved");
@@ -59,6 +73,19 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
             onChange={(event) => setDescription(event.target.value)}
           />
         </div>
+        <div className={styles.field}>
+          <Label htmlFor="site-location">Location</Label>
+          <div className={styles.inputWrap}>
+            <LuMapPin className={styles.inputIcon} />
+            <Input
+              id="site-location"
+              placeholder="Florence (Firenze), Italy"
+              className={styles.inputWithIcon}
+              value={location}
+              onChange={(event) => setLocation(event.target.value)}
+            />
+          </div>
+        </div>
       </section>
 
       <section className={styles.section}>
@@ -66,7 +93,7 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
         <div className={styles.field}>
           <Label htmlFor="site-github">GitHub URL</Label>
           <div className={styles.inputWrap}>
-            <CodeIcon className={styles.inputIcon} />
+            <FaGithub className={styles.inputIcon} />
             <Input
               id="site-github"
               type="url"
@@ -80,7 +107,7 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
         <div className={styles.field}>
           <Label htmlFor="site-linkedin">LinkedIn URL</Label>
           <div className={styles.inputWrap}>
-            <BriefcaseIcon className={styles.inputIcon} />
+            <FaLinkedin className={styles.inputIcon} />
             <Input
               id="site-linkedin"
               type="url"
@@ -92,13 +119,55 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
           </div>
         </div>
         <div className={styles.field}>
+          <Label htmlFor="site-upwork">Upwork URL</Label>
+          <div className={styles.inputWrap}>
+            <SiUpwork className={styles.inputIcon} />
+            <Input
+              id="site-upwork"
+              type="url"
+              placeholder="https://upwork.com/freelancers/your-profile"
+              className={styles.inputWithIcon}
+              value={upworkUrl}
+              onChange={(event) => setUpworkUrl(event.target.value)}
+            />
+          </div>
+        </div>
+        <div className={styles.field}>
+          <Label htmlFor="site-fiverr">Fiverr URL</Label>
+          <div className={styles.inputWrap}>
+            <SiFiverr className={styles.inputIcon} />
+            <Input
+              id="site-fiverr"
+              type="url"
+              placeholder="https://fiverr.com/your-username"
+              className={styles.inputWithIcon}
+              value={fiverrUrl}
+              onChange={(event) => setFiverrUrl(event.target.value)}
+            />
+          </div>
+        </div>
+        <div className={styles.field}>
+          <Label htmlFor="site-instagram">Instagram URL</Label>
+          <div className={styles.inputWrap}>
+            <SiInstagram className={styles.inputIcon} />
+            <Input
+              id="site-instagram"
+              type="url"
+              placeholder="https://instagram.com/your-username"
+              className={styles.inputWithIcon}
+              value={instagramUrl}
+              onChange={(event) => setInstagramUrl(event.target.value)}
+            />
+          </div>
+        </div>
+        <div className={styles.field}>
           <Label htmlFor="site-resume">Resume URL</Label>
           <MediaUrlField
             id="site-resume"
             value={resumeUrl}
             onChange={setResumeUrl}
             placeholder="Link to a hosted PDF, or browse Media"
-            icon={<FileTextIcon />}
+            icon={<LuFileText />}
           />
         </div>
       </section>
@@ -108,7 +177,7 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
           Cancel
         </Button>
         <Button type="submit" disabled={pending}>
-          {pending ? <Loader2Icon className={styles.spinner} /> : <SaveIcon />}
+          {pending ? <LuLoaderCircle className={styles.spinner} /> : <LuSave />}
           Save changes
         </Button>
       </div>
