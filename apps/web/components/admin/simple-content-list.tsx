@@ -4,13 +4,14 @@ import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Reorder, useDragControls } from "framer-motion";
 import { toast } from "sonner";
-import { GripVerticalIcon, Loader2Icon, PlusIcon, Trash2Icon } from "lucide-react";
+import { LuGripVertical, LuLoaderCircle, LuPlus, LuTrash2 } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { TagInput } from "@/components/admin/tag-input";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import type { SimpleContentType, SimpleField } from "@/lib/admin/simple-content-fields";
 import { simpleContentSummaries } from "@/lib/admin/simple-content-fields";
 import styles from "./simple-content-list.module.scss";
@@ -115,6 +116,17 @@ function SimpleContentForm({
               </div>
             );
           }
+          if (field.type === "richtext") {
+            return (
+              <div key={field.key} className={styles.field}>
+                <Label htmlFor={fieldId}>{field.label}</Label>
+                <RichTextEditor
+                  value={values[field.key] as string}
+                  onChange={(html) => setField(field.key, html)}
+                />
+              </div>
+            );
+          }
           return (
             <div key={field.key} className={styles.field}>
               <Label htmlFor={fieldId}>{field.label}</Label>
@@ -139,7 +151,7 @@ function SimpleContentForm({
         })}
       </div>
       <Button type="submit" size="sm" disabled={pending}>
-        {pending ? <Loader2Icon className={styles.spinner} /> : null}
+        {pending ? <LuLoaderCircle className={styles.spinner} /> : null}
         {submitLabel}
       </Button>
     </form>
@@ -195,7 +207,7 @@ function SortableRow({
             className={styles.dragHandle}
             aria-label="Drag to reorder"
           >
-            <GripVerticalIcon className={styles.dragIcon} />
+            <LuGripVertical className={styles.dragIcon} />
           </button>
         ) : null}
         <span className={styles.summaryText}>
@@ -213,7 +225,7 @@ function SortableRow({
           disabled={pending}
           aria-label="Delete"
         >
-          <Trash2Icon />
+          <LuTrash2 />
         </Button>
       </summary>
       <div className={styles.itemBody}>
@@ -320,7 +332,7 @@ export function SimpleContentList({
 
       <details className={styles.createDisclosure}>
         <summary className={styles.createTrigger}>
-          <PlusIcon className={styles.createIcon} />
+          <LuPlus className={styles.createIcon} />
           Add new
         </summary>
         <div className={styles.createBody}>

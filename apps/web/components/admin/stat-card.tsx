@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { LucideIcon } from "lucide-react";
+import type { IconType } from "react-icons";
 import { Card } from "@/components/ui/card";
 import { StatusBadge } from "./status-badge";
 import styles from "./stat-card.module.scss";
@@ -16,7 +16,7 @@ export function StatCard({
   href,
 }: {
   title: string;
-  icon: LucideIcon;
+  icon: IconType;
   counts: StatusCount[];
   href: string;
 }) {

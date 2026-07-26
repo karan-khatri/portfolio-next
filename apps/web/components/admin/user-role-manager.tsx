@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2Icon } from "lucide-react";
+import { LuLoaderCircle } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -132,7 +132,7 @@ function UserRow({
                 </div>
               ) : null}
               <Button type="submit" size="sm" disabled={pending}>
-                {pending ? <Loader2Icon className={styles.spinner} /> : null}
+                {pending ? <LuLoaderCircle className={styles.spinner} /> : null}
                 Assign
               </Button>
             </form>

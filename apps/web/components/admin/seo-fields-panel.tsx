@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Loader2Icon } from "lucide-react";
+import { LuLoaderCircle } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -91,7 +91,7 @@ export function SeoFieldsPanel({
           disabled={pending}
           className={styles.saveButton}
         >
-          {pending ? <Loader2Icon className={styles.spinner} /> : null}
+          {pending ? <LuLoaderCircle className={styles.spinner} /> : null}
           Save SEO
         </Button>
       </CardContent>

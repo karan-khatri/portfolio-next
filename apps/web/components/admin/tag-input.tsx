@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import { XIcon } from "lucide-react";
+import { LuX } from "react-icons/lu";
 import { Label } from "@/components/ui/label";
 import styles from "./tag-input.module.scss";
 
@@ -53,7 +53,7 @@ export function TagInput({
               className={styles.pillRemove}
               aria-label={`Remove ${tag}`}
             >
-              <XIcon className={styles.pillRemoveIcon} />
+              <LuX className={styles.pillRemoveIcon} />
             </button>
           </span>
         ))}

@@ -1,4 +1,4 @@
-import { SearchIcon } from "lucide-react";
+import { LuSearch } from "react-icons/lu";
 import styles from "./search-input.module.scss";
 
 export function SearchInput({
@@ -12,7 +12,7 @@ export function SearchInput({
 }) {
   return (
     <form action={basePath} method="GET" className={styles.form}>
-      <SearchIcon className={styles.icon} />
+      <LuSearch className={styles.icon} />
       <input
         type="search"
         name="q"
