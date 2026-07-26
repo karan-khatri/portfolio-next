@@ -1,0 +1,21 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.heading {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.description {
+  margin-top: -1rem;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+
+  a {
+    color: var(--primary);
+    text-decoration: underline;
+  }
+}

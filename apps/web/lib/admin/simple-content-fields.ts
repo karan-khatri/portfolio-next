@@ -14,7 +14,8 @@ export type SimpleContentType =
   | "service"
   | "testimonial"
   | "author"
-  | "redirect";
+  | "redirect"
+  | "techStack";
 
 export interface SimpleContentSummary {
   primary: string;
@@ -48,6 +49,10 @@ export const simpleContentSummaries: Record<
   redirect: (item) => ({
     primary: `${item.fromPath as string} → ${item.toPath as string}`,
     secondary: (item.statusCode as number) === 308 ? "Permanent" : "Temporary",
+  }),
+  techStack: (item) => ({
+    primary: item.name as string,
+    secondary: item.imageUrl ? undefined : "No image yet — showing fallback icon",
   }),
 };
 
@@ -103,4 +108,13 @@ export const redirectFields: SimpleField[] = [
   { key: "fromPath", label: "From path", type: "text", required: true },
   { key: "toPath", label: "To path", type: "text", required: true },
   { key: "permanent", label: "Permanent", type: "boolean", booleanLabel: "Permanent (308)" },
+];
+
+export const techStackFields: SimpleField[] = [
+  { key: "name", label: "Name", type: "text", required: true },
+  {
+    key: "imageUrl",
+    label: "Logo image URL (upload it in Media, then paste the URL here)",
+    type: "url",
+  },
 ];

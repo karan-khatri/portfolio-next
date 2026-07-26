@@ -337,6 +337,20 @@ model Skill {
   order    Int    @default(0)
 }
 
+// No `locale` (unlike its sibling simple-list models): a tech logo/name isn't
+// user-facing prose that gets translated, so per-locale rows would just be
+// unused duplication. `imageUrl` is intentionally a plain string rather than
+// a Media FK — these are meant to be pasted external logo URLs, not files
+// run through the admin's upload/Media pipeline.
+model TechStackItem {
+  id        String   @id @default(cuid())
+  name      String
+  imageUrl  String?
+  order     Int      @default(0)
+
+  @@index([order])
+}
+
 model Language {
   id          String @id @default(cuid())
   locale      String

@@ -157,12 +157,17 @@ async function renderSection(section: RenderableSection, locale: string) {
         orderBy: { order: "asc" },
         select: { id: true, name: true, category: true },
       });
+      const techStackItems = await prisma.techStackItem.findMany({
+        orderBy: { order: "asc" },
+        select: { id: true, name: true, imageUrl: true },
+      });
       return (
         <SkillsSection
           id={headingId}
           content={content as never}
           headingLevel={headingLevel}
           items={items}
+          techStackItems={techStackItems}
         />
       );
     }

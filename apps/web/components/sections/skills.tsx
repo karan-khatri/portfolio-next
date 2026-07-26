@@ -1,5 +1,5 @@
 import type { SkillsContent } from "@portfolio/sections";
-import { TechMarquee } from "@/components/tech-marquee";
+import { TechMarquee, type TechMarqueeItem } from "@/components/tech-marquee";
 import { SectionShell } from "./section-shell";
 import { EmptyState } from "./empty-state";
 import { SkillsDiagram } from "./skills-diagram";
@@ -47,11 +47,13 @@ export function SkillsSection({
   content,
   headingLevel,
   items,
+  techStackItems,
 }: {
   id: string;
   content: SkillsContent;
   headingLevel: 2 | 3;
   items: SkillListItem[];
+  techStackItems: TechMarqueeItem[];
 }) {
   const { ungrouped, grouped } = groupByCategory(items);
 
@@ -73,7 +75,7 @@ export function SkillsSection({
       showEyebrow={content.showEyebrow}
       headingAlign={content.headingAlign}
     >
-      <TechMarquee />
+      <TechMarquee items={techStackItems} />
       {showDiagram ? (
         <SkillsDiagram
           centerLabel={content.diagramCenterLabel}

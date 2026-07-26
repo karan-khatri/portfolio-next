@@ -348,3 +348,27 @@
     transform: translateY(-8px);
   }
 }
+
+/* Tech marquee tiles: every other tile bobs the opposite direction of its
+   neighbors. Symmetric around translateY(0) — the tile's natural resting
+   spot — so the oscillation is centered on the tile, not pinned to one
+   edge of its travel range. */
+@keyframes bob-up-down {
+  0%,
+  100% {
+    transform: translateY(-6px);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+@keyframes bob-down-up {
+  0%,
+  100% {
+    transform: translateY(6px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}

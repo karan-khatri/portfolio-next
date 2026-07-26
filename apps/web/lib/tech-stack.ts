@@ -1,4 +1,5 @@
 import type { IconType } from "react-icons";
+import { LuBoxes } from "react-icons/lu";
 import {
   SiJavascript,
   SiTypescript,
@@ -18,31 +19,24 @@ import {
   SiStreamlit,
 } from "react-icons/si";
 
-export interface TechStackItem {
-  name: string;
-  /** Drop a logo URL here (e.g. an uploaded /uploads/... or hosted image) to use it instead of `Icon`. */
-  imageUrl?: string;
-  Icon: IconType;
-}
+/** Best-effort fallback icon by name, used until an item has its own uploaded image. */
+export const TECH_STACK_ICON_BY_NAME: Record<string, IconType> = {
+  JavaScript: SiJavascript,
+  TypeScript: SiTypescript,
+  Python: SiPython,
+  Go: SiGo,
+  React: SiReact,
+  "Next.js": SiNextdotjs,
+  "Node.js": SiNodedotjs,
+  FastAPI: SiFastapi,
+  PostgreSQL: SiPostgresql,
+  MongoDB: SiMongodb,
+  Redis: SiRedis,
+  Docker: SiDocker,
+  RabbitMQ: SiRabbitmq,
+  "GitHub Actions": SiGithubactions,
+  LangChain: SiLangchain,
+  Streamlit: SiStreamlit,
+};
 
-export const TECH_STACK_ROW_1: TechStackItem[] = [
-  { name: "JavaScript", Icon: SiJavascript },
-  { name: "TypeScript", Icon: SiTypescript },
-  { name: "Python", Icon: SiPython },
-  { name: "Go", Icon: SiGo },
-  { name: "React", Icon: SiReact },
-  { name: "Next.js", Icon: SiNextdotjs },
-  { name: "Node.js", Icon: SiNodedotjs },
-  { name: "FastAPI", Icon: SiFastapi },
-];
-
-export const TECH_STACK_ROW_2: TechStackItem[] = [
-  { name: "PostgreSQL", Icon: SiPostgresql },
-  { name: "MongoDB", Icon: SiMongodb },
-  { name: "Redis", Icon: SiRedis },
-  { name: "Docker", Icon: SiDocker },
-  { name: "RabbitMQ", Icon: SiRabbitmq },
-  { name: "GitHub Actions", Icon: SiGithubactions },
-  { name: "LangChain", Icon: SiLangchain },
-  { name: "Streamlit", Icon: SiStreamlit },
-];
+export const DEFAULT_TECH_STACK_ICON: IconType = LuBoxes;
