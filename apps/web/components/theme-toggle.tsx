@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { MoonIcon, SunIcon } from "lucide-react";
+import { LuMoon, LuSun } from "react-icons/lu";
 
 export function ThemeToggle({
   className,
@@ -24,9 +24,9 @@ export function ThemeToggle({
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
     >
       {mounted && resolvedTheme === "dark" ? (
-        <SunIcon className={iconClassName} />
+        <LuSun className={iconClassName} />
       ) : (
-        <MoonIcon className={iconClassName} />
+        <LuMoon className={iconClassName} />
       )}
     </button>
   );
