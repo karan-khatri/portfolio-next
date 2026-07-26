@@ -1,5 +1,5 @@
-import { ArrowRightIcon, FolderGit2Icon } from "lucide-react";
-import { Reveal } from "@/components/motion/reveal";
+import { LuExternalLink, LuFolderGit2 } from "react-icons/lu";
+import { FaGithub } from "react-icons/fa";
 import type { SectionImage } from "./hero";
 
 export interface ProjectCardItem {
@@ -13,10 +13,11 @@ export interface ProjectCardItem {
   liveUrl: string | null;
 }
 
-export function ProjectCard({ project, delay = 0 }: { project: ProjectCardItem; delay?: number }) {
+export function ProjectCard({ project }: { project: ProjectCardItem }) {
+  const hasLinks = Boolean(project.codeRepository || project.liveUrl);
+
   return (
-    <Reveal delay={delay} className="h-full">
-      <div className="glass-panel glow-primary group flex h-full flex-col overflow-hidden rounded-xl transition-all duration-300 hover:-translate-y-1">
+      <div className="glass-panel glow-primary group flex h-full flex-col overflow-hidden rounded-xl transition-all duration-300">
         <div className="relative aspect-16/10 w-full overflow-hidden bg-muted">
           {project.coverImage ? (
             <img
@@ -26,15 +27,45 @@ export function ProjectCard({ project, delay = 0 }: { project: ProjectCardItem; 
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
-              <FolderGit2Icon className="size-10 text-muted-foreground/40" />
+              <LuFolderGit2 className="size-10 text-muted-foreground/40" />
             </div>
           )}
           <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-background/95 to-transparent" />
-          <h3 className="absolute inset-x-0 bottom-0 p-5 font-heading text-xl font-medium">
-            <a href={`/projects/${project.slug}`} className="hover:underline">
-              {project.title}
-            </a>
-          </h3>
+          <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 p-5">
+            <h3 className="min-w-0 flex-1 truncate font-heading text-xl font-medium" title={project.title}>
+              <a href={`/projects/${project.slug}`} className="hover:underline">
+                {project.title}
+              </a>
+            </h3>
+            {hasLinks ? (
+              <div className="flex shrink-0 items-center gap-1">
+                {project.codeRepository ? (
+                  <a
+                    href={project.codeRepository}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="View source repository"
+                    title="View source repository"
+                    className="flex size-8 items-center justify-center rounded-full text-foreground/90 transition-colors hover:bg-white/10 hover:text-primary"
+                  >
+                    <FaGithub className="size-4" />
+                  </a>
+                ) : null}
+                {project.liveUrl ? (
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="View live site"
+                    title="View live site"
+                    className="flex size-8 items-center justify-center rounded-full text-foreground/90 transition-colors hover:bg-white/10 hover:text-primary"
+                  >
+                    <LuExternalLink className="size-4" />
+                  </a>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
         </div>
 
         <div className="flex flex-1 flex-col p-5 sm:p-6">
@@ -53,32 +84,7 @@ export function ProjectCard({ project, delay = 0 }: { project: ProjectCardItem; 
               ))}
             </div>
           ) : null}
-          <div className="mt-auto flex gap-4 pt-6">
-            {project.codeRepository ? (
-              <a
-                href={project.codeRepository}
-                target="_blank"
-                rel="noreferrer"
-                className="group/link flex items-center gap-2 font-mono text-xs text-primary"
-              >
-                View Repo
-                <ArrowRightIcon className="size-3.5 transition-transform group-hover/link:translate-x-1" />
-              </a>
-            ) : null}
-            {project.liveUrl ? (
-              <a
-                href={project.liveUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="group/link flex items-center gap-2 font-mono text-xs text-primary"
-              >
-                Live site
-                <ArrowRightIcon className="size-3.5 transition-transform group-hover/link:translate-x-1" />
-              </a>
-            ) : null}
-          </div>
         </div>
       </div>
-    </Reveal>
   );
 }

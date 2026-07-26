@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import { ProjectCard, type ProjectCardItem } from "./project-card";
 
 export function ProjectSlider({ items }: { items: ProjectCardItem[] }) {
@@ -33,7 +33,7 @@ export function ProjectSlider({ items }: { items: ProjectCardItem[] }) {
     <div className="relative">
       <div
         ref={trackRef}
-        className="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-1 py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {items.map((project) => (
           <div key={project.id} className="w-[85%] shrink-0 snap-start sm:w-[60%] lg:w-[40%]">
@@ -64,7 +64,7 @@ export function ProjectSlider({ items }: { items: ProjectCardItem[] }) {
             disabled={activeIndex === 0}
             className="glass-panel absolute top-1/2 -left-4 hidden -translate-y-1/2 items-center justify-center rounded-full p-2 text-foreground transition-opacity disabled:opacity-30 sm:flex"
           >
-            <ChevronLeftIcon className="size-5" />
+            <LuChevronLeft className="size-5" />
           </button>
           <button
             type="button"
@@ -73,7 +73,7 @@ export function ProjectSlider({ items }: { items: ProjectCardItem[] }) {
             disabled={activeIndex === items.length - 1}
             className="glass-panel absolute top-1/2 -right-4 hidden -translate-y-1/2 items-center justify-center rounded-full p-2 text-foreground transition-opacity disabled:opacity-30 sm:flex"
           >
-            <ChevronRightIcon className="size-5" />
+            <LuChevronRight className="size-5" />
           </button>
         </>
       ) : null}

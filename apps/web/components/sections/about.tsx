@@ -1,16 +1,7 @@
 import type { AboutContent } from "@portfolio/sections";
-import { GlobeIcon, GraduationCapIcon, MapPinIcon, TerminalIcon } from "lucide-react";
-import { Reveal } from "@/components/motion/reveal";
 import { SectionShell } from "./section-shell";
 import { ProseContent } from "@/components/prose-content";
 import type { SectionImage } from "./hero";
-
-const QUICK_FACTS = [
-  { icon: MapPinIcon, label: "Location — Florence, Italy" },
-  { icon: TerminalIcon, label: "Focus — Backend + AI/RAG" },
-  { icon: GraduationCapIcon, label: "Education — MSc, Univ. of Florence (2026)" },
-  { icon: GlobeIcon, label: "Status — Open to remote roles" },
-] as const;
 
 export function AboutSection({
   id,
@@ -23,37 +14,88 @@ export function AboutSection({
   headingLevel: 2 | 3;
   image: SectionImage | null;
 }>) {
+  const stats = [
+    { label: "Location", value: content.location },
+    { label: "Focus", value: content.focusTag },
+    { label: "Education", value: content.education },
+  ].filter((stat) => stat.value);
+
+  const terminalLines = [
+    { label: "Role", value: content.role },
+    { label: "Focus", value: content.focusDetail },
+    { label: "Currently", value: content.currently },
+  ].filter((line) => line.value);
+
   return (
-    <SectionShell eyebrow="About" headingId={id} headingLevel={headingLevel} heading={content.heading}>
-      <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-        <Reveal className="order-2 space-y-6 lg:order-1">
-          <div className="glass-panel glow-primary rounded-xl p-6 transition-all duration-300">
-            <ProseContent html={content.body} className="text-muted-foreground" />
-          </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {QUICK_FACTS.map((fact) => (
-              <div
-                key={fact.label}
-                className="glass-panel flex items-center gap-3 rounded-lg p-4"
-              >
-                <fact.icon className="size-5 shrink-0 text-primary" />
-                <span className="font-mono text-xs text-muted-foreground">{fact.label}</span>
-              </div>
-            ))}
-          </div>
-        </Reveal>
+    <SectionShell
+      eyebrow="About"
+      id={id}
+      headingLevel={headingLevel}
+      heading={content.heading}
+      showEyebrow={content.showEyebrow}
+      headingAlign={content.headingAlign}
+    >
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-stretch">
+        <div className="flex flex-col">
+          <ProseContent html={content.body} className="text-muted-foreground" />
+          {stats.length > 0 ? (
+            <div className="mt-8 grid grid-cols-3 gap-6 border-t border-border/60 pt-6">
+              {stats.map((stat) => (
+                <div key={stat.label} className="min-w-0">
+                  <p className="font-mono text-[10px] tracking-[0.28em] text-primary uppercase">
+                    {stat.label}
+                  </p>
+                  <p className="mt-1.5 font-mono text-sm font-semibold">{stat.value}</p>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </div>
 
         {image ? (
-          <Reveal delay={0.1} className="order-1 lg:order-2">
-            <img
-              src={image.url}
-              alt={image.altText ?? ""}
-              width={image.width ?? undefined}
-              height={image.height ?? undefined}
-              className="glass-panel aspect-square w-full rounded-2xl object-cover lg:aspect-4/3"
-            />
-          </Reveal>
-        ) : null}
+          <img
+            src={image.url}
+            alt={image.altText ?? ""}
+            width={image.width ?? undefined}
+            height={image.height ?? undefined}
+            className="glass-panel h-full min-h-96 w-full rounded-2xl object-cover lg:max-w-xl"
+          />
+        ) : (
+          <div className="flex flex-col">
+            <div className="glass-panel flex flex-1 flex-col overflow-hidden rounded-2xl shadow-2xl lg:max-w-xl">
+              <div className="flex h-10 shrink-0 items-center gap-2 border-b border-border/50 bg-card/50 px-4">
+                <span className="size-3 rounded-full bg-[#ff5f56]" />
+                <span className="size-3 rounded-full bg-[#ffbd2e]" />
+                <span className="size-3 rounded-full bg-[#27c93f]" />
+                <span className="mx-auto font-mono text-xs text-muted-foreground/50">
+                  {content.terminalTitle ?? "guest@portfolio: ~"}
+                </span>
+              </div>
+              <div className="flex flex-1 flex-col gap-4 p-6 font-mono text-sm leading-relaxed">
+                <div>
+                  <span className="text-primary">$</span> whoami
+                  {" "}
+                  <span className="inline-block h-4 w-2 bg-primary animate-pulse" />
+                </div>
+                {terminalLines.length > 0 ? (
+                  <div className="flex flex-col gap-2 text-muted-foreground">
+                    {terminalLines.map((line) => (
+                      <div key={line.label}>
+                        <span className="text-primary">{line.label}:</span> {line.value}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            </div>
+            {content.status ? (
+              <div className="hidden lg:block mt-8 border-t border-border/60 pt-6 lg:max-w-xl">
+                <p className="font-mono text-[10px] tracking-[0.28em] text-primary uppercase">Status</p>
+                <p className="mt-1.5 font-mono text-sm font-semibold">{content.status}</p>
+              </div>
+            ) : null}
+          </div>
+        )}
       </div>
     </SectionShell>
   );
