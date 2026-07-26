@@ -138,11 +138,7 @@ export async function createPreviewAction(
       data,
       userId: user.id,
     });
-    const preview = await createPreviewToken({
-      entityType: "Project",
-      entityId: projectId,
-      revisionId: revision.id,
-    });
+    const preview = await createPreviewToken({ revisionId: revision.id, userId: user.id });
     return { revisionId: revision.id, previewToken: preview.token };
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Could not create preview" };

@@ -1,5 +1,6 @@
 import { prisma } from "./client";
 import { logAudit } from "./audit";
+import { assertHasActiveRole } from "./auth";
 import { saveDraft, type EntityType, type RevisionData } from "./cms";
 
 export async function listRevisions(entityType: EntityType, entityId: string, limit = 20) {
@@ -17,6 +18,8 @@ export async function restoreRevision(params: {
   revisionId: string;
   userId: string;
 }) {
+  await assertHasActiveRole(params.userId);
+
   const target = await prisma.revision.findUniqueOrThrow({ where: { id: params.revisionId } });
   if (target.entityType !== params.entityType || target.entityId !== params.entityId) {
     throw new Error("Revision does not match the given entity");

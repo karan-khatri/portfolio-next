@@ -26,7 +26,7 @@ interface RoleOption {
 }
 
 interface PendingInvite {
-  token: string;
+  id: string;
   email: string;
   role: { name: string };
   roleExpiresAt: Date | null;
@@ -146,7 +146,7 @@ export function InvitesPanel({
 
       <ul className={styles.list}>
         {pendingInvites.map((invite) => (
-          <li key={invite.token} className={styles.row}>
+          <li key={invite.id} className={styles.row}>
             <span className={styles.rowMain}>
               <span className={styles.email}>{invite.email}</span>
               <span className={styles.meta}>

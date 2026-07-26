@@ -8,7 +8,7 @@ interface ActivityRow {
   entity: string;
   entityId: string;
   createdAt: Date;
-  user: { email: string };
+  user: { email: string } | null;
 }
 
 export function ActivityFeed({ activity }: { activity: ActivityRow[] }) {
@@ -27,7 +27,7 @@ export function ActivityFeed({ activity }: { activity: ActivityRow[] }) {
             </span>
             <span className={styles.body}>
               <span className={styles.primary}>
-                <span className={styles.user}>{row.user.email}</span>{" "}
+                <span className={styles.user}>{row.user?.email ?? "Deleted user"}</span>{" "}
                 <span className={styles.action}>
                   {row.action} · {row.entity}:{row.entityId.slice(0, 8)}
                 </span>

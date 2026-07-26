@@ -18,6 +18,16 @@ model Role {
   inviteTokens InviteToken[]
 }
 
+// Two invariants live only in app code (packages/db/src/auth.ts's
+// assertRoleTimeFrame) today; a migration additionally enforces them at the
+// DB level via raw SQL Prisma's schema DSL can't express natively:
+//   - CHECK: expiresAt IS NULL OR expiresAt > startsAt
+//   - TRIGGER: a row referencing an isPermanent Role must have expiresAt NULL
+// (Overlapping active assignments for the same user are NOT constrained at
+// the DB level — that needs a GiST EXCLUDE constraint requiring the
+// btree_gist extension, which may not be creatable on a managed Postgres
+// instance without elevated privileges. Left as an app-level invariant
+// pending confirmation that CREATE EXTENSION is safe to run there.)
 model UserRoleAssignment {
   id          String    @id @default(cuid())
   userId      String
@@ -63,7 +73,10 @@ model Session {
 }
 
 model InviteToken {
-  token         String    @id @default(cuid())
+  id            String    @id @default(cuid())
+  // SHA-256 hash of a randomBytes(32) token — the raw token is only ever
+  // returned once, at creation, and never persisted (mirrors Session.tokenHash).
+  tokenHash     String    @unique
   email         String
   roleId        String
   role          Role      @relation(fields: [roleId], references: [id])
@@ -88,8 +101,11 @@ model LoginAttempt {
 
 model AuditLog {
   id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  // Nullable + SetNull: an audit entry is the historical record of what
+  // happened, and should survive the acting user being deleted later —
+  // it just loses the ability to point at that (now-gone) User row.
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   action    String
   entity    String
   entityId  String
@@ -107,33 +123,54 @@ enum ContentStatus {
   ARCHIVED
 }
 
+// Page/Project/Post revisions share one polymorphic table since Prisma can't
+// express a true FK across three unrelated target tables — entityId stays a
+// free-text cuid, but entityType is a real enum so a typo can't silently
+// create an unreachable row (previously a plain String). Revisions
+// deliberately are NOT cascade-deleted when their source entity is removed:
+// they're the audit/history trail, which should survive deletion of the
+// thing it documents, so an orphaned revision after a delete is expected
+// behavior, not a bug.
 model Revision {
-  id          String        @id @default(cuid())
-  entityType  String
+  id          String             @id @default(cuid())
+  entityType  RevisionEntityType
   entityId    String
   status      ContentStatus
   data        Json
   createdById String?
-  createdBy   User?         @relation(fields: [createdById], references: [id])
-  createdAt   DateTime      @default(now())
+  createdBy   User?              @relation(fields: [createdById], references: [id])
+  createdAt   DateTime           @default(now())
 
   previewTokens PreviewToken[]
 
   @@index([entityType, entityId, createdAt])
 }
 
+enum RevisionEntityType {
+  Page
+  Project
+  Post
+}
+
 model PreviewToken {
-  token      String   @id @default(cuid())
-  entityType String
-  entityId   String
+  id        String   @id @default(cuid())
+  // SHA-256 hash of a randomBytes(32) token — see InviteToken.tokenHash.
+  tokenHash String   @unique
+  // entityType/entityId are NOT duplicated here — they previously were,
+  // independently of `revision`, with nothing keeping the two in sync. Read
+  // them off `revision.entityType`/`revision.entityId` instead.
   revisionId String
   revision   Revision @relation(fields: [revisionId], references: [id], onDelete: Cascade)
   expiresAt  DateTime
   createdAt  DateTime @default(now())
-
-  @@index([entityType, entityId])
 }
 
+// Seo owns the FK back to whichever single entity it belongs to (rather than
+// Page/Project/Post each holding an independent unique FK into Seo). That
+// makes "one Seo row per entity" a real constraint instead of a convention:
+// the DB now cascades the delete when the owning entity is removed, and a
+// CHECK constraint (added in the migration) guarantees at most one of
+// pageId/projectId/postId is ever set on a given row.
 model Seo {
   id              String   @id @default(cuid())
   metaTitle       String?
@@ -144,9 +181,12 @@ model Seo {
   noindex         Boolean  @default(false)
   nofollow        Boolean  @default(false)
   structuredData  Json?
-  page            Page?
-  project         Project?
-  post            Post?
+  pageId          String?  @unique
+  page            Page?    @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  projectId       String?  @unique
+  project         Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  postId          String?  @unique
+  post            Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
   updatedAt       DateTime @updatedAt
 }
 
@@ -223,8 +263,7 @@ model Page {
   status            ContentStatus @default(DRAFT)
   publishedAt       DateTime?
   sections          SectionInstance[]
-  seoId             String?       @unique
-  seo               Seo?          @relation(fields: [seoId], references: [id])
+  seo               Seo?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 
@@ -243,7 +282,7 @@ model SectionInstance {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
-  @@index([pageId, order])
+  @@unique([pageId, order])
 }
 
 model Project {
@@ -264,8 +303,7 @@ model Project {
   publishedAt        DateTime?
   featured           Boolean       @default(false)
   featuredOrder      Int?
-  seoId              String?       @unique
-  seo                Seo?          @relation(fields: [seoId], references: [id])
+  seo                Seo?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
 
@@ -288,8 +326,7 @@ model Post {
   tags               Tag[]         @relation("PostTags")
   status             ContentStatus @default(DRAFT)
   publishedAt        DateTime?
-  seoId              String?       @unique
-  seo                Seo?          @relation(fields: [seoId], references: [id])
+  seo                Seo?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
 
@@ -328,6 +365,9 @@ model Education {
   order       Int       @default(0)
 }
 
+// level is CHECKed (1-5, raw SQL in the migration — see UserRoleAssignment's
+// comment for why this isn't expressed in the schema DSL) to match what the
+// admin form already labels it: "Level (1-5)".
 model Skill {
   id       String @id @default(cuid())
   locale   String
@@ -344,9 +384,11 @@ model Skill {
 // run through the admin's upload/Media pipeline.
 model TechStackItem {
   id        String   @id @default(cuid())
-  name      String
+  name      String   @unique
   imageUrl  String?
   order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([order])
 }

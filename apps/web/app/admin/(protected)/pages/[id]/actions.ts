@@ -87,11 +87,7 @@ export async function createPreviewAction(
     const user = await requireEditor();
     const data = buildValidatedData(title, sections);
     const revision = await saveDraft({ entityType: "Page", entityId: pageId, data, userId: user.id });
-    const preview = await createPreviewToken({
-      entityType: "Page",
-      entityId: pageId,
-      revisionId: revision.id,
-    });
+    const preview = await createPreviewToken({ revisionId: revision.id, userId: user.id });
     return { revisionId: revision.id, previewToken: preview.token };
   } catch (error) {
     if (error instanceof SectionValidationError) return { error: error.message };

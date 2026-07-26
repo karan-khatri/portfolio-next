@@ -37,7 +37,7 @@ export default async function PreviewPage({
     notFound();
   }
 
-  if (preview.entityType === "Page") {
+  if (preview.revision.entityType === "Page") {
     const data = preview.revision.data as unknown as PageRevisionData;
     const sections = data.sections.map((section, index) => ({
       id: `draft-${index}`,
@@ -66,7 +66,7 @@ export default async function PreviewPage({
     );
   }
 
-  if (preview.entityType === "Project" || preview.entityType === "Post") {
+  if (preview.revision.entityType === "Project" || preview.revision.entityType === "Post") {
     const data = preview.revision.data as unknown as FlatRevisionData;
     const paragraphs = (data.body ?? "").split(/\n{2,}/).filter(Boolean);
 

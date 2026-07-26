@@ -27,7 +27,16 @@ async function getPendingInvites() {
   return prisma.inviteToken.findMany({
     where: { acceptedAt: null, expiresAt: { gt: new Date() } },
     orderBy: { createdAt: "desc" },
-    include: { invitedBy: { select: { email: true } }, role: true },
+    // Explicit select so the (sensitive, though one-way-hashed) tokenHash
+    // column is never serialized down to the client.
+    select: {
+      id: true,
+      email: true,
+      roleExpiresAt: true,
+      expiresAt: true,
+      invitedBy: { select: { email: true } },
+      role: true,
+    },
   });
 }
 

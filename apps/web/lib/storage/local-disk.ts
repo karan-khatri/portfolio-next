@@ -24,7 +24,11 @@ export class LocalDiskStorageAdapter implements StorageAdapter {
     contentType: string;
   }): Promise<StoredFile> {
     await mkdir(UPLOAD_DIR, { recursive: true });
-    const ext = path.extname(filename) || EXTENSION_BY_MIME_TYPE[contentType] || "";
+    // Extension must come only from the (already allowlist-validated) content type —
+    // never from the caller-supplied filename, which lets an attacker smuggle a
+    // mismatched extension (e.g. claim image/png but name the file "x.svg") to get
+    // executable content served back from /uploads/.
+    const ext = EXTENSION_BY_MIME_TYPE[contentType] || "";
     const key = `${randomUUID()}${ext}`;
     await writeFile(path.join(UPLOAD_DIR, key), buffer);
     return { url: `/uploads/${key}` };

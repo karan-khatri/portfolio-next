@@ -1,5 +1,7 @@
+import { randomBytes } from "node:crypto";
 import { prisma } from "./client";
 import { logAudit } from "./audit";
+import { hashToken, assertHasActiveRole } from "./auth";
 import type { ContentStatus, SectionType } from "./generated/client";
 
 export type EntityType = "Page" | "Project" | "Post";
@@ -36,6 +38,8 @@ export async function saveDraft(params: {
   data: RevisionData;
   userId: string;
 }) {
+  await assertHasActiveRole(params.userId);
+
   const revision = await prisma.revision.create({
     data: {
       entityType: params.entityType,
@@ -127,6 +131,8 @@ export async function publishRevision(params: {
   revisionId: string;
   userId: string;
 }) {
+  await assertHasActiveRole(params.userId);
+
   const revision = await prisma.revision.findUniqueOrThrow({
     where: { id: params.revisionId },
   });
@@ -158,6 +164,8 @@ export async function unpublishEntity(params: {
   entityId: string;
   userId: string;
 }) {
+  await assertHasActiveRole(params.userId);
+
   const data = { status: "DRAFT" as const, publishedAt: null };
   if (params.entityType === "Page") {
     await prisma.page.update({ where: { id: params.entityId }, data });
@@ -177,25 +185,26 @@ export async function unpublishEntity(params: {
 
 const PREVIEW_TTL_MS = 60 * 60 * 1000;
 
-export async function createPreviewToken(params: {
-  entityType: EntityType;
-  entityId: string;
-  revisionId: string;
-}) {
+export async function createPreviewToken(params: { revisionId: string; userId: string }) {
+  await assertHasActiveRole(params.userId);
+
   const expiresAt = new Date(Date.now() + PREVIEW_TTL_MS);
-  return prisma.previewToken.create({
+  const token = randomBytes(32).toString("hex");
+  const tokenHash = hashToken(token);
+  const created = await prisma.previewToken.create({
     data: {
-      entityType: params.entityType,
-      entityId: params.entityId,
+      tokenHash,
       revisionId: params.revisionId,
       expiresAt,
     },
   });
+  return { ...created, token };
 }
 
 export async function resolvePreviewToken(token: string) {
+  const tokenHash = hashToken(token);
   const preview = await prisma.previewToken.findUnique({
-    where: { token },
+    where: { tokenHash },
     include: { revision: true },
   });
   if (!preview || preview.expiresAt < new Date()) return null;

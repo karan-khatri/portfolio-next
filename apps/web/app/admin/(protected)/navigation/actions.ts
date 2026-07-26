@@ -14,6 +14,20 @@ export async function createNavigationItemAction(
   try {
     const user = await requireEditor();
     const parentId = values.parentId ? String(values.parentId) : null;
+
+    // Nav is documented/designed as one level of nesting — the schema can't
+    // express "no deeper than 1" or "no cycles" as a constraint, so guard it
+    // here: a parent must itself be a top-level item.
+    if (parentId) {
+      const parent = await prisma.navigationItem.findUnique({
+        where: { id: parentId },
+        select: { parentId: true },
+      });
+      if (!parent || parent.parentId) {
+        return { error: "Sub-links can only be one level deep" };
+      }
+    }
+
     const count = await prisma.navigationItem.count({ where: { parentId } });
     const created = await prisma.navigationItem.create({
       data: {

@@ -92,11 +92,7 @@ export async function createPreviewAction(
     const user = await requireEditor();
     const data = await buildData(input);
     const revision = await saveDraft({ entityType: "Post", entityId: postId, data, userId: user.id });
-    const preview = await createPreviewToken({
-      entityType: "Post",
-      entityId: postId,
-      revisionId: revision.id,
-    });
+    const preview = await createPreviewToken({ revisionId: revision.id, userId: user.id });
     return { revisionId: revision.id, previewToken: preview.token };
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Could not create preview" };

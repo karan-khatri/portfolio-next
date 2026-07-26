@@ -39,7 +39,7 @@ export async function verifyLoginCredentials(email: string, password: string) {
   return success ? user : null;
 }
 
-function hashToken(token: string): string {
+export function hashToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
 }
 
@@ -69,6 +69,23 @@ export async function getActiveRoleAssignment(userId: string) {
     orderBy: { startsAt: "desc" },
     include: { role: true },
   });
+}
+
+/**
+ * Defense-in-depth for the CMS mutation functions (saveDraft, publishRevision,
+ * unpublishEntity, restoreRevision, createPreviewToken): today every real
+ * caller already passes through requireEditor()/requireAdminRole() at the
+ * apps/web route layer first, so this is redundant there — but these
+ * `packages/db` functions otherwise take a userId purely for audit-log
+ * attribution and would silently trust *any* string. This makes them check
+ * for themselves, so a future API route or webhook that forgets the
+ * layout-level gate still can't call through as an unprivileged user.
+ */
+export async function assertHasActiveRole(userId: string): Promise<void> {
+  const assignment = await getActiveRoleAssignment(userId);
+  if (!assignment) {
+    throw new Error("Unauthorized: no active role assignment");
+  }
 }
 
 export async function verifySessionToken(token: string) {
@@ -126,8 +143,11 @@ export async function createInvite(params: {
 }) {
   await assertRoleTimeFrame(params.roleId, params.roleExpiresAt);
   const expiresAt = new Date(Date.now() + INVITE_TTL_MS);
-  return prisma.inviteToken.create({
+  const token = randomBytes(32).toString("hex");
+  const tokenHash = hashToken(token);
+  const created = await prisma.inviteToken.create({
     data: {
+      tokenHash,
       email: params.email,
       roleId: params.roleId,
       roleExpiresAt: params.roleExpiresAt,
@@ -135,13 +155,23 @@ export async function createInvite(params: {
       expiresAt,
     },
   });
+  return { ...created, token };
 }
 
 export async function acceptInvite(token: string, password: string) {
-  const invite = await prisma.inviteToken.findUnique({ where: { token } });
-  if (!invite || invite.acceptedAt || invite.expiresAt < new Date()) {
-    return null;
-  }
+  const tokenHash = hashToken(token);
+
+  // Atomically claim the invite: the `acceptedAt: null` / not-expired conditions
+  // are enforced *in* the update's WHERE clause, not checked separately beforehand,
+  // so two concurrent requests for the same token can't both pass a read-then-write
+  // race — only one `updateMany` can match and flip the still-null row.
+  const claimed = await prisma.inviteToken.updateMany({
+    where: { tokenHash, acceptedAt: null, expiresAt: { gt: new Date() } },
+    data: { acceptedAt: new Date() },
+  });
+  if (claimed.count === 0) return null;
+
+  const invite = await prisma.inviteToken.findUniqueOrThrow({ where: { tokenHash } });
 
   return prisma.$transaction(async (tx) => {
     const user = await tx.user.create({
@@ -158,10 +188,6 @@ export async function acceptInvite(token: string, password: string) {
         expiresAt: invite.roleExpiresAt,
         grantedById: invite.invitedById,
       },
-    });
-    await tx.inviteToken.update({
-      where: { token },
-      data: { acceptedAt: new Date() },
     });
     return user;
   });
