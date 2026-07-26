@@ -6,8 +6,6 @@ import { getPublicNav } from "@/lib/public-nav";
 
 const LOCALE = "en";
 
-export const revalidate = 0;
-
 async function getHomePage() {
   return prisma.page.findFirst({
     where: { slug: "home", locale: LOCALE, status: "PUBLISHED" },
