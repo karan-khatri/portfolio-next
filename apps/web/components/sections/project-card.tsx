@@ -1,3 +1,5 @@
+import Image from "next/image";
+import Link from "next/link";
 import { LuExternalLink, LuFolderGit2 } from "react-icons/lu";
 import { FaGithub } from "react-icons/fa";
 import type { SectionImage } from "./hero";
@@ -21,7 +23,7 @@ export function ProjectCard({ project }: { project: ProjectCardItem }) {
         {/* Stretched-link overlay: makes the whole card navigate to the project,
             while the icon links below sit above it (relative + higher z-index)
             so they keep working as independent, separately-clickable targets. */}
-        <a
+        <Link
           href={`/projects/${project.slug}`}
           className="absolute inset-0 z-10"
           aria-label={project.title}
@@ -29,10 +31,14 @@ export function ProjectCard({ project }: { project: ProjectCardItem }) {
 
         <div className="relative aspect-16/10 w-full overflow-hidden bg-muted">
           {project.coverImage ? (
-            <img
+            <Image
               src={project.coverImage.url}
               alt={project.coverImage.altText ?? ""}
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              fill
+              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+              placeholder={project.coverImage.blurDataUrl ? "blur" : undefined}
+              blurDataURL={project.coverImage.blurDataUrl ?? undefined}
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">

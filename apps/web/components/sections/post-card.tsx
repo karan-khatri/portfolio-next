@@ -1,3 +1,5 @@
+import Image from "next/image";
+import Link from "next/link";
 import { LuArrowUpRight } from "react-icons/lu";
 import type { SectionImage } from "./hero";
 
@@ -11,16 +13,22 @@ export interface PostCardItem {
 
 export function PostCard({ post }: { post: PostCardItem }) {
   return (
-      <a
+      <Link
         href={`/blog/${post.slug}`}
         className="glass-panel glow-primary group flex h-full flex-col rounded-xl p-6 transition-all duration-300 sm:p-8"
       >
         {post.coverImage ? (
-          <img
-            src={post.coverImage.url}
-            alt={post.coverImage.altText ?? ""}
-            className="mb-4 aspect-4/3 w-full rounded-lg object-cover"
-          />
+          <div className="relative mb-4 aspect-4/3 w-full overflow-hidden rounded-lg">
+            <Image
+              src={post.coverImage.url}
+              alt={post.coverImage.altText ?? ""}
+              fill
+              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+              placeholder={post.coverImage.blurDataUrl ? "blur" : undefined}
+              blurDataURL={post.coverImage.blurDataUrl ?? undefined}
+              className="object-cover"
+            />
+          </div>
         ) : null}
         <span className="flex items-start justify-between gap-2 font-heading text-xl font-medium">
           {post.title}
@@ -31,6 +39,6 @@ export function PostCard({ post }: { post: PostCardItem }) {
             {post.excerpt}
           </p>
         ) : null}
-      </a>
+      </Link>
   );
 }

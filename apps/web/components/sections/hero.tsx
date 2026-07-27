@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { HeroContent } from "@portfolio/sections";
 import { LuArrowRight } from "react-icons/lu";
 import { buttonVariants } from "@/components/ui/button";
@@ -67,12 +68,15 @@ export function HeroSection({
               <div className="absolute inset-0 rounded-2xl border-2 border-primary/30 bg-card/20 shadow-2xl" />
             </div>
             <div className="absolute inset-0 -rotate-3 overflow-hidden rounded-2xl shadow-2xl transition-transform duration-500 ease-out group-hover:rotate-0">
-              <img
+              <Image
                 src={image.url}
                 alt={image.altText ?? ""}
-                width={image.width ?? undefined}
-                height={image.height ?? undefined}
-                className="h-full w-full object-cover grayscale transition-all duration-500 ease-out group-hover:grayscale-0"
+                fill
+                priority
+                sizes="(min-width: 1024px) 28rem, 90vw"
+                placeholder={image.blurDataUrl ? "blur" : undefined}
+                blurDataURL={image.blurDataUrl ?? undefined}
+                className="object-cover grayscale transition-all duration-500 ease-out group-hover:grayscale-0"
               />
             </div>
           </div>

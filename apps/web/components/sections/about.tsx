@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { AboutContent } from "@portfolio/sections";
 import { SectionShell } from "./section-shell";
 import { ProseContent } from "@/components/prose-content";
@@ -53,13 +54,17 @@ export function AboutSection({
         </div>
 
         {image ? (
-          <img
-            src={image.url}
-            alt={image.altText ?? ""}
-            width={image.width ?? undefined}
-            height={image.height ?? undefined}
-            className="glass-panel h-full min-h-96 w-full rounded-2xl object-cover lg:max-w-xl"
-          />
+          <div className="glass-panel relative h-full min-h-96 w-full overflow-hidden rounded-2xl lg:max-w-xl">
+            <Image
+              src={image.url}
+              alt={image.altText ?? ""}
+              fill
+              sizes="(min-width: 1024px) 36rem, 100vw"
+              placeholder={image.blurDataUrl ? "blur" : undefined}
+              blurDataURL={image.blurDataUrl ?? undefined}
+              className="object-cover"
+            />
+          </div>
         ) : (
           <div className="flex flex-col">
             <div className="glass-panel flex flex-1 flex-col overflow-hidden rounded-2xl shadow-2xl lg:max-w-xl">

@@ -8,6 +8,15 @@ const nextConfig: NextConfig = {
     serverActions: { bodySizeLimit: "10mb" },
   },
   serverExternalPackages: ["sharp"],
+  images: {
+    // Media uploads go through either LocalDiskStorageAdapter (served
+    // same-origin from /uploads/, no remote pattern needed) or
+    // VercelBlobStorageAdapter — the latter's URLs live on a per-project
+    // subdomain of this shared host.
+    remotePatterns: [
+      { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
+    ],
+  },
   async headers() {
     return [
       {

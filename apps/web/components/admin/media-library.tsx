@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { LuTriangleAlert, LuFile, LuTrash2 } from "react-icons/lu";
@@ -133,7 +134,17 @@ export function MediaLibrary({ initialMedia }: { initialMedia: MediaPickerValue[
           {media.map((item) => (
             <li key={item.id} className={styles.cell}>
               {isImageMedia(item) ? (
-                <img src={item.url} alt={item.altText ?? ""} className={styles.thumb} />
+                <div className={styles.thumb}>
+                  <Image
+                    src={item.url}
+                    alt={item.altText ?? ""}
+                    fill
+                    sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
+                    placeholder={item.blurDataUrl ? "blur" : undefined}
+                    blurDataURL={item.blurDataUrl ?? undefined}
+                    className="object-cover"
+                  />
+                </div>
               ) : (
                 <div className={styles.filePlaceholder}>
                   <LuFile className={styles.fileIcon} />

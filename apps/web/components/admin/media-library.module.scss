@@ -32,9 +32,9 @@
 }
 
 .thumb {
+  position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  object-fit: cover;
   background: var(--muted);
   transition: transform 0.2s ease;
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { LuFile, LuImage, LuX } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -24,7 +25,19 @@ function MediaThumb({ item, className }: { item: MediaPickerValue; className: st
       </div>
     );
   }
-  return <img src={item.url} alt={item.altText ?? ""} className={className} />;
+  return (
+    <div className={className}>
+      <Image
+        src={item.url}
+        alt={item.altText ?? ""}
+        fill
+        sizes="(min-width: 640px) 10rem, 33vw"
+        placeholder={item.blurDataUrl ? "blur" : undefined}
+        blurDataURL={item.blurDataUrl ?? undefined}
+        className="object-cover"
+      />
+    </div>
+  );
 }
 
 export function MediaPicker({

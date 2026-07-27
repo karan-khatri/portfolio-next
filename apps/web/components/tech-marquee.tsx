@@ -29,6 +29,10 @@ export function TechMarquee({ items }: { items: TechMarqueeItem[] }) {
                 style={{ "--bob-anim": bobDirection } as React.CSSProperties}
               >
                 {item.imageUrl ? (
+                  // next/image needs every remote host allowlisted via remotePatterns, but
+                  // TechStackItem.imageUrl is deliberately any admin-pasted external logo URL
+                  // (see schema.prisma's comment on the model) — no fixed set of hosts to allow.
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={item.imageUrl}
                     alt={item.name}

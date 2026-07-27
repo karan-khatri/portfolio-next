@@ -14,12 +14,13 @@
 }
 
 .previewThumb {
+  position: relative;
   width: 3.5rem;
   height: 3.5rem;
   flex-shrink: 0;
-  object-fit: cover;
   border-radius: var(--radius-sm);
   background: var(--muted);
+  overflow: hidden;
 }
 
 .previewMeta {
@@ -80,11 +81,12 @@
 }
 
 .gridThumb {
+  position: relative;
   width: 100%;
   aspect-ratio: 1;
-  object-fit: cover;
   display: block;
   background: var(--muted);
+  overflow: hidden;
 }
 
 .filePlaceholder {
