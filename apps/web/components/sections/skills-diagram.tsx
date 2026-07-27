@@ -15,7 +15,12 @@ function ClusterPills({
   const bgClass = accent === "secondary" ? "md:bg-secondary" : "md:bg-primary";
 
   return (
-    <div className="flex flex-wrap gap-2.5 justify-start md:justify-center">
+    <div
+      className={cn(
+        "flex flex-wrap gap-2.5 justify-start",
+        align === "right" ? "md:justify-end" : "md:justify-center",
+      )}
+    >
       {items.map((item, index) => (
         <span
           key={item.id}

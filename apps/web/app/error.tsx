@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 import { LuArrowLeft, LuRefreshCw } from "react-icons/lu";
 
 export default function Error({
@@ -17,6 +18,7 @@ export default function Error({
   return (
     <div className="theme-site flex min-h-screen flex-col items-center justify-center bg-background px-6 py-32 text-foreground">
       <div className="flex w-full max-w-md flex-col items-start">
+        {/* eslint-disable-next-line react/jsx-no-comment-textnodes -- deliberate "styled like a comment" display text, not a real comment */}
         <span className="font-mono text-xs text-primary">// 500</span>
         <h1 className="font-heading mt-4 text-4xl font-semibold tracking-tight">
           Something went wrong
@@ -33,10 +35,10 @@ export default function Error({
             <LuRefreshCw className="size-3.5 transition-transform group-hover:rotate-45" />
             Try again
           </button>
-          <a href="/" className="group inline-flex items-center gap-2 font-mono text-xs text-primary">
+          <Link href="/" className="group inline-flex items-center gap-2 font-mono text-xs text-primary">
             <LuArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-1" />
             Back home
-          </a>
+          </Link>
         </div>
       </div>
     </div>

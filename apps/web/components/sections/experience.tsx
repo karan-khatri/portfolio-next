@@ -40,7 +40,7 @@ export function ExperienceSection({
         <div className="relative">
           <div className="absolute top-0 bottom-0 left-4 w-px bg-linear-to-b from-primary to-secondary opacity-30 md:left-8" />
           <ul className="space-y-12">
-            {items.map((item, index) => (
+            {items.map((item) => (
               <li key={item.id} className="relative pl-12 md:pl-20">
                 <span className="absolute top-0 left-3 z-10 size-2.5 rounded-full bg-primary shadow-[0_0_10px_var(--ring)] md:left-7.25" />
                   <div className="glass-panel glow-primary rounded-xl p-6 transition-all duration-300">

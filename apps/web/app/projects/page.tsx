@@ -56,6 +56,7 @@ export default async function ProjectsIndexPage({
       linkedinUrl={settings.linkedinUrl}
     >
       <div className="mx-auto w-full max-w-7xl px-6 py-20 sm:px-8 lg:px-12">
+        {/* eslint-disable-next-line react/jsx-no-comment-textnodes -- deliberate "styled like a comment" display text, not a real comment */}
         <span className="mb-4 block font-mono text-xs text-primary">// projects</span>
         <h1 className="font-heading text-4xl font-semibold tracking-tight sm:text-5xl">
           All projects

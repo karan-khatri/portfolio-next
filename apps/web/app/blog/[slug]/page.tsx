@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LuArrowLeft } from "react-icons/lu";
 import { prisma } from "@portfolio/db/server";
@@ -58,13 +59,13 @@ export default async function PostDetailPage({
       linkedinUrl={settings.linkedinUrl}
     >
       <article className="mx-auto w-full max-w-3xl px-6 py-20 sm:px-8 lg:px-12">
-        <a
+        <Link
           href="/"
           className="group inline-flex items-center gap-2 font-mono text-xs text-primary"
         >
           <LuArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-1" />
           Back home
-        </a>
+        </Link>
 
         {post.coverImage ? (
           <img

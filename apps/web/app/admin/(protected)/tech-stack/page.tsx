@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@portfolio/db/server";
 import { SimpleContentList } from "@/components/admin/simple-content-list";
 import { techStackFields } from "@/lib/admin/simple-content-fields";
@@ -17,8 +18,8 @@ export default async function AdminTechStackPage() {
       <h1 className={styles.heading}>Tech Stack</h1>
       <p className={styles.description}>
         Shown in the marquee on the homepage Skills section. Upload a logo in{" "}
-        <a href="/admin/media">Media</a>, then paste its URL here — items without an image fall
-        back to a generic icon.
+        <Link href="/admin/media">Media</Link>, then paste its URL here — items without an image
+        fall back to a generic icon.
       </p>
       <SimpleContentList
         items={items}

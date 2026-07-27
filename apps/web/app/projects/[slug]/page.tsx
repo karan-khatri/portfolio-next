@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
 import { prisma } from "@portfolio/db/server";
@@ -58,13 +59,13 @@ export default async function ProjectDetailPage({
       linkedinUrl={settings.linkedinUrl}
     >
       <article className="mx-auto w-full max-w-3xl px-6 py-20 sm:px-8 lg:px-12">
-        <a
+        <Link
           href="/projects"
           className="group inline-flex items-center gap-2 font-mono text-xs text-primary"
         >
           <LuArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-1" />
           Back to Projects
-        </a>
+        </Link>
 
         {project.coverImage ? (
           <img
@@ -74,6 +75,7 @@ export default async function ProjectDetailPage({
           />
         ) : null}
 
+        {/* eslint-disable-next-line react/jsx-no-comment-textnodes -- deliberate "styled like a comment" display text, not a real comment */}
         <span className="mt-8 block font-mono text-xs text-primary">// case study</span>
         <h1 className="font-heading mt-4 text-4xl font-semibold tracking-tight">
           {project.title}

@@ -16,7 +16,6 @@ const EXTENSION_BY_MIME_TYPE: Record<string, string> = {
 export class LocalDiskStorageAdapter implements StorageAdapter {
   async upload({
     buffer,
-    filename,
     contentType,
   }: {
     buffer: Buffer;

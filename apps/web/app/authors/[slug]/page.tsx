@@ -72,6 +72,7 @@ export default async function AuthorDetailPage({
             />
           ) : null}
           <div>
+            {/* eslint-disable-next-line react/jsx-no-comment-textnodes -- deliberate "styled like a comment" display text, not a real comment */}
             <span className="mb-1 block font-mono text-xs text-primary">// author</span>
             <h1 className="font-heading text-3xl font-semibold tracking-tight">{author.name}</h1>
           </div>
