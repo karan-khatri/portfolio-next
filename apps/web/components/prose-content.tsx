@@ -97,6 +97,7 @@ export function ProseContent({ html, className }: { html: string; className?: st
         "[&_img]:my-4 [&_img]:max-w-full [&_img]:rounded-lg",
         "[&_ol]:list-decimal [&_ol]:pl-6",
         "[&_p]:my-4",
+        "[&_li_p]:my-1",
         "[&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:bg-white/5 [&_pre]:p-4 [&_pre]:text-sm [&_pre_code]:bg-transparent [&_pre_code]:p-0",
         "[&_table]:my-4 [&_table]:w-full [&_table]:border-collapse",
         "[&_th]:border [&_th]:border-border [&_th]:bg-white/5 [&_th]:p-2 [&_th]:text-left [&_th]:font-semibold",
@@ -108,7 +109,6 @@ export function ProseContent({ html, className }: { html: string; className?: st
       ]
         .filter(Boolean)
         .join(" ")}
-      // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: clean }}
     />
   );
