@@ -20,7 +20,10 @@ export default async function AdminUsersPage() {
         id: user.id,
         email: user.email,
         name: user.name,
-        activeRole: active ? { assignmentId: active.id, name: active.role.name, expiresAt: active.expiresAt } : null,
+        activeRole:
+          active && active.role
+            ? { assignmentId: active.id, name: active.role.name, expiresAt: active.expiresAt }
+            : null,
       };
     }),
   );

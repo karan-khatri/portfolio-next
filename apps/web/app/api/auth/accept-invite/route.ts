@@ -31,5 +31,5 @@ export async function POST(request: Request) {
   });
 
   const activeRole = await getActiveRoleAssignment(user.id);
-  return apiSuccess({ email: user.email, role: activeRole?.role.name ?? null }, "Invite accepted");
+  return apiSuccess({ email: user.email, role: activeRole?.role?.name ?? null }, "Invite accepted");
 }

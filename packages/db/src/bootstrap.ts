@@ -1,5 +1,5 @@
 import { prisma } from "./client";
-import { hashPassword } from "./auth";
+import { hashPassword, normalizeEmail } from "./auth";
 import { saveDraft, publishRevision } from "./cms";
 import { resolveTagIds } from "./tags";
 
@@ -257,14 +257,15 @@ async function seedResumeContent(adminId: string): Promise<void> {
 }
 
 export async function ensureSeedData(): Promise<void> {
-  const adminEmail = process.env.SEED_ADMIN_EMAIL;
+  const adminEmailRaw = process.env.SEED_ADMIN_EMAIL;
   const adminPassword = process.env.SEED_ADMIN_PASSWORD;
 
-  if (!adminEmail || !adminPassword) {
+  if (!adminEmailRaw || !adminPassword) {
     throw new Error(
       "SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD must both be set — refusing to start without them.",
     );
   }
+  const adminEmail = normalizeEmail(adminEmailRaw);
 
   const adminRole = await prisma.role.upsert({
     where: { name: "ADMIN" },

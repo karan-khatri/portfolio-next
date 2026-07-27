@@ -40,5 +40,5 @@ export async function POST(request: Request) {
   });
 
   const activeRole = await getActiveRoleAssignment(user.id);
-  return apiSuccess({ email: user.email, role: activeRole?.role.name ?? null }, "Signed in");
+  return apiSuccess({ email: user.email, role: activeRole?.role?.name ?? null }, "Signed in");
 }

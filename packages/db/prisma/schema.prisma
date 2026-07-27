@@ -29,11 +29,16 @@ model Role {
 // instance without elevated privileges. Left as an app-level invariant
 // pending confirmation that CREATE EXTENSION is safe to run there.)
 model UserRoleAssignment {
-  id          String    @id @default(cuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  roleId      String
-  role        Role      @relation(fields: [roleId], references: [id])
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Nullable + SetNull, like AuditLog.userId: this row is the historical
+  // record of "who held what role when" and should survive the Role itself
+  // being deleted later (Role.roleId was previously a hard Restrict, which
+  // meant a Role could never be deleted once anyone had ever held it, even
+  // long after the assignment expired).
+  roleId      String?
+  role        Role?     @relation(fields: [roleId], references: [id], onDelete: SetNull)
   startsAt    DateTime  @default(now())
   expiresAt   DateTime?
   grantedById String?
@@ -57,6 +62,7 @@ model User {
   sentInvites     InviteToken[]        @relation("SentInvites")
   roleAssignments UserRoleAssignment[]
   grantedRoles    UserRoleAssignment[] @relation("RoleGrantedBy")
+  uploadedMedia   Media[]
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt
 }
@@ -73,16 +79,23 @@ model Session {
 }
 
 model InviteToken {
-  id            String    @id @default(cuid())
+  id        String @id @default(cuid())
   // SHA-256 hash of a randomBytes(32) token — the raw token is only ever
   // returned once, at creation, and never persisted (mirrors Session.tokenHash).
-  tokenHash     String    @unique
-  email         String
-  roleId        String
-  role          Role      @relation(fields: [roleId], references: [id])
+  tokenHash String @unique
+  email     String
+  // Nullable + SetNull, same reasoning as UserRoleAssignment.roleId: an old
+  // (accepted/expired) invite is a historical record, and shouldn't block
+  // deleting the Role it once pointed at.
+  roleId        String?
+  role          Role?     @relation(fields: [roleId], references: [id], onDelete: SetNull)
   roleExpiresAt DateTime?
-  invitedById   String
-  invitedBy     User      @relation("SentInvites", fields: [invitedById], references: [id])
+  // Nullable + SetNull, same reasoning as AuditLog.userId: an invite is a
+  // historical record of "who invited whom," and should survive the inviting
+  // User being deleted later (this was previously a hard Restrict, which
+  // meant a User could never be deleted once they'd sent any invite, ever).
+  invitedById   String?
+  invitedBy     User?     @relation("SentInvites", fields: [invitedById], references: [id], onDelete: SetNull)
   expiresAt     DateTime
   acceptedAt    DateTime?
   createdAt     DateTime  @default(now())
@@ -221,7 +234,11 @@ model Media {
   mimeType     String
   sizeBytes    Int
   uploadedById String?
-  createdAt    DateTime @default(now())
+  // Was a bare string with no FK — could point at a nonexistent user and
+  // couldn't be queried as a relation. SetNull so deleting a user keeps
+  // their uploads (and audit trail) around, just unattributed.
+  uploadedBy User? @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  createdAt  DateTime @default(now())
 
   seoUsages     Seo[]
   projectCovers Project[] @relation("ProjectCoverImage")
@@ -268,7 +285,14 @@ model Page {
   updatedAt         DateTime      @updatedAt
 
   @@unique([slug, locale])
-  @@index([translationGroupId])
+  // A translation group must have at most one row per locale — without this,
+  // nothing stopped two Pages sharing a translationGroupId from both being
+  // "en", which breaks the "one row per locale per group" invariant the
+  // translation-group concept depends on.
+  @@unique([translationGroupId, locale])
+  // Covers the public site's actual read pattern: "published rows in this
+  // locale, ordered by publishedAt" (home page, listing pages, [...slug]).
+  @@index([locale, status, publishedAt])
 }
 
 model SectionInstance {
@@ -308,7 +332,8 @@ model Project {
   updatedAt          DateTime      @updatedAt
 
   @@unique([slug, locale])
-  @@index([translationGroupId])
+  @@unique([translationGroupId, locale])
+  @@index([locale, status, publishedAt])
 }
 
 model Post {
@@ -331,7 +356,8 @@ model Post {
   updatedAt          DateTime      @updatedAt
 
   @@unique([slug, locale])
-  @@index([translationGroupId])
+  @@unique([translationGroupId, locale])
+  @@index([locale, status, publishedAt])
 }
 
 model Tag {

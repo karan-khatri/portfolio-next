@@ -8,6 +8,15 @@ const LOGIN_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
 const LOGIN_RATE_LIMIT_MAX_ATTEMPTS = 5;
 const DUMMY_PASSWORD_HASH = `${"0".repeat(32)}:${"0".repeat(128)}`;
 
+// User.email's uniqueness is case-sensitive at the DB level (Postgres text
+// comparison), so without normalizing at every read/write site, "Foo@Bar.com"
+// and "foo@bar.com" would be treated as different accounts. Normalizing here
+// — the single choke point every lookup/creation already goes through —
+// makes the @unique constraint behave as case-insensitive in practice.
+export function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+
 export function hashPassword(password: string): string {
   const salt = randomBytes(16).toString("hex");
   const hash = scryptSync(password, salt, SCRYPT_KEYLEN).toString("hex");
@@ -24,18 +33,20 @@ export function verifyPassword(password: string, stored: string): boolean {
 }
 
 export async function isLoginRateLimited(email: string): Promise<boolean> {
+  const normalizedEmail = normalizeEmail(email);
   const windowStart = new Date(Date.now() - LOGIN_RATE_LIMIT_WINDOW_MS);
   const recentFailures = await prisma.loginAttempt.count({
-    where: { email, success: false, createdAt: { gte: windowStart } },
+    where: { email: normalizedEmail, success: false, createdAt: { gte: windowStart } },
   });
   return recentFailures >= LOGIN_RATE_LIMIT_MAX_ATTEMPTS;
 }
 
 export async function verifyLoginCredentials(email: string, password: string) {
-  const user = await prisma.user.findUnique({ where: { email } });
+  const normalizedEmail = normalizeEmail(email);
+  const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
   const valid = verifyPassword(password, user?.passwordHash ?? DUMMY_PASSWORD_HASH);
   const success = Boolean(user) && valid;
-  await prisma.loginAttempt.create({ data: { email, success } });
+  await prisma.loginAttempt.create({ data: { email: normalizedEmail, success } });
   return success ? user : null;
 }
 
@@ -83,7 +94,10 @@ export async function getActiveRoleAssignment(userId: string) {
  */
 export async function assertHasActiveRole(userId: string): Promise<void> {
   const assignment = await getActiveRoleAssignment(userId);
-  if (!assignment) {
+  // assignment.role is null if the Role it pointed at was since deleted
+  // (SetNull) — that's no longer a live permission grant, so treat it the
+  // same as having no assignment at all.
+  if (!assignment || !assignment.role) {
     throw new Error("Unauthorized: no active role assignment");
   }
 }
@@ -97,7 +111,7 @@ export async function verifySessionToken(token: string) {
   if (!session || session.expiresAt < new Date()) return null;
 
   const activeRole = await getActiveRoleAssignment(session.userId);
-  return { ...session.user, role: activeRole?.role.name ?? null };
+  return { ...session.user, role: activeRole?.role?.name ?? null };
 }
 
 async function assertRoleTimeFrame(roleId: string, expiresAt: Date | null) {
@@ -148,7 +162,7 @@ export async function createInvite(params: {
   const created = await prisma.inviteToken.create({
     data: {
       tokenHash,
-      email: params.email,
+      email: normalizeEmail(params.email),
       roleId: params.roleId,
       roleExpiresAt: params.roleExpiresAt,
       invitedById: params.invitedById,
@@ -172,6 +186,12 @@ export async function acceptInvite(token: string, password: string) {
   if (claimed.count === 0) return null;
 
   const invite = await prisma.inviteToken.findUniqueOrThrow({ where: { tokenHash } });
+
+  // roleId is nullable (SetNull on the referenced Role being deleted) — if the
+  // role this invite was for no longer exists, the invite is no longer
+  // completable. It's already been claimed above, so this treats it the same
+  // as an expired one: single-use, now permanently invalid.
+  if (!invite.roleId) return null;
 
   return prisma.$transaction(async (tx) => {
     const user = await tx.user.create({

@@ -28,10 +28,10 @@ interface RoleOption {
 interface PendingInvite {
   id: string;
   email: string;
-  role: { name: string };
+  role: { name: string } | null;
   roleExpiresAt: Date | null;
   expiresAt: Date;
-  invitedBy: { email: string };
+  invitedBy: { email: string } | null;
 }
 
 const DEFAULT_EXPIRES_IN_DAYS = 30;
@@ -150,7 +150,7 @@ export function InvitesPanel({
             <span className={styles.rowMain}>
               <span className={styles.email}>{invite.email}</span>
               <span className={styles.meta}>
-                invited by {invite.invitedBy.email}
+                invited by {invite.invitedBy?.email ?? "a deleted user"}
                 {invite.roleExpiresAt
                   ? `, role expires ${formatRelativeTime(invite.roleExpiresAt)}`
                   : ""}
@@ -158,7 +158,7 @@ export function InvitesPanel({
               </span>
             </span>
             <Badge variant="outline" className={styles.roleBadge}>
-              {invite.role.name}
+              {invite.role?.name ?? "Deleted role"}
             </Badge>
           </li>
         ))}
