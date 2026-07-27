@@ -9,7 +9,7 @@ const LOCALE = "en";
 async function getHomePage() {
   return prisma.page.findFirst({
     where: { slug: "home", locale: LOCALE, status: "PUBLISHED" },
-    include: { sections: true, seo: true },
+    include: { sections: true, seo: { include: { ogImage: true } } },
   });
 }
 
@@ -17,13 +17,24 @@ export async function generateMetadata(): Promise<Metadata> {
   const page = await getHomePage();
   if (!page) return {};
 
+  const title = page.seo?.metaTitle ?? page.title;
+  const description = page.seo?.metaDescription ?? undefined;
+  const image = page.seo?.ogImage?.url;
+
   return {
-    title: page.seo?.metaTitle ?? page.title,
-    description: page.seo?.metaDescription ?? undefined,
+    title,
+    description,
     alternates: page.seo?.canonicalUrl ? { canonical: page.seo.canonicalUrl } : undefined,
     robots: page.seo
       ? { index: !page.seo.noindex, follow: !page.seo.nofollow }
       : undefined,
+    openGraph: { title, description, images: image ? [{ url: image }] : undefined },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: image ? [image] : undefined,
+    },
   };
 }
 
