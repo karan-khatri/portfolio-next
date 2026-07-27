@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import {
+  prisma,
   saveDraft,
   publishRevision,
   unpublishEntity,
@@ -66,7 +67,12 @@ export async function publishAction(
       revisionId: revision.id,
       userId: user.id,
     });
+    const post = await prisma.post.findUniqueOrThrow({
+      where: { id: postId },
+      select: { slug: true },
+    });
     revalidatePath("/");
+    revalidatePath(`/blog/${post.slug}`);
     return { revisionId: revision.id };
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Could not publish" };
@@ -77,7 +83,12 @@ export async function unpublishAction(postId: string): Promise<ComposerActionRes
   try {
     const user = await requireEditor();
     await unpublishEntity({ entityType: "Post", entityId: postId, userId: user.id });
+    const post = await prisma.post.findUniqueOrThrow({
+      where: { id: postId },
+      select: { slug: true },
+    });
     revalidatePath("/");
+    revalidatePath(`/blog/${post.slug}`);
     return {};
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Could not unpublish" };

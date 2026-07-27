@@ -81,7 +81,12 @@ export async function publishAction(
       revisionId: revision.id,
       userId: user.id,
     });
+    const project = await prisma.project.findUniqueOrThrow({
+      where: { id: projectId },
+      select: { slug: true },
+    });
     revalidatePath("/");
+    revalidatePath(`/projects/${project.slug}`);
     return { revisionId: revision.id };
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Could not publish" };
@@ -92,7 +97,12 @@ export async function unpublishAction(projectId: string): Promise<ComposerAction
   try {
     const user = await requireEditor();
     await unpublishEntity({ entityType: "Project", entityId: projectId, userId: user.id });
+    const project = await prisma.project.findUniqueOrThrow({
+      where: { id: projectId },
+      select: { slug: true },
+    });
     revalidatePath("/");
+    revalidatePath(`/projects/${project.slug}`);
     return {};
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Could not unpublish" };

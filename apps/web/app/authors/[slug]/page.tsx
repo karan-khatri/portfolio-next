@@ -13,6 +13,11 @@ async function getAuthor(slug: string) {
   return prisma.author.findFirst({ where: { slug } });
 }
 
+export async function generateStaticParams() {
+  const authors = await prisma.author.findMany({ select: { slug: true } });
+  return authors.map((author) => ({ slug: author.slug }));
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -65,6 +70,10 @@ export default async function AuthorDetailPage({
       <div className="mx-auto w-full max-w-3xl px-6 py-20 sm:px-8 lg:px-12">
         <div className="flex items-center gap-5">
           {author.imageUrl ? (
+            // Author.imageUrl is a plain admin-pasted external URL (see authorFields in
+            // simple-content-fields.ts), not routed through the Media upload pipeline, so
+            // there's no fixed set of hosts to allowlist via next/image's remotePatterns.
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={author.imageUrl}
               alt=""

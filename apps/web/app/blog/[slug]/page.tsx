@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LuArrowLeft } from "react-icons/lu";
@@ -17,9 +18,17 @@ async function getPost(slug: string) {
       coverImage: true,
       author: true,
       tags: { select: { name: true } },
-      seo: true,
+      seo: { include: { ogImage: true } },
     },
   });
+}
+
+export async function generateStaticParams() {
+  const posts = await prisma.post.findMany({
+    where: { locale: LOCALE, status: "PUBLISHED" },
+    select: { slug: true },
+  });
+  return posts.map((post) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({
@@ -31,11 +40,22 @@ export async function generateMetadata({
   const post = await getPost(slug);
   if (!post) return {};
 
+  const title = post.seo?.metaTitle ?? post.title;
+  const description = post.seo?.metaDescription ?? post.excerpt ?? undefined;
+  const image = post.seo?.ogImage?.url ?? post.coverImage?.url;
+
   return {
-    title: post.seo?.metaTitle ?? post.title,
-    description: post.seo?.metaDescription ?? post.excerpt ?? undefined,
+    title,
+    description,
     alternates: post.seo?.canonicalUrl ? { canonical: post.seo.canonicalUrl } : undefined,
     robots: post.seo ? { index: !post.seo.noindex, follow: !post.seo.nofollow } : undefined,
+    openGraph: { type: "article", title, description, images: image ? [{ url: image }] : undefined },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: image ? [image] : undefined,
+    },
   };
 }
 
@@ -68,11 +88,17 @@ export default async function PostDetailPage({
         </Link>
 
         {post.coverImage ? (
-          <img
-            src={post.coverImage.url}
-            alt={post.coverImage.altText ?? ""}
-            className="glass-panel mt-8 aspect-video w-full rounded-xl object-cover"
-          />
+          <div className="glass-panel relative mt-8 aspect-video w-full overflow-hidden rounded-xl">
+            <Image
+              src={post.coverImage.url}
+              alt={post.coverImage.altText ?? ""}
+              fill
+              sizes="(min-width: 640px) 48rem, 100vw"
+              placeholder={post.coverImage.blurDataUrl ? "blur" : undefined}
+              blurDataURL={post.coverImage.blurDataUrl ?? undefined}
+              className="object-cover"
+            />
+          </div>
         ) : null}
 
         <h1 className="font-heading mt-8 text-4xl font-semibold tracking-tight">{post.title}</h1>

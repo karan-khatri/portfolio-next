@@ -11,8 +11,19 @@ async function getStandalonePage(slug: string[]) {
   if (slug.length !== 1 || slug[0] === "home") return null;
   return prisma.page.findFirst({
     where: { slug: slug[0], locale: LOCALE, status: "PUBLISHED" },
-    include: { sections: true, seo: true },
+    include: { sections: true, seo: { include: { ogImage: true } } },
   });
+}
+
+// Only the known, published standalone pages get prerendered — anything else
+// (including Redirect-only paths, which aren't enumerable up front) still
+// renders on demand, since dynamicParams defaults to true.
+export async function generateStaticParams() {
+  const pages = await prisma.page.findMany({
+    where: { locale: LOCALE, status: "PUBLISHED", slug: { not: "home" } },
+    select: { slug: true },
+  });
+  return pages.map((page) => ({ slug: [page.slug] }));
 }
 
 export async function generateMetadata({
@@ -24,13 +35,24 @@ export async function generateMetadata({
   const page = await getStandalonePage(slug);
   if (!page) return {};
 
+  const title = page.seo?.metaTitle ?? page.title;
+  const description = page.seo?.metaDescription ?? undefined;
+  const image = page.seo?.ogImage?.url;
+
   return {
-    title: page.seo?.metaTitle ?? page.title,
-    description: page.seo?.metaDescription ?? undefined,
+    title,
+    description,
     alternates: page.seo?.canonicalUrl ? { canonical: page.seo.canonicalUrl } : undefined,
     robots: page.seo
       ? { index: !page.seo.noindex, follow: !page.seo.nofollow }
       : undefined,
+    openGraph: { title, description, images: image ? [{ url: image }] : undefined },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: image ? [image] : undefined,
+    },
   };
 }
 

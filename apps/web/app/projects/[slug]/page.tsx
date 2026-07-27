@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
@@ -15,9 +16,17 @@ async function getProject(slug: string) {
     include: {
       coverImage: true,
       tags: { select: { name: true } },
-      seo: true,
+      seo: { include: { ogImage: true } },
     },
   });
+}
+
+export async function generateStaticParams() {
+  const projects = await prisma.project.findMany({
+    where: { locale: LOCALE, status: "PUBLISHED" },
+    select: { slug: true },
+  });
+  return projects.map((project) => ({ slug: project.slug }));
 }
 
 export async function generateMetadata({
@@ -29,13 +38,24 @@ export async function generateMetadata({
   const project = await getProject(slug);
   if (!project) return {};
 
+  const title = project.seo?.metaTitle ?? project.title;
+  const description = project.seo?.metaDescription ?? project.excerpt ?? undefined;
+  const image = project.seo?.ogImage?.url ?? project.coverImage?.url;
+
   return {
-    title: project.seo?.metaTitle ?? project.title,
-    description: project.seo?.metaDescription ?? project.excerpt ?? undefined,
+    title,
+    description,
     alternates: project.seo?.canonicalUrl ? { canonical: project.seo.canonicalUrl } : undefined,
     robots: project.seo
       ? { index: !project.seo.noindex, follow: !project.seo.nofollow }
       : undefined,
+    openGraph: { type: "article", title, description, images: image ? [{ url: image }] : undefined },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: image ? [image] : undefined,
+    },
   };
 }
 
@@ -68,11 +88,17 @@ export default async function ProjectDetailPage({
         </Link>
 
         {project.coverImage ? (
-          <img
-            src={project.coverImage.url}
-            alt={project.coverImage.altText ?? ""}
-            className="glass-panel mt-8 aspect-video w-full rounded-xl object-cover"
-          />
+          <div className="glass-panel relative mt-8 aspect-video w-full overflow-hidden rounded-xl">
+            <Image
+              src={project.coverImage.url}
+              alt={project.coverImage.altText ?? ""}
+              fill
+              sizes="(min-width: 640px) 48rem, 100vw"
+              placeholder={project.coverImage.blurDataUrl ? "blur" : undefined}
+              blurDataURL={project.coverImage.blurDataUrl ?? undefined}
+              className="object-cover"
+            />
+          </div>
         ) : null}
 
         {/* eslint-disable-next-line react/jsx-no-comment-textnodes -- deliberate "styled like a comment" display text, not a real comment */}
