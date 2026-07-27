@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import { createInvite, prisma } from "@portfolio/db/server";
 import { requireAdminRole } from "@/lib/auth/require-admin";
 import { apiSuccess, apiError } from "@/lib/api/response";
+import { sendEmail, escapeHtml } from "@/lib/email";
 
 export async function POST(request: Request) {
   let currentUser;
@@ -34,6 +35,19 @@ export async function POST(request: Request) {
 
   try {
     const invite = await createInvite({ email, roleId, roleExpiresAt, invitedById: currentUser.id });
+
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+    const inviteUrl = `${siteUrl}/admin/accept-invite/${invite.token}`;
+    await sendEmail({
+      to: email,
+      subject: "You've been invited to the admin dashboard",
+      html: `
+        <p>You've been invited to join as <strong>${escapeHtml(role.name)}</strong>.</p>
+        <p><a href="${inviteUrl}">Accept the invite</a></p>
+        <p>This link expires on ${invite.expiresAt.toLocaleString()}.</p>
+      `,
+    });
+
     return apiSuccess({ token: invite.token, expiresAt: invite.expiresAt }, "Invite sent");
   } catch (error) {
     return apiError(error instanceof Error ? error.message : "Could not create invite", {

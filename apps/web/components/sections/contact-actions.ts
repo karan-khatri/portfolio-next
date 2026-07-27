@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@portfolio/db/server";
+import { sendEmail, escapeHtml } from "@/lib/email";
 
 export interface ContactFormResult {
   error?: string;
@@ -38,5 +39,20 @@ export async function submitContactMessageAction(values: {
   }
 
   await prisma.contactMessage.create({ data: { name, email, message } });
+
+  const notifyEmail = process.env.SEED_ADMIN_EMAIL;
+  if (notifyEmail) {
+    await sendEmail({
+      to: notifyEmail,
+      subject: `New contact message from ${name}`,
+      html: `
+        <p><strong>From:</strong> ${escapeHtml(name)} (${escapeHtml(email)})</p>
+        <p><strong>Message:</strong></p>
+        <p>${escapeHtml(message).replaceAll("\n", "<br>")}</p>
+        <p><a href="${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/admin/messages">View in admin</a></p>
+      `,
+    });
+  }
+
   return {};
 }
