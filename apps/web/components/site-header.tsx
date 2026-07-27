@@ -1,5 +1,6 @@
 import type { SectionNavItem } from "@/components/sections/section-renderer";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { MobileNav } from "@/components/mobile-nav";
 import Link from "next/link";
 
 export function SiteHeader({
@@ -57,7 +58,7 @@ export function SiteHeader({
         </nav>
         <div className="flex items-center gap-3">
           <ThemeToggle
-            className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-primary"
+            className="hidden size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-primary md:flex"
             iconClassName="size-4"
           />
           {resumeUrl ? (
@@ -70,6 +71,7 @@ export function SiteHeader({
               Resume
             </a>
           ) : null}
+          <MobileNav navItems={navItems} resumeUrl={resumeUrl} />
         </div>
       </div>
     </header>
