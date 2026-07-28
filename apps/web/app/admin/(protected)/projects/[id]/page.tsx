@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { prisma, getLatestRevision, listRevisions, type FlatRevisionData } from "@portfolio/db/server";
+import { prisma, getLatestRevision, listRevisions } from "@portfolio/db/server";
+import { flatRevisionDataSchema } from "@/lib/revision-data";
 import { ProjectEditor } from "@/components/admin/project-editor";
 import { toMediaPickerValue, type MediaPickerValue } from "@/lib/admin/media";
 import type { RevisionHistoryItem } from "@/components/admin/revision-history-panel";
@@ -30,7 +31,7 @@ export default async function ProjectEditorRoute({
   let liveUrl = project.liveUrl ?? "";
 
   if (latestDraft) {
-    const data = latestDraft.data as unknown as FlatRevisionData;
+    const data = flatRevisionDataSchema.parse(latestDraft.data);
     title = data.title;
     excerpt = data.excerpt ?? "";
     body = data.body ?? "";

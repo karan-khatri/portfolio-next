@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { prisma, getLatestRevision, listRevisions, type PageRevisionData } from "@portfolio/db/server";
+import { prisma, getLatestRevision, listRevisions } from "@portfolio/db/server";
+import { pageRevisionDataSchema } from "@/lib/revision-data";
 import { PageComposer, type ComposerSection } from "@/components/admin/composer/page-composer";
 import { toMediaPickerValue, type MediaPickerValue } from "@/lib/admin/media";
 import type { RevisionHistoryItem } from "@/components/admin/revision-history-panel";
@@ -23,7 +24,7 @@ export default async function PageComposerRoute({
   let initialSections: ComposerSection[];
 
   if (latestDraft) {
-    const data = latestDraft.data as unknown as PageRevisionData;
+    const data = pageRevisionDataSchema.parse(latestDraft.data);
     initialTitle = data.title;
     initialSections = data.sections.map((section, index) => ({
       clientId: `draft-${index}-${section.type}`,

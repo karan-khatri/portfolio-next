@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import {
-  resolvePreviewToken,
-  type PageRevisionData,
-  type FlatRevisionData,
-} from "@portfolio/db/server";
+import { resolvePreviewToken } from "@portfolio/db/server";
+import { flatRevisionDataSchema, pageRevisionDataSchema } from "@/lib/revision-data";
 import { SectionRenderer, getSectionNavItems } from "@/components/sections/section-renderer";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -38,7 +35,7 @@ export default async function PreviewPage({
   }
 
   if (preview.revision.entityType === "Page") {
-    const data = preview.revision.data as unknown as PageRevisionData;
+    const data = pageRevisionDataSchema.parse(preview.revision.data);
     const sections = data.sections.map((section, index) => ({
       id: `draft-${index}`,
       type: section.type,
@@ -67,7 +64,7 @@ export default async function PreviewPage({
   }
 
   if (preview.revision.entityType === "Project" || preview.revision.entityType === "Post") {
-    const data = preview.revision.data as unknown as FlatRevisionData;
+    const data = flatRevisionDataSchema.parse(preview.revision.data);
     const paragraphs = (data.body ?? "").split(/\n{2,}/).filter(Boolean);
 
     return (
