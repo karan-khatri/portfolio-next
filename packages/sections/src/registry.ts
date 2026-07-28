@@ -1,6 +1,21 @@
 import { SectionType } from "@portfolio/db";
 import type { z } from "zod";
-import type { SectionLayout } from "./schemas";
+import type {
+  AboutContent,
+  BlogContent,
+  ContactContent,
+  EducationContent,
+  ExperienceContent,
+  HeroContent,
+  LanguagesContent,
+  NowContent,
+  ProjectsContent,
+  ResumeContent,
+  SectionLayout,
+  ServicesContent,
+  SkillsContent,
+  TestimonialsContent,
+} from "./schemas";
 import {
   aboutContentSchema,
   blogContentSchema,
@@ -35,7 +50,7 @@ function definition<TContent>(
 const DEFAULT_LAYOUT: SectionLayout = { showEyebrow: true, headingAlign: "left" };
 
 export const sectionRegistry = {
-  [SectionType.HERO]: definition({
+  [SectionType.HERO]: definition<HeroContent>({
     type: SectionType.HERO,
     label: "Hero",
     schema: heroContentSchema,
@@ -43,7 +58,7 @@ export const sectionRegistry = {
     minHeight: "60vh",
     headingLevel: 2,
   }),
-  [SectionType.ABOUT]: definition({
+  [SectionType.ABOUT]: definition<AboutContent>({
     type: SectionType.ABOUT,
     label: "About",
     schema: aboutContentSchema,
@@ -51,7 +66,7 @@ export const sectionRegistry = {
     minHeight: "20rem",
     headingLevel: 2,
   }),
-  [SectionType.PROJECTS]: definition({
+  [SectionType.PROJECTS]: definition<ProjectsContent>({
     type: SectionType.PROJECTS,
     label: "Projects",
     schema: projectsContentSchema,
@@ -64,7 +79,7 @@ export const sectionRegistry = {
     minHeight: "30rem",
     headingLevel: 2,
   }),
-  [SectionType.EXPERIENCE]: definition({
+  [SectionType.EXPERIENCE]: definition<ExperienceContent>({
     type: SectionType.EXPERIENCE,
     label: "Experience",
     schema: experienceContentSchema,
@@ -72,7 +87,7 @@ export const sectionRegistry = {
     minHeight: "24rem",
     headingLevel: 2,
   }),
-  [SectionType.EDUCATION]: definition({
+  [SectionType.EDUCATION]: definition<EducationContent>({
     type: SectionType.EDUCATION,
     label: "Education",
     schema: educationContentSchema,
@@ -80,7 +95,7 @@ export const sectionRegistry = {
     minHeight: "24rem",
     headingLevel: 2,
   }),
-  [SectionType.SKILLS]: definition({
+  [SectionType.SKILLS]: definition<SkillsContent>({
     type: SectionType.SKILLS,
     label: "Skills",
     schema: skillsContentSchema,
@@ -96,7 +111,7 @@ export const sectionRegistry = {
     minHeight: "16rem",
     headingLevel: 2,
   }),
-  [SectionType.LANGUAGES]: definition({
+  [SectionType.LANGUAGES]: definition<LanguagesContent>({
     type: SectionType.LANGUAGES,
     label: "Languages",
     schema: languagesContentSchema,
@@ -104,7 +119,7 @@ export const sectionRegistry = {
     minHeight: "12rem",
     headingLevel: 2,
   }),
-  [SectionType.SERVICES]: definition({
+  [SectionType.SERVICES]: definition<ServicesContent>({
     type: SectionType.SERVICES,
     label: "Services",
     schema: servicesContentSchema,
@@ -112,7 +127,7 @@ export const sectionRegistry = {
     minHeight: "20rem",
     headingLevel: 2,
   }),
-  [SectionType.TESTIMONIALS]: definition({
+  [SectionType.TESTIMONIALS]: definition<TestimonialsContent>({
     type: SectionType.TESTIMONIALS,
     label: "Testimonials",
     schema: testimonialsContentSchema,
@@ -120,7 +135,7 @@ export const sectionRegistry = {
     minHeight: "20rem",
     headingLevel: 2,
   }),
-  [SectionType.BLOG]: definition({
+  [SectionType.BLOG]: definition<BlogContent>({
     type: SectionType.BLOG,
     label: "Blog",
     schema: blogContentSchema,
@@ -128,7 +143,7 @@ export const sectionRegistry = {
     minHeight: "24rem",
     headingLevel: 2,
   }),
-  [SectionType.CONTACT]: definition({
+  [SectionType.CONTACT]: definition<ContactContent>({
     type: SectionType.CONTACT,
     label: "Contact",
     schema: contactContentSchema,
@@ -136,7 +151,7 @@ export const sectionRegistry = {
     minHeight: "16rem",
     headingLevel: 2,
   }),
-  [SectionType.RESUME]: definition({
+  [SectionType.RESUME]: definition<ResumeContent>({
     type: SectionType.RESUME,
     label: "Resume",
     schema: resumeContentSchema,
@@ -144,7 +159,7 @@ export const sectionRegistry = {
     minHeight: "10rem",
     headingLevel: 2,
   }),
-  [SectionType.NOW]: definition({
+  [SectionType.NOW]: definition<NowContent>({
     type: SectionType.NOW,
     label: "Now Building",
     schema: nowContentSchema,

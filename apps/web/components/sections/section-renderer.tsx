@@ -22,6 +22,14 @@ export interface RenderableSection {
   content: unknown;
 }
 
+// Every section schema in packages/sections/src/schemas.ts declares this
+// field the same way (`heading: z.string().min(1)`) — used only for the
+// nav-anchor slug and the wrapping <section>'s aria-label, neither of which
+// needs the section's full, specific content type.
+interface HasHeading {
+  heading: string;
+}
+
 function slugifyHeading(heading: string, fallback: string): string {
   const slug = heading
     .trim()
@@ -31,8 +39,8 @@ function slugifyHeading(heading: string, fallback: string): string {
   return slug || fallback;
 }
 
-async function resolveSectionImage(imageId: unknown) {
-  if (typeof imageId !== "string" || !imageId) return null;
+async function resolveSectionImage(imageId: string | undefined) {
+  if (!imageId) return null;
   const media = await prisma.media.findUnique({
     where: { id: imageId },
     select: { url: true, width: true, height: true, blurDataUrl: true, altText: true },
@@ -40,47 +48,43 @@ async function resolveSectionImage(imageId: unknown) {
   return media;
 }
 
+// Each case re-indexes sectionRegistry with the literal SectionType (not the
+// widened `section.type` variable), so TypeScript narrows `def.schema` to
+// that section's specific z.ZodType<TContent> and `content` comes back
+// exactly typed — no `as never` needed anywhere below, and a schema/prop
+// mismatch between the registry and a section component is a compile error
+// again instead of silently passing through.
 async function renderSection(section: RenderableSection, locale: Locale) {
-  const def = sectionRegistry[section.type];
-  const content = def.schema.parse(section.content);
-  const headingId = slugifyHeading(
-    (content as { heading: string }).heading,
-    `section-${section.id}`,
-  );
-  const headingLevel = def.headingLevel;
-
   switch (section.type) {
     case SectionType.HERO: {
-      const image = await resolveSectionImage((content as { imageId?: string }).imageId);
+      const def = sectionRegistry[SectionType.HERO];
+      const content = def.schema.parse(section.content);
+      const headingId = slugifyHeading(content.heading, `section-${section.id}`);
+      const image = await resolveSectionImage(content.imageId);
       return (
-        <HeroSection
-          id={headingId}
-          content={content as never}
-          headingLevel={headingLevel}
-          image={image}
-        />
+        <HeroSection id={headingId} content={content} headingLevel={def.headingLevel} image={image} />
       );
     }
     case SectionType.ABOUT: {
-      const image = await resolveSectionImage((content as { imageId?: string }).imageId);
+      const def = sectionRegistry[SectionType.ABOUT];
+      const content = def.schema.parse(section.content);
+      const headingId = slugifyHeading(content.heading, `section-${section.id}`);
+      const image = await resolveSectionImage(content.imageId);
       return (
-        <AboutSection
-          id={headingId}
-          content={content as never}
-          headingLevel={headingLevel}
-          image={image}
-        />
+        <AboutSection id={headingId} content={content} headingLevel={def.headingLevel} image={image} />
       );
     }
     case SectionType.PROJECTS: {
-      const typed = content as { limit?: number; displayMode?: "list" | "featured" | "slider" };
-      const isCuratedMode = typed.displayMode === "featured" || typed.displayMode === "slider";
+      const def = sectionRegistry[SectionType.PROJECTS];
+      const content = def.schema.parse(section.content);
+      const headingId = slugifyHeading(content.heading, `section-${section.id}`);
+      const isCuratedMode = content.displayMode === "featured" || content.displayMode === "slider";
       const projects = await prisma.project.findMany({
         where: isCuratedMode
           ? { locale, status: "PUBLISHED", featured: true }
           : { locale, status: "PUBLISHED" },
         orderBy: isCuratedMode ? { featuredOrder: "asc" } : { publishedAt: "desc" },
-        take: typed.limit ?? (isCuratedMode ? undefined : 6),
+        take: content.limit ?? (isCuratedMode ? undefined : 6),
         select: {
           id: true,
           slug: true,
@@ -97,8 +101,8 @@ async function renderSection(section: RenderableSection, locale: Locale) {
       return (
         <ProjectsSection
           id={headingId}
-          content={content as never}
-          headingLevel={headingLevel}
+          content={content}
+          headingLevel={def.headingLevel}
           items={projects.map((project) => ({
             ...project,
             tags: project.tags.map((tag) => tag.name),
@@ -107,6 +111,9 @@ async function renderSection(section: RenderableSection, locale: Locale) {
       );
     }
     case SectionType.EXPERIENCE: {
+      const def = sectionRegistry[SectionType.EXPERIENCE];
+      const content = def.schema.parse(section.content);
+      const headingId = slugifyHeading(content.heading, `section-${section.id}`);
       const items = await prisma.experience.findMany({
         where: { locale },
         orderBy: { order: "asc" },
@@ -120,15 +127,13 @@ async function renderSection(section: RenderableSection, locale: Locale) {
         },
       });
       return (
-        <ExperienceSection
-          id={headingId}
-          content={content as never}
-          headingLevel={headingLevel}
-          items={items}
-        />
+        <ExperienceSection id={headingId} content={content} headingLevel={def.headingLevel} items={items} />
       );
     }
     case SectionType.EDUCATION: {
+      const def = sectionRegistry[SectionType.EDUCATION];
+      const content = def.schema.parse(section.content);
+      const headingId = slugifyHeading(content.heading, `section-${section.id}`);
       const items = await prisma.education.findMany({
         where: { locale },
         orderBy: { order: "asc" },
@@ -143,15 +148,13 @@ async function renderSection(section: RenderableSection, locale: Locale) {
         },
       });
       return (
-        <EducationSection
-          id={headingId}
-          content={content as never}
-          headingLevel={headingLevel}
-          items={items}
-        />
+        <EducationSection id={headingId} content={content} headingLevel={def.headingLevel} items={items} />
       );
     }
     case SectionType.SKILLS: {
+      const def = sectionRegistry[SectionType.SKILLS];
+      const content = def.schema.parse(section.content);
+      const headingId = slugifyHeading(content.heading, `section-${section.id}`);
       const items = await prisma.skill.findMany({
         where: { locale },
         orderBy: { order: "asc" },
@@ -164,64 +167,60 @@ async function renderSection(section: RenderableSection, locale: Locale) {
       return (
         <SkillsSection
           id={headingId}
-          content={content as never}
-          headingLevel={headingLevel}
+          content={content}
+          headingLevel={def.headingLevel}
           items={items}
           techStackItems={techStackItems}
         />
       );
     }
     case SectionType.LANGUAGES: {
+      const def = sectionRegistry[SectionType.LANGUAGES];
+      const content = def.schema.parse(section.content);
+      const headingId = slugifyHeading(content.heading, `section-${section.id}`);
       const items = await prisma.language.findMany({
         where: { locale },
         orderBy: { order: "asc" },
         select: { id: true, name: true, proficiency: true },
       });
       return (
-        <LanguagesSection
-          id={headingId}
-          content={content as never}
-          headingLevel={headingLevel}
-          items={items}
-        />
+        <LanguagesSection id={headingId} content={content} headingLevel={def.headingLevel} items={items} />
       );
     }
     case SectionType.SERVICES: {
+      const def = sectionRegistry[SectionType.SERVICES];
+      const content = def.schema.parse(section.content);
+      const headingId = slugifyHeading(content.heading, `section-${section.id}`);
       const items = await prisma.service.findMany({
         where: { locale },
         orderBy: { order: "asc" },
         select: { id: true, title: true, description: true },
       });
       return (
-        <ServicesSection
-          id={headingId}
-          content={content as never}
-          headingLevel={headingLevel}
-          items={items}
-        />
+        <ServicesSection id={headingId} content={content} headingLevel={def.headingLevel} items={items} />
       );
     }
     case SectionType.TESTIMONIALS: {
+      const def = sectionRegistry[SectionType.TESTIMONIALS];
+      const content = def.schema.parse(section.content);
+      const headingId = slugifyHeading(content.heading, `section-${section.id}`);
       const items = await prisma.testimonial.findMany({
         where: { locale },
         orderBy: { order: "asc" },
         select: { id: true, authorName: true, authorRole: true, quote: true },
       });
       return (
-        <TestimonialsSection
-          id={headingId}
-          content={content as never}
-          headingLevel={headingLevel}
-          items={items}
-        />
+        <TestimonialsSection id={headingId} content={content} headingLevel={def.headingLevel} items={items} />
       );
     }
     case SectionType.BLOG: {
-      const typed = content as { limit?: number };
+      const def = sectionRegistry[SectionType.BLOG];
+      const content = def.schema.parse(section.content);
+      const headingId = slugifyHeading(content.heading, `section-${section.id}`);
       const posts = await prisma.post.findMany({
         where: { locale, status: "PUBLISHED" },
         orderBy: { publishedAt: "desc" },
-        take: typed.limit ?? 3,
+        take: content.limit ?? 3,
         select: {
           id: true,
           slug: true,
@@ -233,21 +232,19 @@ async function renderSection(section: RenderableSection, locale: Locale) {
         },
       });
       return (
-        <BlogSection
-          id={headingId}
-          content={content as never}
-          headingLevel={headingLevel}
-          items={posts}
-        />
+        <BlogSection id={headingId} content={content} headingLevel={def.headingLevel} items={posts} />
       );
     }
     case SectionType.CONTACT: {
+      const def = sectionRegistry[SectionType.CONTACT];
+      const content = def.schema.parse(section.content);
+      const headingId = slugifyHeading(content.heading, `section-${section.id}`);
       const settings = await getSiteSettings();
       return (
         <ContactSection
           id={headingId}
-          content={content as never}
-          headingLevel={headingLevel}
+          content={content}
+          headingLevel={def.headingLevel}
           githubUrl={settings.githubUrl}
           linkedinUrl={settings.linkedinUrl}
           upworkUrl={settings.upworkUrl}
@@ -257,22 +254,18 @@ async function renderSection(section: RenderableSection, locale: Locale) {
         />
       );
     }
-    case SectionType.RESUME:
-      return (
-        <ResumeSection
-          id={headingId}
-          content={content as never}
-          headingLevel={headingLevel}
-        />
-      );
-    case SectionType.NOW:
-      return (
-        <NowSection
-          id={headingId}
-          content={content as never}
-          headingLevel={headingLevel}
-        />
-      );
+    case SectionType.RESUME: {
+      const def = sectionRegistry[SectionType.RESUME];
+      const content = def.schema.parse(section.content);
+      const headingId = slugifyHeading(content.heading, `section-${section.id}`);
+      return <ResumeSection id={headingId} content={content} headingLevel={def.headingLevel} />;
+    }
+    case SectionType.NOW: {
+      const def = sectionRegistry[SectionType.NOW];
+      const content = def.schema.parse(section.content);
+      const headingId = slugifyHeading(content.heading, `section-${section.id}`);
+      return <NowSection id={headingId} content={content} headingLevel={def.headingLevel} />;
+    }
     default:
       return null;
   }
@@ -294,7 +287,7 @@ export function getSectionNavItems(sections: RenderableSection[]): SectionNavIte
     .filter((section) => section.type !== SectionType.HERO)
     .map((section) => {
       const def = sectionRegistry[section.type];
-      const content = def.schema.parse(section.content) as { heading: string };
+      const content = def.schema.parse(section.content) as HasHeading;
       const slug = slugifyHeading(content.heading, `section-${section.id}`);
       return { id: slug, label: content.heading, href: `#${slug}` };
     });
@@ -312,7 +305,7 @@ export async function SectionRenderer({
   const rendered = await Promise.all(
     enabled.map(async (section) => {
       const def = sectionRegistry[section.type];
-      const content = def.schema.parse(section.content) as { heading?: string };
+      const content = def.schema.parse(section.content) as HasHeading;
       const body = await renderSection(section, locale);
       return (
         <section key={section.id} aria-label={content.heading} style={{ minHeight: def.minHeight }}>

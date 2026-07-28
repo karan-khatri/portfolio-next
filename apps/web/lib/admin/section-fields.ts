@@ -1,4 +1,19 @@
 import { SectionType } from "@portfolio/db";
+import type {
+  AboutContent,
+  BlogContent,
+  ContactContent,
+  EducationContent,
+  ExperienceContent,
+  HeroContent,
+  LanguagesContent,
+  NowContent,
+  ProjectsContent,
+  ResumeContent,
+  ServicesContent,
+  SkillsContent,
+  TestimonialsContent,
+} from "@portfolio/sections";
 
 export interface SectionField {
   key: string;
@@ -10,21 +25,31 @@ export interface SectionField {
   itemFields?: SectionField[];
 }
 
-const LAYOUT_FIELDS: SectionField[] = [
-  { key: "showEyebrow", label: "Show eyebrow label (e.g. \"// contact\")", type: "boolean" },
+// Same shape as SectionField, but `key` is constrained to an actual key of
+// the section's real Zod-inferred content type — so a typo'd or renamed
+// field (the exact "schema/prop drift" finding #1 flagged on the render
+// side) fails typecheck here too, on the composer/editing side, instead of
+// silently producing a field that reads/writes nothing.
+type StrictSectionField<TContent> = Omit<SectionField, "key" | "itemFields"> & {
+  key: Extract<keyof TContent, string>;
+  itemFields?: SectionField[];
+};
+
+const LAYOUT_FIELDS = [
+  { key: "showEyebrow" as const, label: "Show eyebrow label (e.g. \"// contact\")", type: "boolean" as const },
   {
-    key: "headingAlign",
+    key: "headingAlign" as const,
     label: "Heading alignment",
-    type: "select",
+    type: "select" as const,
     options: [
       { value: "left", label: "Left" },
       { value: "center", label: "Center" },
       { value: "right", label: "Right" },
     ],
   },
-];
+] satisfies SectionField[];
 
-export const sectionFields: Record<SectionType, SectionField[]> = {
+const strictSectionFields = {
   [SectionType.HERO]: [
     { key: "heading", label: "Heading", type: "text", required: true },
     { key: "subheading", label: "Subheading", type: "text" },
@@ -164,7 +189,28 @@ export const sectionFields: Record<SectionType, SectionField[]> = {
     },
     ...LAYOUT_FIELDS,
   ],
+} satisfies {
+  [SectionType.HERO]: StrictSectionField<HeroContent>[];
+  [SectionType.ABOUT]: StrictSectionField<AboutContent>[];
+  [SectionType.PROJECTS]: StrictSectionField<ProjectsContent>[];
+  [SectionType.EXPERIENCE]: StrictSectionField<ExperienceContent>[];
+  [SectionType.EDUCATION]: StrictSectionField<EducationContent>[];
+  [SectionType.SKILLS]: StrictSectionField<SkillsContent>[];
+  [SectionType.LANGUAGES]: StrictSectionField<LanguagesContent>[];
+  [SectionType.SERVICES]: StrictSectionField<ServicesContent>[];
+  [SectionType.TESTIMONIALS]: StrictSectionField<TestimonialsContent>[];
+  [SectionType.BLOG]: StrictSectionField<BlogContent>[];
+  [SectionType.CONTACT]: StrictSectionField<ContactContent>[];
+  [SectionType.RESUME]: StrictSectionField<ResumeContent>[];
+  [SectionType.NOW]: StrictSectionField<NowContent>[];
 };
+
+// Widened for consumers (SectionForm, ListItemField, ...) that render fields
+// generically across every section type and don't need — or want — a
+// generic parameter of their own; the per-section key check above already
+// happened at the point of authorship, which is where drift actually gets
+// introduced.
+export const sectionFields: Record<SectionType, SectionField[]> = strictSectionFields;
 
 export const sectionDataSource: Partial<Record<SectionType, { label: string; href: string }>> = {
   [SectionType.PROJECTS]: { label: "Projects", href: "/admin/projects" },
