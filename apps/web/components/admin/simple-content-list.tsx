@@ -11,19 +11,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { TagInput } from "@/components/admin/tag-input";
-import { RichTextEditor } from "@/components/admin/rich-text-editor";
+import { RichTextEditor } from "@/components/admin/rich-text-editor-dynamic";
 import type { SimpleContentType, SimpleField } from "@/lib/admin/simple-content-fields";
 import { simpleContentSummaries } from "@/lib/admin/simple-content-fields";
+import type { ActionResult } from "@/lib/admin/action-result";
 import styles from "./simple-content-list.module.scss";
 
 export interface SimpleContentItem {
   id: string;
   order?: number;
   [key: string]: unknown;
-}
-
-interface ActionResult {
-  error?: string;
 }
 
 type FieldValue = string | string[] | boolean;

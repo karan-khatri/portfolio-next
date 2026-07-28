@@ -2,10 +2,7 @@
 
 import { prisma, logAudit } from "@portfolio/db/server";
 import { requireEditor } from "@/lib/auth/require-admin";
-
-export interface ActionResult {
-  error?: string;
-}
+import type { ActionResult } from "@/lib/admin/action-result";
 
 export async function deleteMessageAction(id: string): Promise<ActionResult> {
   try {

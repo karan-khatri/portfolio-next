@@ -3,10 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { assignRole, revokeRole, logAudit } from "@portfolio/db/server";
 import { requireAdminRole } from "@/lib/auth/require-admin";
-
-export interface ActionResult {
-  error?: string;
-}
+import type { ActionResult } from "@/lib/admin/action-result";
 
 export async function assignRoleAction(
   targetUserId: string,

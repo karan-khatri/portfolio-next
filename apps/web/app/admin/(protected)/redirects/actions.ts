@@ -3,10 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma, logAudit } from "@portfolio/db/server";
 import { requireEditor } from "@/lib/auth/require-admin";
-
-export interface ActionResult {
-  error?: string;
-}
+import type { ActionResult } from "@/lib/admin/action-result";
 
 function toRedirectData(values: Record<string, unknown>) {
   return {

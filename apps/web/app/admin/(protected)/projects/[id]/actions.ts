@@ -11,12 +11,7 @@ import {
   type FlatRevisionData,
 } from "@portfolio/db/server";
 import { requireEditor } from "@/lib/auth/require-admin";
-
-export interface ComposerActionResult {
-  error?: string;
-  revisionId?: string;
-  previewToken?: string;
-}
+import type { ComposerActionResult } from "@/lib/admin/action-result";
 
 export interface ProjectFormInput {
   title: string;

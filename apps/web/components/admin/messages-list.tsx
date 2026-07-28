@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { LuTrash2, LuMail, LuMailOpen } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
+import type { ActionResult } from "@/lib/admin/action-result";
 import styles from "./messages-list.module.scss";
 
 export interface ContactMessageItem {
@@ -14,10 +15,6 @@ export interface ContactMessageItem {
   message: string;
   read: boolean;
   createdAt: Date;
-}
-
-interface ActionResult {
-  error?: string;
 }
 
 export function MessagesList({

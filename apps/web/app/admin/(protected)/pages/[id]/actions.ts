@@ -12,12 +12,7 @@ import {
 } from "@portfolio/db/server";
 import { validateSectionContent, SectionValidationError } from "@portfolio/sections";
 import { requireEditor } from "@/lib/auth/require-admin";
-
-export interface ComposerActionResult {
-  error?: string;
-  revisionId?: string;
-  previewToken?: string;
-}
+import type { ComposerActionResult } from "@/lib/admin/action-result";
 
 // The "home" page is served at "/" (app/page.tsx), not "/home" — every other
 // standalone page is served at "/{slug}" via the app/[...slug] catch-all.

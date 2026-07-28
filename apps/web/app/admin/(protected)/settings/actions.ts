@@ -3,10 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { upsertSiteSettings, logAudit, type SiteSettingsValues } from "@portfolio/db/server";
 import { requireEditor } from "@/lib/auth/require-admin";
-
-export interface ActionResult {
-  error?: string;
-}
+import type { ActionResult } from "@/lib/admin/action-result";
 
 export async function saveSiteSettingsAction(values: SiteSettingsValues): Promise<ActionResult> {
   try {
