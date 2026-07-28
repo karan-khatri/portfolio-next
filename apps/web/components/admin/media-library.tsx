@@ -19,7 +19,7 @@ import { deleteMediaAction, getMediaUsageAction } from "@/app/admin/(protected)/
 import { MediaUploadForm } from "./media-upload-form";
 import { formatBytes } from "@/lib/admin/format-bytes";
 import { isImageMedia, type MediaPickerValue } from "@/lib/admin/media";
-import type { MediaUsageCounts } from "@portfolio/db/server";
+import type { MediaUsageCounts } from "@/lib/admin/view-models";
 import styles from "./media-library.module.scss";
 
 function formatUsage(usage: MediaUsageCounts): string {

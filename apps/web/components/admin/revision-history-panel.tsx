@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { formatRelativeTime } from "@/lib/admin/format-relative-time";
 import { restoreRevisionAction } from "@/app/admin/(protected)/revision-actions";
-import type { EntityType } from "@portfolio/db/server";
+import type { EntityType } from "@/lib/admin/view-models";
 import styles from "./revision-history-panel.module.scss";
 
 export interface RevisionHistoryItem {
