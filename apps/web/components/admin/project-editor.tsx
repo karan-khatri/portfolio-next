@@ -45,7 +45,6 @@ interface ProjectEditorInitial {
   coverImage: MediaPickerValue | null;
   codeRepository: string;
   liveUrl: string;
-  programmingLanguages: string[];
   featured: boolean;
 }
 
@@ -72,7 +71,6 @@ export function ProjectEditor({
   const [coverImage, setCoverImage] = useState(initial.coverImage);
   const [codeRepository, setCodeRepository] = useState(initial.codeRepository);
   const [liveUrl, setLiveUrl] = useState(initial.liveUrl);
-  const [programmingLanguages, setProgrammingLanguages] = useState(initial.programmingLanguages);
   const [featured, setFeatured] = useState(initial.featured);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -86,7 +84,6 @@ export function ProjectEditor({
     setCoverImage(initial.coverImage);
     setCodeRepository(initial.codeRepository);
     setLiveUrl(initial.liveUrl);
-    setProgrammingLanguages(initial.programmingLanguages);
     setFeatured(initial.featured);
   }, [initial]);
 
@@ -99,7 +96,6 @@ export function ProjectEditor({
       coverImageId: coverImage?.id ?? null,
       codeRepository,
       liveUrl,
-      programmingLanguages,
     };
   }
 
@@ -233,12 +229,6 @@ export function ProjectEditor({
                   />
                 </div>
               </div>
-              <TagInput
-                label="Programming languages"
-                value={programmingLanguages}
-                onChange={setProgrammingLanguages}
-                placeholder="Type a language, press Enter"
-              />
             </CardContent>
           </Card>
 

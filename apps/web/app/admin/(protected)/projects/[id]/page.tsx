@@ -28,7 +28,6 @@ export default async function ProjectEditorRoute({
     : null;
   let codeRepository = project.codeRepository ?? "";
   let liveUrl = project.liveUrl ?? "";
-  let programmingLanguages = project.programmingLanguages;
 
   if (latestDraft) {
     const data = latestDraft.data as unknown as FlatRevisionData;
@@ -37,7 +36,6 @@ export default async function ProjectEditorRoute({
     body = data.body ?? "";
     codeRepository = data.codeRepository ?? "";
     liveUrl = data.liveUrl ?? "";
-    programmingLanguages = data.programmingLanguages ?? [];
     if (data.tagIds) {
       const draftTags = await prisma.tag.findMany({ where: { id: { in: data.tagIds } } });
       tagNames = draftTags.map((tag) => tag.name);
@@ -72,7 +70,6 @@ export default async function ProjectEditorRoute({
         coverImage,
         codeRepository,
         liveUrl,
-        programmingLanguages,
         featured: project.featured,
       }}
       seo={{

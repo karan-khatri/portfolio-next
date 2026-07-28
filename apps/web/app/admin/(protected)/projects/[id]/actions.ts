@@ -26,7 +26,6 @@ export interface ProjectFormInput {
   coverImageId: string | null;
   codeRepository: string;
   liveUrl: string;
-  programmingLanguages: string[];
 }
 
 async function buildData(input: ProjectFormInput): Promise<FlatRevisionData> {
@@ -39,7 +38,6 @@ async function buildData(input: ProjectFormInput): Promise<FlatRevisionData> {
     coverImageId: input.coverImageId,
     codeRepository: input.codeRepository || null,
     liveUrl: input.liveUrl || null,
-    programmingLanguages: input.programmingLanguages,
   };
 }
 

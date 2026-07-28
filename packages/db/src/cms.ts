@@ -26,7 +26,6 @@ export interface FlatRevisionData {
   tagIds?: string[];
   codeRepository?: string | null;
   liveUrl?: string | null;
-  programmingLanguages?: string[];
   authorId?: string | null;
 }
 
@@ -114,7 +113,6 @@ async function applyFlatRevision(
         tags,
         codeRepository: data.codeRepository,
         liveUrl: data.liveUrl,
-        programmingLanguages: data.programmingLanguages,
       },
     });
   } else {
