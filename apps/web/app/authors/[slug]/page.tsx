@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LuLink } from "react-icons/lu";
-import { prisma } from "@portfolio/db/server";
+import { prisma, Locale } from "@portfolio/db/server";
 import { PublicShell } from "@/components/public-shell";
 import { getPublicNav } from "@/lib/public-nav";
 import { PostCard } from "@/components/sections/post-card";
 import { EmptyState } from "@/components/sections/empty-state";
 
-const LOCALE = "en";
+const LOCALE: Locale = "en";
 
 async function getAuthor(slug: string) {
   return prisma.author.findFirst({ where: { slug } });

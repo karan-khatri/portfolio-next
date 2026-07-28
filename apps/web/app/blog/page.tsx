@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { prisma } from "@portfolio/db/server";
+import { prisma, Locale } from "@portfolio/db/server";
 import { PublicShell } from "@/components/public-shell";
 import { getPublicNav } from "@/lib/public-nav";
 import { PostCard } from "@/components/sections/post-card";
 import { EmptyState } from "@/components/sections/empty-state";
 import { Pagination } from "@/components/pagination";
 
-const LOCALE = "en";
+const LOCALE: Locale = "en";
 const PAGE_SIZE = 9;
 
 export const metadata: Metadata = {

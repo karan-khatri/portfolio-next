@@ -136,6 +136,14 @@ enum ContentStatus {
   ARCHIVED
 }
 
+// Only "en" exists today — this isn't i18n support, just a closed vocabulary
+// so a typo ("En", "en-US") can't silently create content that never shows
+// up anywhere. Add a value here (and a migration) when a second locale
+// actually ships.
+enum Locale {
+  en
+}
+
 // Page/Project/Post revisions share one polymorphic table since Prisma can't
 // express a true FK across three unrelated target tables — entityId stays a
 // free-text cuid, but entityType is a real enum so a typo can't silently
@@ -150,6 +158,11 @@ model Revision {
   entityId    String
   status      ContentStatus
   data        Json
+  // Bumped whenever the shape written into `data` changes (e.g. a Page
+  // section gains/loses a field). Nothing reads this yet — it exists so a
+  // future restore/render path can tell "old shape" from "current shape"
+  // instead of guessing from missing fields.
+  schemaVersion Int              @default(1)
   createdById String?
   createdBy   User?              @relation(fields: [createdById], references: [id])
   createdAt   DateTime           @default(now())
@@ -224,7 +237,12 @@ model ContactMessage {
 
 model Media {
   id           String   @id @default(cuid())
-  url          String
+  // Unique so the same uploaded asset can't end up as two different Media
+  // rows referenced inconsistently across Project.coverImage/Post.coverImage/
+  // Seo.ogImage — both storage adapters already generate a fresh random key
+  // per upload, so a genuine collision only happens on an actual re-upload
+  // of the same file, which should reuse the existing row.
+  url          String   @unique
   width        Int?
   height       Int?
   blurDataUrl  String?
@@ -274,7 +292,7 @@ enum SectionType {
 model Page {
   id                String        @id @default(cuid())
   slug              String
-  locale             String
+  locale             Locale @default(en)
   translationGroupId String
   title             String
   status            ContentStatus @default(DRAFT)
@@ -296,15 +314,20 @@ model Page {
 }
 
 model SectionInstance {
-  id        String      @id @default(cuid())
-  pageId    String
-  page      Page        @relation(fields: [pageId], references: [id], onDelete: Cascade)
-  type      SectionType
-  order     Int
-  enabled   Boolean     @default(true)
-  content   Json
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id      String      @id @default(cuid())
+  pageId  String
+  page    Page        @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  type    SectionType
+  order   Int
+  enabled Boolean     @default(true)
+  content Json
+  // Bumped whenever a section type's content shape changes (a field added,
+  // removed, or renamed on HERO/ABOUT/etc). Nothing reads this yet — it's
+  // here so section-renderer can eventually branch on "old shape" instead of
+  // every future field being implicitly optional forever.
+  schemaVersion Int    @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@unique([pageId, order])
 }
@@ -312,7 +335,7 @@ model SectionInstance {
 model Project {
   id                 String        @id @default(cuid())
   slug               String
-  locale             String
+  locale             Locale @default(en)
   translationGroupId String
   title              String
   excerpt            String?
@@ -321,12 +344,16 @@ model Project {
   coverImage         Media?        @relation("ProjectCoverImage", fields: [coverImageId], references: [id])
   codeRepository     String?
   liveUrl            String?
-  programmingLanguages String[]
   tags               Tag[]         @relation("ProjectTags")
   status             ContentStatus @default(DRAFT)
   publishedAt        DateTime?
   featured           Boolean       @default(false)
-  featuredOrder      Int?
+  // Unique (not just indexed) so two featured projects can't silently share
+  // a position — that would make the featured-projects ordering
+  // nondeterministic. NULL is exempt from the uniqueness check (Postgres
+  // treats NULLs as distinct), which is what we want: only currently-featured
+  // rows need a real, unique position.
+  featuredOrder      Int?          @unique
   seo                Seo?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
@@ -339,7 +366,7 @@ model Project {
 model Post {
   id                 String        @id @default(cuid())
   slug               String
-  locale             String
+  locale             Locale @default(en)
   translationGroupId String
   title              String
   excerpt            String?
@@ -370,7 +397,7 @@ model Tag {
 
 model Experience {
   id          String   @id @default(cuid())
-  locale      String
+  locale      Locale @default(en)
   company     String
   title       String
   startDate   DateTime
@@ -381,7 +408,7 @@ model Experience {
 
 model Education {
   id          String    @id @default(cuid())
-  locale      String
+  locale      Locale @default(en)
   institution String
   degree      String
   location    String?
@@ -396,7 +423,7 @@ model Education {
 // admin form already labels it: "Level (1-5)".
 model Skill {
   id       String @id @default(cuid())
-  locale   String
+  locale   Locale @default(en)
   name     String
   category String?
   level    Int?
@@ -421,7 +448,7 @@ model TechStackItem {
 
 model Language {
   id          String @id @default(cuid())
-  locale      String
+  locale      Locale @default(en)
   name        String
   proficiency String
   order       Int    @default(0)
@@ -429,7 +456,7 @@ model Language {
 
 model Service {
   id          String  @id @default(cuid())
-  locale      String
+  locale      Locale @default(en)
   title       String
   description String?
   order       Int     @default(0)
@@ -437,7 +464,7 @@ model Service {
 
 model Testimonial {
   id         String  @id @default(cuid())
-  locale     String
+  locale     Locale @default(en)
   authorName String
   authorRole String?
   quote      String
@@ -447,7 +474,7 @@ model Testimonial {
 
 model NavigationItem {
   id       String  @id @default(cuid())
-  locale   String
+  locale   Locale @default(en)
   label    String
   href     String
   order    Int     @default(0)

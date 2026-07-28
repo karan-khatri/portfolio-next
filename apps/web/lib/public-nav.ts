@@ -1,7 +1,7 @@
-import { prisma, getSiteSettings, type SiteSettingsValues } from "@portfolio/db/server";
+import { prisma, getSiteSettings, type SiteSettingsValues, type Locale } from "@portfolio/db/server";
 import { getSectionNavItems, type SectionNavItem } from "@/components/sections/section-renderer";
 
-const LOCALE = "en";
+const LOCALE: Locale = "en";
 
 export async function getPublicNav(): Promise<{
   navItems: SectionNavItem[];

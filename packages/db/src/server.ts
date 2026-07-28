@@ -1,5 +1,6 @@
-export { SectionType } from "./generated/client";
+export { SectionType, Locale } from "./generated/client";
 export * from "./client";
+export * from "./locale";
 export * from "./auth";
 export * from "./cms";
 export * from "./audit";

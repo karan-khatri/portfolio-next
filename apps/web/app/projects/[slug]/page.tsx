@@ -3,12 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
-import { prisma } from "@portfolio/db/server";
+import { prisma, Locale } from "@portfolio/db/server";
 import { PublicShell } from "@/components/public-shell";
 import { getPublicNav } from "@/lib/public-nav";
 import { ProseContent } from "@/components/prose-content";
 
-const LOCALE = "en";
+const LOCALE: Locale = "en";
 
 async function getProject(slug: string) {
   return prisma.project.findFirst({

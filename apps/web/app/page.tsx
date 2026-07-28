@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { prisma } from "@portfolio/db/server";
+import { prisma, Locale } from "@portfolio/db/server";
 import { SectionRenderer } from "@/components/sections/section-renderer";
 import { PublicShell } from "@/components/public-shell";
 import { getPublicNav } from "@/lib/public-nav";
 
-const LOCALE = "en";
+const LOCALE: Locale = "en";
 
 async function getHomePage() {
   return prisma.page.findFirst({

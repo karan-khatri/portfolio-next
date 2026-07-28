@@ -1,4 +1,4 @@
-import { prisma, SectionType, getSiteSettings } from "@portfolio/db/server";
+import { prisma, SectionType, getSiteSettings, type Locale } from "@portfolio/db/server";
 import { sectionRegistry } from "@portfolio/sections";
 import { HeroSection } from "./hero";
 import { AboutSection } from "./about";
@@ -40,7 +40,7 @@ async function resolveSectionImage(imageId: unknown) {
   return media;
 }
 
-async function renderSection(section: RenderableSection, locale: string) {
+async function renderSection(section: RenderableSection, locale: Locale) {
   const def = sectionRegistry[section.type];
   const content = def.schema.parse(section.content);
   const headingId = slugifyHeading(
@@ -305,7 +305,7 @@ export async function SectionRenderer({
   locale,
 }: {
   sections: RenderableSection[];
-  locale: string;
+  locale: Locale;
 }) {
   const enabled = enabledSections(sections);
 

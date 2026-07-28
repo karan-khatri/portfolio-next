@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { prisma } from "@portfolio/db/server";
+import { prisma, isValidLocale } from "@portfolio/db/server";
 import { requireEditor } from "@/lib/auth/require-admin";
 
 export interface CreatePostState {
@@ -28,6 +28,9 @@ export async function createPostAction(
   }
   if (!/^[a-z0-9-]+$/.test(slug)) {
     return { error: "Slug must be lowercase letters, numbers, and hyphens only" };
+  }
+  if (!isValidLocale(locale)) {
+    return { error: `Unknown locale "${locale}"` };
   }
 
   const existing = await prisma.post.findUnique({

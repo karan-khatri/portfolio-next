@@ -35,7 +35,11 @@ export function CreateSlugContentForm({
       </div>
       <div className={styles.field}>
         <Label htmlFor="locale">Locale</Label>
-        <Input id="locale" name="locale" required defaultValue="en" className={styles.localeInput} />
+        {/* "en" is the only value the Locale enum accepts today — read-only
+            rather than a free-text input an admin could mistype into an
+            invalid value (the server action validates this too, but there's
+            no reason to let the mistake happen in the first place). */}
+        <Input id="locale" name="locale" required defaultValue="en" readOnly className={styles.localeInput} />
       </div>
       <div className={styles.field}>
         <Label htmlFor="title">Title</Label>

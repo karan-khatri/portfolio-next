@@ -3,13 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LuArrowLeft } from "react-icons/lu";
-import { prisma } from "@portfolio/db/server";
+import { prisma, Locale } from "@portfolio/db/server";
 import { PublicShell } from "@/components/public-shell";
 import { getPublicNav } from "@/lib/public-nav";
 import { formatDate } from "@/lib/format-date";
 import { ProseContent } from "@/components/prose-content";
 
-const LOCALE = "en";
+const LOCALE: Locale = "en";
 
 async function getPost(slug: string) {
   return prisma.post.findFirst({

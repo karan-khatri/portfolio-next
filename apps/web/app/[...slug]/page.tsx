@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect, redirect } from "next/navigation";
-import { prisma } from "@portfolio/db/server";
+import { prisma, Locale } from "@portfolio/db/server";
 import { SectionRenderer } from "@/components/sections/section-renderer";
 import { PublicShell } from "@/components/public-shell";
 import { getPublicNav } from "@/lib/public-nav";
 
-const LOCALE = "en";
+const LOCALE: Locale = "en";
 
 async function getStandalonePage(slug: string[]) {
   if (slug.length !== 1 || slug[0] === "home") return null;
