@@ -1,10 +1,7 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { LuArrowLeft, LuCopy, LuExternalLink, LuPlus } from "react-icons/lu";
+import { useEffect, useState } from "react";
+import { LuPlus } from "react-icons/lu";
 import type { SectionType } from "@portfolio/db";
 import { sectionRegistry } from "@portfolio/sections";
 import { SectionListEditor } from "./section-list";
@@ -27,9 +24,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { StatusBadge } from "@/components/admin/status-badge";
 import { ComposerActionBar } from "@/components/admin/composer-action-bar";
+import { EditorShell, PreviewLinkBox } from "@/components/admin/editor-shell";
 import { RevisionHistoryPanel, type RevisionHistoryItem } from "@/components/admin/revision-history-panel";
+import { useEntityEditor } from "@/lib/admin/use-entity-editor";
 import styles from "./page-composer.module.scss";
 
 export type { ComposerSection };
@@ -53,7 +51,6 @@ export function PageComposer({
   hasDraft: boolean;
   revisions: RevisionHistoryItem[];
 }) {
-  const router = useRouter();
   const [title, setTitle] = useState(initialTitle);
   const [sections, setSections] = useState(initialSections);
   const [resolvedMedia, setResolvedMedia] = useState(initialResolvedMedia);
@@ -64,8 +61,6 @@ export function PageComposer({
     setSections(initialSections);
     setResolvedMedia(initialResolvedMedia);
   }, [initialTitle, initialSections, initialResolvedMedia]);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
 
   function toInput() {
     return sections.map((section, index) => ({
@@ -111,134 +106,74 @@ export function PageComposer({
     setResolvedMedia((prev) => ({ ...prev, [media.id]: media }));
   }
 
-  function handleSaveDraft() {
-    startTransition(async () => {
-      const result = await saveDraftAction(pageId, title, toInput());
-      if (result.error) toast.error(result.error);
-      else toast.success("Draft saved");
+  const { pending, previewUrl, handleSaveDraft, handlePublish, handleUnpublish, handlePreview, copyPreviewLink } =
+    useEntityEditor({
+      saveDraft: () => saveDraftAction(pageId, title, toInput()),
+      publish: () => publishAction(pageId, title, toInput()),
+      unpublish: () => unpublishAction(pageId),
+      createPreview: () => createPreviewAction(pageId, title, toInput()),
     });
-  }
-
-  function handlePublish() {
-    startTransition(async () => {
-      const result = await publishAction(pageId, title, toInput());
-      if (result.error) toast.error(result.error);
-      else {
-        toast.success("Published");
-        router.refresh();
-      }
-    });
-  }
-
-  function handleUnpublish() {
-    startTransition(async () => {
-      const result = await unpublishAction(pageId);
-      if (result.error) toast.error(result.error);
-      else {
-        toast.success("Unpublished");
-        router.refresh();
-      }
-    });
-  }
-
-  function handlePreview() {
-    setPreviewUrl(null);
-    startTransition(async () => {
-      const result = await createPreviewAction(pageId, title, toInput());
-      if (result.error) toast.error(result.error);
-      else if (result.previewToken) setPreviewUrl(`/preview/${result.previewToken}`);
-    });
-  }
-
-  function copyPreviewLink() {
-    if (!previewUrl) return;
-    navigator.clipboard.writeText(`${window.location.origin}${previewUrl}`);
-    toast.success("Copied preview link");
-  }
 
   return (
-    <div className={styles.page}>
-      <div className={styles.header}>
-        <Link href="/admin/pages" className={styles.backLink}>
-          <LuArrowLeft className={styles.backIcon} />
-          Pages
-        </Link>
-        <div className={styles.titleRow}>
-          <h1 className={styles.heading}>Edit page</h1>
-          <StatusBadge status={pageStatus} />
-          {hasDraft ? <StatusBadge status="UNPUBLISHED DRAFT LOADED" /> : null}
-        </div>
-      </div>
-
-      <div className={styles.layout}>
-        <div className={styles.mainColumn}>
-          <Card>
-            <CardContent>
-              <div className={styles.field}>
-                <Label htmlFor="page-title">Title</Label>
-                <Input
-                  id="page-title"
-                  value={title}
-                  onChange={(event) => setTitle(event.target.value)}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <SectionListEditor
-            sections={sections}
-            onReorder={setSections}
-            onToggle={toggleSection}
-            onRemove={removeSection}
-            onContentChange={updateContent}
-            resolvedMedia={resolvedMedia}
-            onResolveMedia={resolveMedia}
-          />
-
-          <div className={styles.addSectionRow}>
-            <Select value={newSectionType} onValueChange={(value) => setNewSectionType(value as SectionType)}>
-              <SelectTrigger className={styles.addSectionSelect}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {ALL_SECTION_TYPES.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {sectionRegistry[type].label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button type="button" variant="outline" onClick={addSection}>
-              <LuPlus />
-              Add section
-            </Button>
+    <EditorShell
+      backHref="/admin/pages"
+      backLabel="Pages"
+      heading="Edit page"
+      status={pageStatus}
+      hasDraft={hasDraft}
+      sidebar={<RevisionHistoryPanel entityType="Page" entityId={pageId} revisions={revisions} />}
+    >
+      <Card>
+        <CardContent>
+          <div className={styles.field}>
+            <Label htmlFor="page-title">Title</Label>
+            <Input
+              id="page-title"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+            />
           </div>
+        </CardContent>
+      </Card>
 
-          {previewUrl ? (
-            <div className={styles.previewBox}>
-              <a href={previewUrl} target="_blank" rel="noreferrer" className={styles.previewLink}>
-                {previewUrl}
-                <LuExternalLink className={styles.previewIcon} />
-              </a>
-              <Button type="button" variant="ghost" size="icon-sm" onClick={copyPreviewLink}>
-                <LuCopy />
-              </Button>
-            </div>
-          ) : null}
+      <SectionListEditor
+        sections={sections}
+        onReorder={setSections}
+        onToggle={toggleSection}
+        onRemove={removeSection}
+        onContentChange={updateContent}
+        resolvedMedia={resolvedMedia}
+        onResolveMedia={resolveMedia}
+      />
 
-          <ComposerActionBar
-            pending={pending}
-            onSaveDraft={handleSaveDraft}
-            onPreview={handlePreview}
-            onPublish={handlePublish}
-            onUnpublish={handleUnpublish}
-          />
-        </div>
-
-        <div className={styles.sidebarColumn}>
-          <RevisionHistoryPanel entityType="Page" entityId={pageId} revisions={revisions} />
-        </div>
+      <div className={styles.addSectionRow}>
+        <Select value={newSectionType} onValueChange={(value) => setNewSectionType(value as SectionType)}>
+          <SelectTrigger className={styles.addSectionSelect}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {ALL_SECTION_TYPES.map((type) => (
+              <SelectItem key={type} value={type}>
+                {sectionRegistry[type].label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button type="button" variant="outline" onClick={addSection}>
+          <LuPlus />
+          Add section
+        </Button>
       </div>
-    </div>
+
+      {previewUrl ? <PreviewLinkBox previewUrl={previewUrl} onCopy={copyPreviewLink} /> : null}
+
+      <ComposerActionBar
+        pending={pending}
+        onSaveDraft={handleSaveDraft}
+        onPreview={handlePreview}
+        onPublish={handlePublish}
+        onUnpublish={handleUnpublish}
+      />
+    </EditorShell>
   );
 }
