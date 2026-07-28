@@ -1,19 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { LuFile, LuImage, LuX } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { listMediaAction } from "@/app/admin/(protected)/media/actions";
-import { MediaUploadForm } from "./media-upload-form";
+import { MediaBrowserDialog } from "./media-browser-dialog";
+import { useMediaBrowser } from "@/lib/admin/use-media-browser";
 import { isImageMedia, type MediaPickerValue } from "@/lib/admin/media";
 import styles from "./media-picker.module.scss";
 
@@ -52,14 +45,7 @@ export function MediaPicker({
   kind?: "image" | "any";
 }) {
   const [open, setOpen] = useState(false);
-  const [media, setMedia] = useState<MediaPickerValue[] | null>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    listMediaAction().then(setMedia);
-  }, [open]);
-
-  const selectable = media?.filter((item) => kind === "any" || isImageMedia(item)) ?? null;
+  const { setMedia, selectable } = useMediaBrowser(open, kind);
 
   function handlePick(item: MediaPickerValue) {
     onChange(item);
@@ -97,32 +83,29 @@ export function MediaPicker({
         </Button>
       )}
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className={styles.dialogContent}>
-          <DialogHeader>
-            <DialogTitle>{kind === "any" ? "Choose a file" : "Choose an image"}</DialogTitle>
-            <DialogDescription>Upload a new file or pick an existing one.</DialogDescription>
-          </DialogHeader>
-
-          <MediaUploadForm onUploaded={handleUploaded} kind={kind} />
-
-          {selectable === null ? (
-            <p className={styles.loading}>Loading…</p>
-          ) : selectable.length === 0 ? (
-            <p className={styles.loading}>Nothing uploaded yet.</p>
-          ) : (
-            <ul className={styles.grid}>
-              {selectable.map((item) => (
-                <li key={item.id}>
-                  <button type="button" className={styles.gridItem} onClick={() => handlePick(item)}>
-                    <MediaThumb item={item} className={styles.gridThumb} />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </DialogContent>
-      </Dialog>
+      <MediaBrowserDialog
+        open={open}
+        onOpenChange={setOpen}
+        title={kind === "any" ? "Choose a file" : "Choose an image"}
+        description="Upload a new file or pick an existing one."
+        kind={kind}
+        selectable={selectable}
+        onUploaded={handleUploaded}
+        dialogClassName={styles.dialogContent}
+        loadingClassName={styles.loading}
+      >
+        {(items) => (
+          <ul className={styles.grid}>
+            {items.map((item) => (
+              <li key={item.id}>
+                <button type="button" className={styles.gridItem} onClick={() => handlePick(item)}>
+                  <MediaThumb item={item} className={styles.gridThumb} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </MediaBrowserDialog>
     </div>
   );
 }
