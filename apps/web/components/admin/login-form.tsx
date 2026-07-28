@@ -1,41 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { LuArrowRight, LuLoaderCircle, LuLock, LuMail } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { ApiResponseBody } from "@/lib/api/response";
+import { loginAction } from "@/app/admin/login/actions";
 import styles from "./login-form.module.scss";
 
 export function LoginForm() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const [pending, startTransition] = useTransition();
 
-  async function handleSubmit(event: React.FormEvent) {
+  function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    setSubmitting(true);
-
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+    startTransition(async () => {
+      const result = await loginAction(email, password);
+      if (result.error) toast.error(result.error);
     });
-
-    setSubmitting(false);
-
-    const body: ApiResponseBody<{ email: string; role: string }> = await response.json();
-    if (!body.success) {
-      toast.error(body.message);
-      return;
-    }
-
-    router.push("/admin");
-    router.refresh();
   }
 
   return (
@@ -70,10 +54,10 @@ export function LoginForm() {
           />
         </div>
       </div>
-      <Button type="submit" disabled={submitting} className={styles.submit}>
-        {submitting ? <LuLoaderCircle className={styles.spinner} /> : null}
-        {submitting ? "Signing in…" : "Sign in"}
-        {!submitting ? <LuArrowRight className={styles.submitIcon} /> : null}
+      <Button type="submit" disabled={pending} className={styles.submit}>
+        {pending ? <LuLoaderCircle className={styles.spinner} /> : null}
+        {pending ? "Signing in…" : "Sign in"}
+        {!pending ? <LuArrowRight className={styles.submitIcon} /> : null}
       </Button>
     </form>
   );

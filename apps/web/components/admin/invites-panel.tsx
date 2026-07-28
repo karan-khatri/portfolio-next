@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { LuCopy, LuLoaderCircle } from "react-icons/lu";
@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatRelativeTime } from "@/lib/admin/format-relative-time";
-import type { ApiResponseBody } from "@/lib/api/response";
+import { createInviteAction } from "@/app/admin/(protected)/invite-actions";
 import styles from "./invites-panel.module.scss";
 
 interface RoleOption {
@@ -47,38 +47,29 @@ export function InvitesPanel({
   const [email, setEmail] = useState("");
   const [roleId, setRoleId] = useState(roles[0]?.id ?? "");
   const [expiresInDays, setExpiresInDays] = useState(String(DEFAULT_EXPIRES_IN_DAYS));
-  const [submitting, setSubmitting] = useState(false);
+  const [pending, startTransition] = useTransition();
   const [lastInviteLink, setLastInviteLink] = useState<string | null>(null);
 
   const selectedRole = roles.find((r) => r.id === roleId);
 
-  async function handleSubmit(event: React.FormEvent) {
+  function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    setSubmitting(true);
     setLastInviteLink(null);
-
-    const response = await fetch("/api/admin/invites", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    startTransition(async () => {
+      const result = await createInviteAction(
         email,
         roleId,
-        expiresInDays: selectedRole?.isPermanent ? null : Number(expiresInDays),
-      }),
+        selectedRole?.isPermanent ? null : Number(expiresInDays),
+      );
+      if (result.error || !result.token) {
+        toast.error(result.error ?? "Could not create invite");
+        return;
+      }
+      setLastInviteLink(`${window.location.origin}/admin/accept-invite/${result.token}`);
+      setEmail("");
+      toast.success("Invite sent");
+      router.refresh();
     });
-
-    setSubmitting(false);
-
-    const body: ApiResponseBody<{ token: string; expiresAt: string }> = await response.json();
-    if (!body.success) {
-      toast.error(body.message);
-      return;
-    }
-
-    setLastInviteLink(`${window.location.origin}/admin/accept-invite/${body.data.token}`);
-    setEmail("");
-    toast.success(body.message);
-    router.refresh();
   }
 
   function copyInviteLink() {
@@ -129,9 +120,9 @@ export function InvitesPanel({
             />
           </div>
         ) : null}
-        <Button type="submit" disabled={submitting}>
-          {submitting ? <LuLoaderCircle className={styles.spinner} /> : null}
-          {submitting ? "Sending…" : "Send invite"}
+        <Button type="submit" disabled={pending}>
+          {pending ? <LuLoaderCircle className={styles.spinner} /> : null}
+          {pending ? "Sending…" : "Send invite"}
         </Button>
       </form>
 

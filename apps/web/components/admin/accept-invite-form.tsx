@@ -1,40 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { LuLoaderCircle } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { ApiResponseBody } from "@/lib/api/response";
+import { acceptInviteAction } from "@/app/admin/accept-invite/[token]/actions";
 import styles from "./accept-invite-form.module.scss";
 
 export function AcceptInviteForm({ token }: { token: string }) {
-  const router = useRouter();
   const [password, setPassword] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const [pending, startTransition] = useTransition();
 
-  async function handleSubmit(event: React.FormEvent) {
+  function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    setSubmitting(true);
-
-    const response = await fetch("/api/auth/accept-invite", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, password }),
+    startTransition(async () => {
+      const result = await acceptInviteAction(token, password);
+      if (result.error) toast.error(result.error);
     });
-
-    setSubmitting(false);
-
-    const body: ApiResponseBody<{ email: string; role: string }> = await response.json();
-    if (!body.success) {
-      toast.error(body.message);
-      return;
-    }
-
-    router.push("/admin");
-    router.refresh();
   }
 
   return (
@@ -51,9 +35,9 @@ export function AcceptInviteForm({ token }: { token: string }) {
           onChange={(event) => setPassword(event.target.value)}
         />
       </div>
-      <Button type="submit" disabled={submitting} className={styles.submit}>
-        {submitting ? <LuLoaderCircle className={styles.spinner} /> : null}
-        {submitting ? "Setting up…" : "Set password & sign in"}
+      <Button type="submit" disabled={pending} className={styles.submit}>
+        {pending ? <LuLoaderCircle className={styles.spinner} /> : null}
+        {pending ? "Setting up…" : "Set password & sign in"}
       </Button>
     </form>
   );
