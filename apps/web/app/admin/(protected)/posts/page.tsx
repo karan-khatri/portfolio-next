@@ -3,7 +3,7 @@ import { LuPlus } from "react-icons/lu";
 import { prisma } from "@portfolio/db/server";
 import { CreateSlugContentForm } from "@/components/admin/create-slug-content-form";
 import { StatusBadge } from "@/components/admin/status-badge";
-import { Pagination } from "@/components/admin/pagination";
+import { Pagination } from "@/components/pagination";
 import { SearchInput } from "@/components/admin/search-input";
 import { formatRelativeTime } from "@/lib/admin/format-relative-time";
 import { Card, CardContent } from "@/components/ui/card";
@@ -67,7 +67,13 @@ export default async function AdminPostsListPage({
         </CardContent>
       </Card>
 
-      <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/admin/posts" query={{ q: query }} />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        basePath="/admin/posts"
+        query={{ q: query }}
+        variant="admin"
+      />
 
       <details className={styles.createDisclosure}>
         <summary className={styles.createTrigger}>

@@ -3,7 +3,7 @@ import { LuPlus } from "react-icons/lu";
 import { prisma } from "@portfolio/db/server";
 import { CreateSlugContentForm } from "@/components/admin/create-slug-content-form";
 import { StatusBadge } from "@/components/admin/status-badge";
-import { Pagination } from "@/components/admin/pagination";
+import { Pagination } from "@/components/pagination";
 import { SearchInput } from "@/components/admin/search-input";
 import { FeaturedProjectsPanel } from "@/components/admin/featured-projects-panel";
 import { formatRelativeTime } from "@/lib/admin/format-relative-time";
@@ -82,6 +82,7 @@ export default async function AdminProjectsListPage({
         totalPages={totalPages}
         basePath="/admin/projects"
         query={{ q: query }}
+        variant="admin"
       />
 
       <details className={styles.createDisclosure}>

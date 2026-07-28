@@ -1,6 +1,6 @@
 import { listMedia } from "@portfolio/db/server";
 import { MediaLibrary } from "@/components/admin/media-library";
-import { Pagination } from "@/components/admin/pagination";
+import { Pagination } from "@/components/pagination";
 import { SearchInput } from "@/components/admin/search-input";
 import { toMediaPickerValue } from "@/lib/admin/media";
 import styles from "./page.module.scss";
@@ -30,7 +30,13 @@ export default async function AdminMediaPage({
         <SearchInput basePath="/admin/media" initialQuery={query} placeholder="Search files…" />
       </div>
       <MediaLibrary initialMedia={items.map(toMediaPickerValue)} />
-      <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/admin/media" query={{ q: query }} />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        basePath="/admin/media"
+        query={{ q: query }}
+        variant="admin"
+      />
     </div>
   );
 }
