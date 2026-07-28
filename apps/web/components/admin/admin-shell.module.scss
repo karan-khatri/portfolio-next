@@ -225,41 +225,6 @@
   gap: 0.75rem;
 }
 
-.searchWrap {
-  position: relative;
-  display: none;
-  align-items: center;
-
-  @media (min-width: 48rem) {
-    display: flex;
-  }
-}
-
-.searchIcon {
-  position: absolute;
-  left: 0.5rem;
-  width: 1rem;
-  height: 1rem;
-  color: var(--muted-foreground);
-  pointer-events: none;
-}
-
-.searchInput {
-  width: 12rem;
-  height: 1.75rem;
-  padding-left: 1.75rem;
-  border-radius: var(--radius-md);
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--foreground);
-  font-size: 0.8125rem;
-  outline: none;
-
-  &::placeholder {
-    color: var(--outline);
-  }
-}
-
 .iconButton {
   position: relative;
   display: flex;
@@ -289,39 +254,6 @@
 .topbarIcon {
   width: 1.125rem;
   height: 1.125rem;
-}
-
-.iconDot {
-  position: absolute;
-  top: 0.3rem;
-  right: 0.3rem;
-  width: 0.375rem;
-  height: 0.375rem;
-  border-radius: 999px;
-  background: var(--primary);
-}
-
-.publishButton {
-  padding: 0.3125rem 0.75rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--primary);
-  background: transparent;
-  color: var(--primary);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease;
-
-  &:hover {
-    background: var(--primary);
-    color: var(--primary-foreground);
-  }
-
-  @media (max-width: 48rem) {
-    display: none;
-  }
 }
 
 .avatar {

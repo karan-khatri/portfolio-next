@@ -22,9 +22,6 @@ import {
   LuSettings,
   LuUsers,
   LuLogOut,
-  LuSearch,
-  LuBell,
-  LuCircleHelp,
 } from "react-icons/lu";
 import { initialsFromEmail } from "@/lib/admin/initials";
 import { useBodyThemeClass } from "@/lib/use-body-theme-class";
@@ -140,21 +137,7 @@ export function AdminShell({
         <header className={styles.topbar}>
           <span className={styles.topbarTitle}>{currentLabel}</span>
           <div className={styles.topbarActions}>
-            <div className={styles.searchWrap}>
-              <LuSearch className={styles.searchIcon} />
-              <input className={styles.searchInput} placeholder="Search…" type="text" readOnly />
-            </div>
             <ThemeToggle className={styles.iconButton} iconClassName={styles.topbarIcon} />
-            <button type="button" className={styles.iconButton} aria-label="Notifications">
-              <LuBell className={styles.topbarIcon} />
-              <span className={styles.iconDot} aria-hidden="true" />
-            </button>
-            <button type="button" className={styles.iconButton} aria-label="Help">
-              <LuCircleHelp className={styles.topbarIcon} />
-            </button>
-            <button type="button" className={styles.publishButton}>
-              Publish Changes
-            </button>
             <span className={styles.avatar} title={userEmail}>
               {initialsFromEmail(userEmail)}
             </span>
