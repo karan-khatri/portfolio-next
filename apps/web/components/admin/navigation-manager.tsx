@@ -26,6 +26,31 @@ export interface NavigationItemWithChildren extends NavigationItemRow {
   children: NavigationItemRow[];
 }
 
+function useNavigationRowActions(itemId: string, onChanged: () => void) {
+  const [pending, startTransition] = useTransition();
+
+  function handleUpdate(values: { label: string; href: string }) {
+    startTransition(async () => {
+      const result = await updateNavigationItemAction(itemId, values);
+      if (result.error) toast.error(result.error);
+      else {
+        toast.success("Saved");
+        onChanged();
+      }
+    });
+  }
+
+  function handleDelete() {
+    startTransition(async () => {
+      const result = await deleteNavigationItemAction(itemId);
+      if (result.error) toast.error(result.error);
+      else onChanged();
+    });
+  }
+
+  return { pending, handleUpdate, handleDelete };
+}
+
 function LinkForm({
   idPrefix,
   initial,
@@ -67,26 +92,7 @@ function LinkForm({
 
 function ChildRow({ item, onChanged }: { item: NavigationItemRow; onChanged: () => void }) {
   const controls = useDragControls();
-  const [pending, startTransition] = useTransition();
-
-  function handleUpdate(values: { label: string; href: string }) {
-    startTransition(async () => {
-      const result = await updateNavigationItemAction(item.id, values);
-      if (result.error) toast.error(result.error);
-      else {
-        toast.success("Saved");
-        onChanged();
-      }
-    });
-  }
-
-  function handleDelete() {
-    startTransition(async () => {
-      const result = await deleteNavigationItemAction(item.id);
-      if (result.error) toast.error(result.error);
-      else onChanged();
-    });
-  }
+  const { pending, handleUpdate, handleDelete } = useNavigationRowActions(item.id, onChanged);
 
   return (
     <Reorder.Item value={item} dragListener={false} dragControls={controls} className={styles.childWrapper}>
@@ -134,31 +140,12 @@ function NavigationItemCard({
   onChanged: () => void;
 }) {
   const controls = useDragControls();
-  const [pending, startTransition] = useTransition();
+  const { pending, handleUpdate, handleDelete } = useNavigationRowActions(item.id, onChanged);
   const [creatingChild, startCreatingChild] = useTransition();
   const [children, setChildren] = useState(item.children);
   const [createChildKey, setCreateChildKey] = useState(0);
 
   useEffect(() => setChildren(item.children), [item.children]);
-
-  function handleUpdate(values: { label: string; href: string }) {
-    startTransition(async () => {
-      const result = await updateNavigationItemAction(item.id, values);
-      if (result.error) toast.error(result.error);
-      else {
-        toast.success("Saved");
-        onChanged();
-      }
-    });
-  }
-
-  function handleDelete() {
-    startTransition(async () => {
-      const result = await deleteNavigationItemAction(item.id);
-      if (result.error) toast.error(result.error);
-      else onChanged();
-    });
-  }
 
   function handleCreateChild(values: { label: string; href: string }) {
     startCreatingChild(async () => {
