@@ -21,7 +21,7 @@ export function ExperienceSection({
 }: {
   id: string;
   content: ExperienceContent;
-  headingLevel: 2 | 3;
+  headingLevel: 1 | 2 | 3;
   items: ExperienceListItem[];
 }) {
   return (

@@ -51,7 +51,7 @@ export function SkillsSection({
 }: {
   id: string;
   content: SkillsContent;
-  headingLevel: 2 | 3;
+  headingLevel: 1 | 2 | 3;
   items: SkillListItem[];
   techStackItems: TechMarqueeItem[];
 }) {

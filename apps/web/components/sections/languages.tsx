@@ -16,7 +16,7 @@ export function LanguagesSection({
 }: {
   id: string;
   content: LanguagesContent;
-  headingLevel: 2 | 3;
+  headingLevel: 1 | 2 | 3;
   items: LanguageListItem[];
 }) {
   return (

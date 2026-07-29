@@ -7,7 +7,7 @@ export function SectionHeading({
   className,
   children,
 }: {
-  level: 2 | 3;
+  level: 1 | 2 | 3;
   id?: string;
   size?: "default" | "display";
   className?: string;
@@ -22,6 +22,13 @@ export function SectionHeading({
 
   const combined = cn(sizeClasses, className);
 
+  if (level === 1) {
+    return (
+      <h1 id={id} className={combined}>
+        {children}
+      </h1>
+    );
+  }
   if (level === 2) {
     return (
       <h2 id={id} className={combined}>

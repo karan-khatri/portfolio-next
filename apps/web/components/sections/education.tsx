@@ -22,7 +22,7 @@ export function EducationSection({
 }: {
   id: string;
   content: EducationContent;
-  headingLevel: 2 | 3;
+  headingLevel: 1 | 2 | 3;
   items: EducationListItem[];
 }) {
   return (

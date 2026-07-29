@@ -26,7 +26,7 @@ export function ContactSection({
 }: Readonly<{
   id: string;
   content: ContactContent;
-  headingLevel: 2 | 3;
+  headingLevel: 1 | 2 | 3;
   githubUrl?: string | null;
   linkedinUrl?: string | null;
   upworkUrl?: string | null;

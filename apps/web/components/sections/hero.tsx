@@ -21,7 +21,7 @@ export function HeroSection({
 }: Readonly<{
   id: string;
   content: HeroContent;
-  headingLevel: 2 | 3;
+  headingLevel: 1 | 2 | 3;
   image: SectionImage | null;
 }>) {
   return (

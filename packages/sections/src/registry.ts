@@ -38,7 +38,7 @@ export interface SectionDefinition<TContent = unknown> {
   schema: z.ZodType<TContent>;
   defaultContent: () => TContent;
   minHeight: string;
-  headingLevel: 2 | 3;
+  headingLevel: 1 | 2 | 3;
 }
 
 function definition<TContent>(
@@ -56,7 +56,11 @@ export const sectionRegistry = {
     schema: heroContentSchema,
     defaultContent: () => ({ heading: "Your name" }),
     minHeight: "60vh",
-    headingLevel: 2,
+    // Hero is the entry point of every page that uses it (home + any
+    // standalone page), so its heading is the page's single h1 — every
+    // other section type stays at h2/h3. Without this, no page had an h1
+    // at all except the "no page published" fallback.
+    headingLevel: 1,
   }),
   [SectionType.ABOUT]: definition<AboutContent>({
     type: SectionType.ABOUT,

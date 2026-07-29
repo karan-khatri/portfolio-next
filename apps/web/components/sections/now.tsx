@@ -28,7 +28,7 @@ export function NowSection({
 }: Readonly<{
   id: string;
   content: NowContent;
-  headingLevel: 2 | 3;
+  headingLevel: 1 | 2 | 3;
 }>) {
   return (
     <SectionShell

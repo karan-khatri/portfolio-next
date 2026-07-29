@@ -12,7 +12,7 @@ export function AboutSection({
 }: Readonly<{
   id: string;
   content: AboutContent;
-  headingLevel: 2 | 3;
+  headingLevel: 1 | 2 | 3;
   image: SectionImage | null;
 }>) {
   const stats = [

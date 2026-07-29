@@ -16,7 +16,7 @@ export function ServicesSection({
 }: {
   id: string;
   content: ServicesContent;
-  headingLevel: 2 | 3;
+  headingLevel: 1 | 2 | 3;
   items: ServiceListItem[];
 }) {
   return (

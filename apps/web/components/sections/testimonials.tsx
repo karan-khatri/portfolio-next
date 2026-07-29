@@ -17,7 +17,7 @@ export function TestimonialsSection({
 }: {
   id: string;
   content: TestimonialsContent;
-  headingLevel: 2 | 3;
+  headingLevel: 1 | 2 | 3;
   items: TestimonialListItem[];
 }) {
   return (

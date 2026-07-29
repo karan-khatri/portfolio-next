@@ -14,7 +14,7 @@ export function ProjectsSection({
 }: {
   id: string;
   content: ProjectsContent;
-  headingLevel: 2 | 3;
+  headingLevel: 1 | 2 | 3;
   items: ProjectListItem[];
 }) {
   const emptyMessage =

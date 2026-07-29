@@ -13,7 +13,7 @@ export function BlogSection({
 }: {
   id: string;
   content: BlogContent;
-  headingLevel: 2 | 3;
+  headingLevel: 1 | 2 | 3;
   items: PostListItem[];
 }) {
   return (

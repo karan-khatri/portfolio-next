@@ -23,7 +23,7 @@ export function SectionShell({
   eyebrow?: string;
   showEyebrow?: boolean;
   heading: string;
-  headingLevel: 2 | 3;
+  headingLevel: 1 | 2 | 3;
   headingAlign?: "left" | "center" | "right";
   subheading?: string;
   variant?: "default" | "hero";
