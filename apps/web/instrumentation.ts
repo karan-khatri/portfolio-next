@@ -3,7 +3,9 @@ export async function register() {
 
   const { ensureSeedData } = await import("@portfolio/db/server");
   try {
+    console.log("Ensuring seed data...");
     await ensureSeedData();
+    console.log("Seed data ensured");
   } catch (error) {
     console.error(error);
   }
