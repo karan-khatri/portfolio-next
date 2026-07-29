@@ -688,7 +688,12 @@ async function seedResumeContent(adminId: string, mediaIdByUrl: Map<string, stri
   await seedProjects(adminId, mediaIdByUrl);
 }
 
-export async function ensureSeedData(): Promise<void> {
+// Arbitrary constant — identifies this app's seed routine for Postgres's
+// session-level advisory lock, scoped to the whole DB (not a row/table), so
+// it also serializes callers across separate connections/processes.
+const SEED_LOCK_ID = 727384910;
+
+async function runSeed(): Promise<void> {
   const adminEmailRaw = process.env.SEED_ADMIN_EMAIL;
   const adminPassword = process.env.SEED_ADMIN_PASSWORD;
 
@@ -729,4 +734,23 @@ export async function ensureSeedData(): Promise<void> {
   await seedSiteSettings();
   await seedHomePage(admin.id, mediaIdByUrl);
   await seedResumeContent(admin.id, mediaIdByUrl);
+}
+
+export async function ensureSeedData(): Promise<void> {
+  // instrumentation.ts's register() runs this on every server process cold
+  // start — on a serverless host, a fresh deploy can spin up several
+  // instances concurrently, each racing through this same sequence of
+  // upserts/creates. Without serializing them, two instances can both see
+  // "not seeded yet" for the same step and collide (e.g. both creating the
+  // same Seo row), throwing partway through and silently aborting whatever
+  // that instance hadn't gotten to yet (observed: Projects never seeded).
+  // The lock makes every concurrent caller queue up and run one at a time;
+  // by the time a queued caller gets the lock, the work is already done and
+  // every step's own upsert/count-gate makes it a no-op.
+  await prisma.$executeRaw`SELECT pg_advisory_lock(${SEED_LOCK_ID})`;
+  try {
+    await runSeed();
+  } finally {
+    await prisma.$executeRaw`SELECT pg_advisory_unlock(${SEED_LOCK_ID})`;
+  }
 }
