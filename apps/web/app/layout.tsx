@@ -36,8 +36,10 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${settings.title}`,
     },
     description: settings.description,
+    authors: [{ name: settings.title }],
     openGraph: {
       type: "website",
+      url: siteUrl,
       siteName: settings.title,
       title: settings.title,
       description: settings.description,

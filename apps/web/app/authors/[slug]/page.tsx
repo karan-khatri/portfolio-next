@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { LuLink } from "react-icons/lu";
 import { prisma, Locale } from "@portfolio/db/server";
 import { PublicShell } from "@/components/public-shell";
+import { JsonLd } from "@/components/json-ld";
 import { getPublicNav } from "@/lib/public-nav";
+import { findRedirect, redirectOrNotFound } from "@/lib/redirect-or-404";
 import { PostCard } from "@/components/sections/post-card";
 import { EmptyState } from "@/components/sections/empty-state";
 
 const LOCALE: Locale = "en";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 async function getAuthor(slug: string) {
   return prisma.author.findFirst({ where: { slug } });
@@ -27,9 +29,26 @@ export async function generateMetadata({
   const author = await getAuthor(slug);
   if (!author) return {};
 
+  const description = author.bio ?? undefined;
+  const url = `${siteUrl}/authors/${author.slug}`;
+
   return {
     title: author.name,
-    description: author.bio ?? undefined,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "profile",
+      url,
+      title: author.name,
+      description,
+      images: author.imageUrl ? [{ url: author.imageUrl }] : undefined,
+    },
+    twitter: {
+      card: "summary",
+      title: author.name,
+      description,
+      images: author.imageUrl ? [author.imageUrl] : undefined,
+    },
   };
 }
 
@@ -40,7 +59,7 @@ export default async function AuthorDetailPage({
 }) {
   const { slug } = await params;
   const author = await getAuthor(slug);
-  if (!author) notFound();
+  if (!author) redirectOrNotFound(await findRedirect(`/authors/${slug}`));
 
   const [posts, { navItems, settings }] = await Promise.all([
     prisma.post.findMany({
@@ -67,6 +86,17 @@ export default async function AuthorDetailPage({
       githubUrl={settings.githubUrl}
       linkedinUrl={settings.linkedinUrl}
     >
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Person",
+          name: author.name,
+          description: author.bio ?? undefined,
+          image: author.imageUrl ?? undefined,
+          url: `${siteUrl}/authors/${author.slug}`,
+          ...(author.sameAs.length > 0 ? { sameAs: author.sameAs } : {}),
+        }}
+      />
       <div className="mx-auto w-full max-w-3xl px-6 py-20 sm:px-8 lg:px-12">
         <div className="flex items-center gap-5">
           {author.imageUrl ? (
@@ -76,7 +106,7 @@ export default async function AuthorDetailPage({
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={author.imageUrl}
-              alt=""
+              alt={author.name}
               className="glass-panel size-20 shrink-0 rounded-full object-cover"
             />
           ) : null}

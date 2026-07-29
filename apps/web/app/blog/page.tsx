@@ -8,11 +8,27 @@ import { Pagination } from "@/components/pagination";
 
 const LOCALE: Locale = "en";
 const PAGE_SIZE = 9;
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
-export const metadata: Metadata = {
-  title: "Writing",
-  description: "All published posts.",
-};
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}): Promise<Metadata> {
+  const { page } = await searchParams;
+  const currentPage = Math.max(1, Number(page) || 1);
+  const canonical = currentPage > 1 ? `${siteUrl}/blog?page=${currentPage}` : `${siteUrl}/blog`;
+  const title = "Writing";
+  const description = "All published posts.";
+
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: { url: canonical, title, description },
+    twitter: { card: "summary", title, description },
+  };
+}
 
 export default async function BlogIndexPage({
   searchParams,

@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { LuArrowLeft } from "react-icons/lu";
 import { prisma, Locale } from "@portfolio/db/server";
 import { PublicShell } from "@/components/public-shell";
+import { JsonLd } from "@/components/json-ld";
 import { getPublicNav } from "@/lib/public-nav";
+import { findRedirect, redirectOrNotFound } from "@/lib/redirect-or-404";
 import { formatDate } from "@/lib/format-date";
 import { ProseContent } from "@/components/prose-content";
 
 const LOCALE: Locale = "en";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 async function getPost(slug: string) {
   return prisma.post.findFirst({
@@ -43,13 +45,14 @@ export async function generateMetadata({
   const title = post.seo?.metaTitle ?? post.title;
   const description = post.seo?.metaDescription ?? post.excerpt ?? undefined;
   const image = post.seo?.ogImage?.url ?? post.coverImage?.url;
+  const url = post.seo?.canonicalUrl ?? `${siteUrl}/blog/${post.slug}`;
 
   return {
     title,
     description,
     alternates: post.seo?.canonicalUrl ? { canonical: post.seo.canonicalUrl } : undefined,
     robots: post.seo ? { index: !post.seo.noindex, follow: !post.seo.nofollow } : undefined,
-    openGraph: { type: "article", title, description, images: image ? [{ url: image }] : undefined },
+    openGraph: { type: "article", url, title, description, images: image ? [{ url: image }] : undefined },
     twitter: {
       card: "summary_large_image",
       title,
@@ -66,9 +69,10 @@ export default async function PostDetailPage({
 }) {
   const { slug } = await params;
   const post = await getPost(slug);
-  if (!post) notFound();
+  if (!post) redirectOrNotFound(await findRedirect(`/blog/${slug}`));
 
   const { navItems, settings } = await getPublicNav();
+  const postUrl = `${siteUrl}/blog/${post.slug}`;
 
   return (
     <PublicShell
@@ -78,6 +82,31 @@ export default async function PostDetailPage({
       githubUrl={settings.githubUrl}
       linkedinUrl={settings.linkedinUrl}
     >
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "BlogPosting",
+              headline: post.title,
+              description: post.excerpt ?? undefined,
+              url: postUrl,
+              image: post.coverImage?.url,
+              datePublished: (post.publishedAt ?? post.createdAt).toISOString(),
+              dateModified: post.updatedAt.toISOString(),
+              author: { "@type": "Person", name: post.author?.name ?? settings.title },
+            },
+            {
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+                { "@type": "ListItem", position: 2, name: "Writing", item: `${siteUrl}/blog` },
+                { "@type": "ListItem", position: 3, name: post.title, item: postUrl },
+              ],
+            },
+          ],
+        }}
+      />
       <article className="mx-auto w-full max-w-3xl px-6 py-20 sm:px-8 lg:px-12">
         <Link
           href="/"
@@ -106,9 +135,9 @@ export default async function PostDetailPage({
         <p className="mt-4 font-mono text-xs text-muted-foreground">
           {post.author ? (
             <>
-              <a href={`/authors/${post.author.slug}`} className="text-primary hover:underline">
+              <Link href={`/authors/${post.author.slug}`} className="text-primary hover:underline">
                 {post.author.name}
-              </a>{" "}
+              </Link>{" "}
               ·{" "}
             </>
           ) : null}

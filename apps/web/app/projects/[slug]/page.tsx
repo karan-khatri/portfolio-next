@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
 import { prisma, Locale } from "@portfolio/db/server";
 import { PublicShell } from "@/components/public-shell";
+import { JsonLd } from "@/components/json-ld";
 import { getPublicNav } from "@/lib/public-nav";
+import { findRedirect, redirectOrNotFound } from "@/lib/redirect-or-404";
 import { ProseContent } from "@/components/prose-content";
 
 const LOCALE: Locale = "en";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 async function getProject(slug: string) {
   return prisma.project.findFirst({
@@ -41,6 +43,7 @@ export async function generateMetadata({
   const title = project.seo?.metaTitle ?? project.title;
   const description = project.seo?.metaDescription ?? project.excerpt ?? undefined;
   const image = project.seo?.ogImage?.url ?? project.coverImage?.url;
+  const url = project.seo?.canonicalUrl ?? `${siteUrl}/projects/${project.slug}`;
 
   return {
     title,
@@ -49,7 +52,7 @@ export async function generateMetadata({
     robots: project.seo
       ? { index: !project.seo.noindex, follow: !project.seo.nofollow }
       : undefined,
-    openGraph: { type: "article", title, description, images: image ? [{ url: image }] : undefined },
+    openGraph: { type: "article", url, title, description, images: image ? [{ url: image }] : undefined },
     twitter: {
       card: "summary_large_image",
       title,
@@ -66,9 +69,10 @@ export default async function ProjectDetailPage({
 }) {
   const { slug } = await params;
   const project = await getProject(slug);
-  if (!project) notFound();
+  if (!project) redirectOrNotFound(await findRedirect(`/projects/${slug}`));
 
   const { navItems, settings } = await getPublicNav();
+  const projectUrl = `${siteUrl}/projects/${project.slug}`;
 
   return (
     <PublicShell
@@ -78,6 +82,31 @@ export default async function ProjectDetailPage({
       githubUrl={settings.githubUrl}
       linkedinUrl={settings.linkedinUrl}
     >
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Article",
+              headline: project.title,
+              description: project.excerpt ?? undefined,
+              url: projectUrl,
+              image: project.coverImage?.url,
+              datePublished: (project.publishedAt ?? project.createdAt).toISOString(),
+              dateModified: project.updatedAt.toISOString(),
+              author: { "@type": "Person", name: settings.title },
+            },
+            {
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+                { "@type": "ListItem", position: 2, name: "Projects", item: `${siteUrl}/projects` },
+                { "@type": "ListItem", position: 3, name: project.title, item: projectUrl },
+              ],
+            },
+          ],
+        }}
+      />
       <article className="mx-auto w-full max-w-3xl px-6 py-20 sm:px-8 lg:px-12">
         <Link
           href="/projects"

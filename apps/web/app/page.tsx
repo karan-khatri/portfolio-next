@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import { prisma, Locale } from "@portfolio/db/server";
+import { prisma, Locale, getSiteSettings } from "@portfolio/db/server";
 import { SectionRenderer } from "@/components/sections/section-renderer";
 import { PublicShell } from "@/components/public-shell";
+import { JsonLd } from "@/components/json-ld";
 import { getPublicNav } from "@/lib/public-nav";
 
 const LOCALE: Locale = "en";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 async function getHomePage() {
   return prisma.page.findFirst({
@@ -14,11 +16,11 @@ async function getHomePage() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const page = await getHomePage();
+  const [page, settings] = await Promise.all([getHomePage(), getSiteSettings()]);
   if (!page) return {};
 
   const title = page.seo?.metaTitle ?? page.title;
-  const description = page.seo?.metaDescription ?? undefined;
+  const description = page.seo?.metaDescription ?? settings.description;
   const image = page.seo?.ogImage?.url;
 
   return {
@@ -28,7 +30,7 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: page.seo
       ? { index: !page.seo.noindex, follow: !page.seo.nofollow }
       : undefined,
-    openGraph: { title, description, images: image ? [{ url: image }] : undefined },
+    openGraph: { url: siteUrl, title, description, images: image ? [{ url: image }] : undefined },
     twitter: {
       card: "summary_large_image",
       title,
@@ -54,6 +56,10 @@ export default async function HomePage() {
 
   const { navItems, settings } = await getPublicNav();
 
+  const sameAs = [settings.githubUrl, settings.linkedinUrl, settings.upworkUrl, settings.fiverrUrl, settings.instagramUrl].filter(
+    (url): url is string => Boolean(url),
+  );
+
   return (
     <PublicShell
       title={settings.title}
@@ -62,6 +68,26 @@ export default async function HomePage() {
       githubUrl={settings.githubUrl}
       linkedinUrl={settings.linkedinUrl}
     >
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "WebSite",
+              name: settings.title,
+              url: siteUrl,
+              description: settings.description,
+            },
+            {
+              "@type": "Person",
+              name: settings.title,
+              url: siteUrl,
+              description: settings.description,
+              ...(sameAs.length > 0 ? { sameAs } : {}),
+            },
+          ],
+        }}
+      />
       <SectionRenderer sections={page.sections} locale={LOCALE} />
     </PublicShell>
   );
