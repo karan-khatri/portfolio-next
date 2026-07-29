@@ -139,7 +139,7 @@ const SEED_MEDIA: CreateMediaInput[] = [
     height: 800,
     blurDataUrl:
       "data:image/webp;base64,UklGRoAAAABXRUJQVlA4IHQAAADwAQCdASoQABAAA4BaJbACdACpfbg1F/gA/rIgrgfVX0QqLvbD/jbE1K1mKQOuQjdfpxXo6SLGmOtYFiy2l+j6O2oaLdj3ck1Zj5o9U313cKOfv4rtW7gamGL2Z7hjphv41ksGZez3tnO7O0EL/xuk9oAAAA==",
-    altText: null,
+    altText: "Portrait of Karan Kumar",
     filename: "profile.jpg",
     mimeType: "image/jpeg",
     sizeBytes: 146612,
@@ -215,7 +215,8 @@ const SEED_TECH_STACK: Array<{ name: string; imageUrl: string | null; order: num
 
 const SEED_SITE_SETTINGS: SiteSettingsValues = {
   title: "Karan Kumar",
-  description: "portfolio Webiste",
+  description:
+    "Portfolio of Karan Kumar, a Full Stack Software Engineer building production systems and retrieval-augmented generation pipelines.",
   githubUrl: "https://github.com/karan-khatri",
   linkedinUrl: "https://linkedin.com/in/karan-kumar-khatri",
   upworkUrl: null,
@@ -255,7 +256,7 @@ const SEED_PROJECTS: SeedProject[] = [
     seo: {
       metaTitle: "National Gas Industries Website — Corporate Site for Gas Manufacturer",
       metaDescription:
-        "Case study: a bilingual corporate website built for National Gas Industries, a Jordan-based gas manufacturer, featuring a product catalog and lead-gen contact form.",
+        "A bilingual corporate website for National Gas Industries, a Jordan-based gas manufacturer, with a product catalog and lead-gen contact form.",
       canonicalUrl: "https://kumarkaran.com/projects/national-gas-industries",
     },
   },
@@ -274,7 +275,7 @@ const SEED_PROJECTS: SeedProject[] = [
     seo: {
       metaTitle: "Real-Time Chat Backend — Go Microservices Case Study",
       metaDescription:
-        "Six independent Go microservices — auth, user, chat, notification, presence, and API gateway. Redis Streams WebSocket fan-out, JWT token rotation with race-condition safety, three-layer blocking cache, and a raw-TCP WebSocket tunnel.",
+        "A real-time chat backend built as six Go microservices, with Redis Streams WebSocket fan-out, JWT rotation, and a raw-TCP WebSocket tunnel at the gateway.",
       canonicalUrl: "/projects/gochat",
     },
   },
