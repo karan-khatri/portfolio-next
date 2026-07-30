@@ -19,14 +19,14 @@ export function MobileNav({
     <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
       <DialogPrimitive.Trigger
         aria-label="Open menu"
-        className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-primary md:hidden"
+        className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-primary lg:hidden"
       >
         <LuMenu className="size-5" />
       </DialogPrimitive.Trigger>
 
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Backdrop className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 md:hidden" />
-        <DialogPrimitive.Popup className="top-0 fixed inset-y-0 right-0 z-50 flex w-full max-w-xs flex-col gap-8 border-l border-border bg-background p-6 outline-none data-open:animate-in data-open:slide-in-from-right data-closed:animate-out data-closed:slide-out-to-right md:hidden">
+        <DialogPrimitive.Backdrop className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 lg:hidden" />
+        <DialogPrimitive.Popup className="top-0 fixed inset-y-0 right-0 z-50 flex w-full max-w-xs flex-col gap-8 border-l border-border bg-background p-6 outline-none data-open:animate-in data-open:slide-in-from-right data-closed:animate-out data-closed:slide-out-to-right lg:hidden">
           <div className="flex items-center justify-between">
             <span className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
               Menu

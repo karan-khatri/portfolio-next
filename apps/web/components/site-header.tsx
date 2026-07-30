@@ -21,7 +21,7 @@ export function SiteHeader({
         >
           {title}
         </Link>
-        <nav className="hidden gap-8 md:flex">
+        <nav className="hidden gap-8 lg:flex">
           {navItems.map((item) =>
             item.children && item.children.length > 0 ? (
               <div key={item.id} className="group relative">
@@ -58,7 +58,7 @@ export function SiteHeader({
         </nav>
         <div className="flex items-center gap-3">
           <ThemeToggle
-            className="hidden size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-primary md:flex"
+            className="hidden size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-primary lg:flex"
             iconClassName="size-4"
           />
           {resumeUrl ? (
@@ -66,7 +66,7 @@ export function SiteHeader({
               href={resumeUrl}
               target="_blank"
               rel="noreferrer"
-              className="hidden rounded-md bg-primary px-4 py-2 font-heading text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_15px_var(--ring)] md:inline-flex"
+              className="hidden rounded-md bg-primary px-4 py-2 font-heading text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_15px_var(--ring)] lg:inline-flex"
             >
               Resume
             </a>

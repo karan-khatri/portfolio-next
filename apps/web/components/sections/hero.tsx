@@ -25,8 +25,8 @@ export function HeroSection({
   image: SectionImage | null;
 }>) {
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-7xl flex-col items-center gap-12 px-6 py-20 sm:px-8 lg:flex-row lg:px-12">
-      <div className="flex w-full flex-col gap-6 lg:w-1/2">
+    <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-7xl flex-col-reverse items-center gap-12 px-6 py-20 sm:px-8 lg:flex-row lg:px-12">
+      <div className="flex w-full flex-col items-center gap-6 text-center lg:w-1/2 lg:items-start lg:text-left">
         <span className="inline-flex items-center gap-2 font-mono text-sm text-primary">
           <span className="text-secondary opacity-70">~</span>
           {" "}
@@ -63,7 +63,7 @@ export function HeroSection({
 
       <div className="w-full lg:w-1/2">
         {image ? (
-          <div className="group relative mx-auto aspect-square w-full max-w-md">
+          <div className="group relative mx-auto aspect-square w-full max-w-xs sm:max-w-sm lg:max-w-md">
             <div className="absolute inset-0 rotate-3 rounded-2xl transition-transform duration-500 ease-out group-hover:rotate-0">
               <div className="absolute inset-0 rounded-2xl border-2 border-primary/30 bg-card/20 shadow-2xl" />
             </div>
@@ -73,7 +73,7 @@ export function HeroSection({
                 alt={image.altText ?? ""}
                 fill
                 priority
-                sizes="(min-width: 1024px) 28rem, 90vw"
+                sizes="(min-width: 1024px) 28rem, (min-width: 640px) 24rem, 20rem"
                 placeholder={image.blurDataUrl ? "blur" : undefined}
                 blurDataURL={image.blurDataUrl ?? undefined}
                 className="object-cover grayscale transition-all duration-500 ease-out group-hover:grayscale-0"

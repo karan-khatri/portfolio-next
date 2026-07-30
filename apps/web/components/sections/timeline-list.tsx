@@ -25,7 +25,7 @@ export function TimelineList({ items }: { items: TimelineItem[] }) {
                 <span className="font-mono text-xs text-muted-foreground">{item.meta}</span>
               </div>
               {item.description ? (
-                <ProseContent html={item.description} className="text-muted-foreground" />
+                <ProseContent html={item.description} className="text-base text-muted-foreground" />
               ) : null}
             </div>
           </li>

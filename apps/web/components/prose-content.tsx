@@ -1,4 +1,5 @@
 import sanitizeHtml from "sanitize-html";
+import { cn } from "@/lib/utils";
 
 const ALLOWED_TAGS = [
   "p",
@@ -82,7 +83,7 @@ export function ProseContent({ html, className }: { html: string; className?: st
 
   return (
     <div
-      className={[
+      className={cn(
         "text-lg leading-relaxed text-foreground/90",
         "[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2",
         "[&_blockquote]:border-l-2 [&_blockquote]:border-primary [&_blockquote]:pl-4 [&_blockquote]:text-muted-foreground",
@@ -106,9 +107,7 @@ export function ProseContent({ html, className }: { html: string; className?: st
         "[&_ul[data-type=taskList]]:list-none [&_ul[data-type=taskList]]:pl-1",
         "[&_ul[data-type=taskList]_li]:flex [&_ul[data-type=taskList]_li]:items-start [&_ul[data-type=taskList]_li]:gap-2",
         className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      )}
       dangerouslySetInnerHTML={{ __html: clean }}
     />
   );
