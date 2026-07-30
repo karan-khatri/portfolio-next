@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   saveDraftAction,
   publishAction,
@@ -75,14 +75,17 @@ export function PostEditor({
   const [coverImage, setCoverImage] = useState(initial.coverImage);
   const [authorId, setAuthorId] = useState(initial.authorId ?? NO_AUTHOR);
 
+  const loadedPostId = useRef(postId);
   useEffect(() => {
+    if (loadedPostId.current === postId) return;
+    loadedPostId.current = postId;
     setTitle(initial.title);
     setExcerpt(initial.excerpt);
     setBody(initial.body);
     setTags(initial.tags);
     setCoverImage(initial.coverImage);
     setAuthorId(initial.authorId ?? NO_AUTHOR);
-  }, [initial]);
+  }, [postId, initial]);
 
   function toInput(): PostFormInput {
     return {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
   saveDraftAction,
@@ -75,7 +75,10 @@ export function ProjectEditor({
   const [galleryImages, setGalleryImages] = useState(initial.galleryImages);
   const [togglingFeatured, startTogglingFeatured] = useTransition();
 
+  const loadedProjectId = useRef(projectId);
   useEffect(() => {
+    if (loadedProjectId.current === projectId) return;
+    loadedProjectId.current = projectId;
     setTitle(initial.title);
     setExcerpt(initial.excerpt);
     setBody(initial.body);
@@ -85,7 +88,7 @@ export function ProjectEditor({
     setLiveUrl(initial.liveUrl);
     setFeatured(initial.featured);
     setGalleryImages(initial.galleryImages);
-  }, [initial]);
+  }, [projectId, initial]);
 
   function toInput(): ProjectFormInput {
     return {
