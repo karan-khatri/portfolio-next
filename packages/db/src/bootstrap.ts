@@ -688,7 +688,7 @@ async function seedResumeContent(adminId: string, mediaIdByUrl: Map<string, stri
   await seedProjects(adminId, mediaIdByUrl);
 }
 
-export async function ensureSeedData(): Promise<void> {
+export async function ensureAdminAccount() {
   const adminEmailRaw = process.env.SEED_ADMIN_EMAIL;
   const adminPassword = process.env.SEED_ADMIN_PASSWORD;
 
@@ -723,6 +723,12 @@ export async function ensureSeedData(): Promise<void> {
       data: { userId: admin.id, roleId: adminRole.id, expiresAt: null },
     });
   }
+
+  return admin;
+}
+
+export async function ensureSeedData(): Promise<void> {
+  const admin = await ensureAdminAccount();
 
   const mediaIdByUrl = await seedMedia();
   await seedTechStack();

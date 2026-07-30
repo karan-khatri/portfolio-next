@@ -21,6 +21,7 @@ import {
   LuArrowRightLeft,
   LuSettings,
   LuUsers,
+  LuFileJson,
   LuLogOut,
 } from "react-icons/lu";
 import { initialsFromEmail } from "@/lib/admin/initials";
@@ -60,6 +61,7 @@ const NAV_GROUPS = [
       { href: "/admin/redirects", label: "Redirects", icon: LuArrowRightLeft },
       { href: "/admin/settings", label: "Settings", icon: LuSettings },
       { href: "/admin/users", label: "Users", icon: LuUsers },
+      { href: "/admin/seed", label: "Import / Seed", icon: LuFileJson },
     ],
   },
 ];

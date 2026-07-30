@@ -10,3 +10,4 @@ export * from "./media";
 export * from "./site-settings";
 export * from "./revisions";
 export * from "./bootstrap";
+export * from "./seed-from-json";

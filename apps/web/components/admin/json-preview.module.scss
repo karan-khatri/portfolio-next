@@ -1,0 +1,92 @@
+@use "../../styles/admin/mixins" as mix;
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+
+  &[data-variant="error"] {
+    border: 1px solid color-mix(in oklch, var(--destructive) 40%, transparent);
+    background: color-mix(in oklch, var(--destructive) 10%, transparent);
+  }
+}
+
+.calloutIcon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+  color: var(--destructive);
+}
+
+.calloutTitle {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--foreground);
+  margin-bottom: 0.25rem;
+}
+
+.issueList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  font-size: 0.8125rem;
+  font-family: var(--font-mono);
+  color: var(--foreground);
+}
+
+.empty {
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+}
+
+.summaryList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--foreground);
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  @include mix.glass-panel;
+}
+
+.rawToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  align-self: flex-start;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    color: var(--foreground);
+  }
+}
+
+.rawJson {
+  max-height: 20rem;
+  overflow: auto;
+  padding: 0.75rem;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  white-space: pre-wrap;
+  word-break: break-word;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--muted);
+  color: var(--foreground);
+}
