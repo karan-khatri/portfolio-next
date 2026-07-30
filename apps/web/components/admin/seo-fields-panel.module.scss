@@ -27,6 +27,12 @@
   gap: 0.5rem;
 }
 
+.jsonTextarea {
+  min-height: 8rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+
 .saveButton {
   width: fit-content;
 }

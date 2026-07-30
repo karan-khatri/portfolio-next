@@ -1,8 +1,10 @@
+import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { prisma, getLatestRevision, listRevisions } from "@portfolio/db/server";
 import { flatRevisionDataSchema } from "@/lib/revision-data";
 import { ProjectEditor } from "@/components/admin/project-editor";
 import { toMediaPickerValue, type MediaPickerValue } from "@/lib/admin/media";
+import type { GalleryImageEntry } from "@/components/admin/project-gallery-picker";
 import type { RevisionHistoryItem } from "@/components/admin/revision-history-panel";
 
 export default async function ProjectEditorRoute({
@@ -14,7 +16,12 @@ export default async function ProjectEditorRoute({
 
   const project = await prisma.project.findUnique({
     where: { id },
-    include: { tags: true, seo: true, coverImage: true },
+    include: {
+      tags: true,
+      seo: { include: { ogImage: true } },
+      coverImage: true,
+      images: { include: { media: true }, orderBy: { order: "asc" } },
+    },
   });
   if (!project) notFound();
 
@@ -29,6 +36,10 @@ export default async function ProjectEditorRoute({
     : null;
   let codeRepository = project.codeRepository ?? "";
   let liveUrl = project.liveUrl ?? "";
+  let galleryImages: GalleryImageEntry[] = project.images.map((entry) => ({
+    galleryKey: randomUUID(),
+    media: toMediaPickerValue(entry.media),
+  }));
 
   if (latestDraft) {
     const data = flatRevisionDataSchema.parse(latestDraft.data);
@@ -46,6 +57,14 @@ export default async function ProjectEditorRoute({
         ? await prisma.media.findUnique({ where: { id: data.coverImageId } })
         : null;
       coverImage = media ? toMediaPickerValue(media) : null;
+    }
+    if (data.galleryImageIds) {
+      const draftMedia = await prisma.media.findMany({ where: { id: { in: data.galleryImageIds } } });
+      const byId = new Map(draftMedia.map((media) => [media.id, media]));
+      galleryImages = data.galleryImageIds
+        .map((mediaId) => byId.get(mediaId))
+        .filter((media): media is NonNullable<typeof media> => Boolean(media))
+        .map((media) => ({ galleryKey: randomUUID(), media: toMediaPickerValue(media) }));
     }
   }
 
@@ -72,11 +91,14 @@ export default async function ProjectEditorRoute({
         codeRepository,
         liveUrl,
         featured: project.featured,
+        galleryImages,
       }}
       seo={{
         metaTitle: project.seo?.metaTitle ?? null,
         metaDescription: project.seo?.metaDescription ?? null,
         canonicalUrl: project.seo?.canonicalUrl ?? null,
+        ogImage: project.seo?.ogImage ? toMediaPickerValue(project.seo.ogImage) : null,
+        structuredData: project.seo?.structuredData ?? null,
         noindex: project.seo?.noindex ?? false,
         nofollow: project.seo?.nofollow ?? false,
       }}

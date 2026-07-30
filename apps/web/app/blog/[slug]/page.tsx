@@ -83,29 +83,31 @@ export default async function PostDetailPage({
       linkedinUrl={settings.linkedinUrl}
     >
       <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@graph": [
-            {
-              "@type": "BlogPosting",
-              headline: post.title,
-              description: post.excerpt ?? undefined,
-              url: postUrl,
-              image: post.coverImage?.url,
-              datePublished: (post.publishedAt ?? post.createdAt).toISOString(),
-              dateModified: post.updatedAt.toISOString(),
-              author: { "@type": "Person", name: post.author?.name ?? settings.title },
-            },
-            {
-              "@type": "BreadcrumbList",
-              itemListElement: [
-                { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
-                { "@type": "ListItem", position: 2, name: "Writing", item: `${siteUrl}/blog` },
-                { "@type": "ListItem", position: 3, name: post.title, item: postUrl },
-              ],
-            },
-          ],
-        }}
+        data={
+          (post.seo?.structuredData as Record<string, unknown> | null) ?? {
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "BlogPosting",
+                headline: post.title,
+                description: post.excerpt ?? undefined,
+                url: postUrl,
+                image: post.seo?.ogImage?.url ?? post.coverImage?.url,
+                datePublished: (post.publishedAt ?? post.createdAt).toISOString(),
+                dateModified: post.updatedAt.toISOString(),
+                author: { "@type": "Person", name: post.author?.name ?? settings.title },
+              },
+              {
+                "@type": "BreadcrumbList",
+                itemListElement: [
+                  { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+                  { "@type": "ListItem", position: 2, name: "Writing", item: `${siteUrl}/blog` },
+                  { "@type": "ListItem", position: 3, name: post.title, item: postUrl },
+                ],
+              },
+            ],
+          }
+        }
       />
       <article className="mx-auto w-full max-w-3xl px-6 py-20 sm:px-8 lg:px-12">
         <Link

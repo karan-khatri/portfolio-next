@@ -4,7 +4,17 @@ import { saveDraft, publishRevision, type PageSectionInput } from "./cms";
 import { resolveTagIds } from "./tags";
 import { upsertSiteSettings, getSiteSettings, type SiteSettingsValues } from "./site-settings";
 import { upsertSeo, type SeoFields } from "./seo";
-import type { SectionType } from "./generated/client";
+import type { SectionType, Prisma } from "./generated/client";
+
+export interface SeedSeoFields {
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  canonicalUrl?: string | null;
+  ogImageUrl?: string | null;
+  structuredData?: Record<string, unknown> | null;
+  noindex?: boolean;
+  nofollow?: boolean;
+}
 
 export interface SeedMediaItem {
   url: string;
@@ -34,7 +44,8 @@ export interface SeedProjectInput {
   liveUrl: string | null;
   featured: boolean;
   featuredOrder: number | null;
-  seo: SeoFields | null;
+  seo: SeedSeoFields | null;
+  images: string[];
 }
 
 export interface SeedSectionInput {
@@ -148,6 +159,8 @@ function collectReferencedMediaUrls(payload: SeedPayload): string[] {
   const urls = new Set<string>();
   for (const project of payload.projects ?? []) {
     if (project.coverImageUrl) urls.add(project.coverImageUrl);
+    if (project.seo?.ogImageUrl) urls.add(project.seo.ogImageUrl);
+    for (const url of project.images) urls.add(url);
   }
   for (const section of payload.homePageSections ?? []) {
     const imageUrl = section.content.imageUrl;
@@ -198,6 +211,9 @@ async function applyProjects(
     const projectId = projectIds[i];
     const tagIds = await resolveTagIds(entry.tags);
     const coverImageId = entry.coverImageUrl ? (mediaIdByUrl.get(entry.coverImageUrl) ?? null) : null;
+    const galleryImageIds = entry.images
+      .map((url) => mediaIdByUrl.get(url))
+      .filter((id): id is string => Boolean(id));
 
     const revision = await saveDraft({
       entityType: "Project",
@@ -210,6 +226,7 @@ async function applyProjects(
         coverImageId,
         codeRepository: entry.codeRepository,
         liveUrl: entry.liveUrl,
+        galleryImageIds,
       },
       userId: adminId,
     });
@@ -226,7 +243,13 @@ async function applyProjects(
     });
 
     if (entry.seo) {
-      await upsertSeo({ entityType: "Project", entityId: projectId, fields: entry.seo });
+      const { ogImageUrl, structuredData, ...seoRest } = entry.seo;
+      const fields: SeoFields = {
+        ...seoRest,
+        ogImageId: ogImageUrl ? (mediaIdByUrl.get(ogImageUrl) ?? null) : null,
+        structuredData: structuredData as Prisma.InputJsonValue | null,
+      };
+      await upsertSeo({ entityType: "Project", entityId: projectId, fields });
     }
   }
 
@@ -368,7 +391,12 @@ export async function exportSeedPayload(): Promise<SeedPayload> {
       getSiteSettings(),
       prisma.project.findMany({
         where: { locale: "en" },
-        include: { tags: true, coverImage: true, seo: true },
+        include: {
+          tags: true,
+          coverImage: true,
+          seo: { include: { ogImage: true } },
+          images: { include: { media: true }, orderBy: { order: "asc" } },
+        },
         orderBy: { createdAt: "asc" },
       }),
       prisma.page.findUnique({
@@ -410,10 +438,13 @@ export async function exportSeedPayload(): Promise<SeedPayload> {
             metaTitle: project.seo.metaTitle,
             metaDescription: project.seo.metaDescription,
             canonicalUrl: project.seo.canonicalUrl,
+            ogImageUrl: project.seo.ogImage?.url ?? null,
+            structuredData: project.seo.structuredData as Record<string, unknown> | null,
             noindex: project.seo.noindex,
             nofollow: project.seo.nofollow,
           }
         : null,
+      images: project.images.map((entry) => entry.media.url),
     })),
     homePageSections:
       homePage?.sections.map((section) => ({

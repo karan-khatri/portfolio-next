@@ -27,6 +27,7 @@ export interface FlatRevisionData {
   codeRepository?: string | null;
   liveUrl?: string | null;
   authorId?: string | null;
+  galleryImageIds?: string[];
 }
 
 export type RevisionData = PageRevisionData | FlatRevisionData;
@@ -115,6 +116,15 @@ async function applyFlatRevision(
         liveUrl: data.liveUrl,
       },
     });
+
+    if (data.galleryImageIds !== undefined) {
+      await prisma.$transaction([
+        prisma.projectImage.deleteMany({ where: { projectId: entityId } }),
+        prisma.projectImage.createMany({
+          data: data.galleryImageIds.map((mediaId, order) => ({ projectId: entityId, mediaId, order })),
+        }),
+      ]);
+    }
   } else {
     await prisma.post.update({
       where: { id: entityId },

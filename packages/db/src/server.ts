@@ -1,4 +1,4 @@
-export { SectionType, Locale } from "./generated/client";
+export { SectionType, Locale, type Prisma } from "./generated/client";
 export * from "./client";
 export * from "./locale";
 export * from "./auth";

@@ -35,6 +35,8 @@ const seedSeoFieldsSchema = z.object({
   metaTitle: z.string().nullish(),
   metaDescription: z.string().nullish(),
   canonicalUrl: z.string().nullish(),
+  ogImageUrl: z.string().nullable().default(null),
+  structuredData: z.record(z.string(), z.unknown()).nullable().default(null),
   noindex: z.boolean().optional(),
   nofollow: z.boolean().optional(),
 });
@@ -51,6 +53,7 @@ const seedProjectSchema = z.object({
   featured: z.boolean().default(false),
   featuredOrder: z.number().int().nullable().default(null),
   seo: seedSeoFieldsSchema.nullable().default(null),
+  images: z.array(z.string()).default([]),
 });
 
 const seedSectionSchema = z

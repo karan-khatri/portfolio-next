@@ -17,6 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { TagInput } from "@/components/admin/tag-input";
 import { MediaPicker } from "@/components/admin/media-picker";
+import { ProjectGalleryPicker, type GalleryImageEntry } from "@/components/admin/project-gallery-picker";
 import { RichTextEditor } from "@/components/admin/rich-text-editor-dynamic";
 import { SeoFieldsPanel } from "@/components/admin/seo-fields-panel";
 import { ComposerActionBar } from "@/components/admin/composer-action-bar";
@@ -30,6 +31,8 @@ interface SeoInitial {
   metaTitle: string | null;
   metaDescription: string | null;
   canonicalUrl: string | null;
+  ogImage: MediaPickerValue | null;
+  structuredData: unknown;
   noindex: boolean;
   nofollow: boolean;
 }
@@ -43,6 +46,7 @@ interface ProjectEditorInitial {
   codeRepository: string;
   liveUrl: string;
   featured: boolean;
+  galleryImages: GalleryImageEntry[];
 }
 
 export function ProjectEditor({
@@ -68,6 +72,7 @@ export function ProjectEditor({
   const [codeRepository, setCodeRepository] = useState(initial.codeRepository);
   const [liveUrl, setLiveUrl] = useState(initial.liveUrl);
   const [featured, setFeatured] = useState(initial.featured);
+  const [galleryImages, setGalleryImages] = useState(initial.galleryImages);
   const [togglingFeatured, startTogglingFeatured] = useTransition();
 
   useEffect(() => {
@@ -79,6 +84,7 @@ export function ProjectEditor({
     setCodeRepository(initial.codeRepository);
     setLiveUrl(initial.liveUrl);
     setFeatured(initial.featured);
+    setGalleryImages(initial.galleryImages);
   }, [initial]);
 
   function toInput(): ProjectFormInput {
@@ -90,6 +96,7 @@ export function ProjectEditor({
       coverImageId: coverImage?.id ?? null,
       codeRepository,
       liveUrl,
+      galleryImageIds: galleryImages.map((entry) => entry.media.id),
     };
   }
 
@@ -143,6 +150,7 @@ export function ProjectEditor({
           </div>
           <TagInput label="Tags" value={tags} onChange={setTags} placeholder="Type a tag, press Enter" />
           <MediaPicker label="Cover image" value={coverImage} onChange={setCoverImage} />
+          <ProjectGalleryPicker label="Gallery images" value={galleryImages} onChange={setGalleryImages} />
           <div className={styles.featuredField}>
             <Switch
               id="project-featured"

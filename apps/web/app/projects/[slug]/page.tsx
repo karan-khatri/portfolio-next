@@ -5,6 +5,7 @@ import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
 import { prisma, Locale } from "@portfolio/db/server";
 import { PublicShell } from "@/components/public-shell";
 import { JsonLd } from "@/components/json-ld";
+import { ProjectGallery } from "@/components/project-gallery";
 import { getPublicNav } from "@/lib/public-nav";
 import { findRedirect, redirectOrNotFound } from "@/lib/redirect-or-404";
 import { ProseContent } from "@/components/prose-content";
@@ -19,6 +20,7 @@ async function getProject(slug: string) {
       coverImage: true,
       tags: { select: { name: true } },
       seo: { include: { ogImage: true } },
+      images: { include: { media: true }, orderBy: { order: "asc" } },
     },
   });
 }
@@ -83,29 +85,31 @@ export default async function ProjectDetailPage({
       linkedinUrl={settings.linkedinUrl}
     >
       <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@graph": [
-            {
-              "@type": "Article",
-              headline: project.title,
-              description: project.excerpt ?? undefined,
-              url: projectUrl,
-              image: project.coverImage?.url,
-              datePublished: (project.publishedAt ?? project.createdAt).toISOString(),
-              dateModified: project.updatedAt.toISOString(),
-              author: { "@type": "Person", name: settings.title },
-            },
-            {
-              "@type": "BreadcrumbList",
-              itemListElement: [
-                { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
-                { "@type": "ListItem", position: 2, name: "Projects", item: `${siteUrl}/projects` },
-                { "@type": "ListItem", position: 3, name: project.title, item: projectUrl },
-              ],
-            },
-          ],
-        }}
+        data={
+          (project.seo?.structuredData as Record<string, unknown> | null) ?? {
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "Article",
+                headline: project.title,
+                description: project.excerpt ?? undefined,
+                url: projectUrl,
+                image: project.seo?.ogImage?.url ?? project.coverImage?.url,
+                datePublished: (project.publishedAt ?? project.createdAt).toISOString(),
+                dateModified: project.updatedAt.toISOString(),
+                author: { "@type": "Person", name: settings.title },
+              },
+              {
+                "@type": "BreadcrumbList",
+                itemListElement: [
+                  { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+                  { "@type": "ListItem", position: 2, name: "Projects", item: `${siteUrl}/projects` },
+                  { "@type": "ListItem", position: 3, name: project.title, item: projectUrl },
+                ],
+              },
+            ],
+          }
+        }
       />
       <article className="mx-auto w-full max-w-3xl px-6 py-20 sm:px-8 lg:px-12">
         <Link
@@ -116,7 +120,19 @@ export default async function ProjectDetailPage({
           Back to Projects
         </Link>
 
-        {project.coverImage ? (
+        {project.images.length > 0 ? (
+          <div className="mt-8">
+            <ProjectGallery
+              images={project.images.map((entry) => ({
+                url: entry.media.url,
+                altText: entry.media.altText,
+                width: entry.media.width,
+                height: entry.media.height,
+                blurDataUrl: entry.media.blurDataUrl,
+              }))}
+            />
+          </div>
+        ) : project.coverImage ? (
           <div className="glass-panel relative mt-8 aspect-video w-full overflow-hidden rounded-xl">
             <Image
               src={project.coverImage.url}

@@ -9,7 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { MediaPicker } from "@/components/admin/media-picker";
 import { saveSeoAction } from "@/app/admin/(protected)/seo-actions";
+import type { MediaPickerValue } from "@/lib/admin/media";
+import type { Prisma } from "@portfolio/db/server";
 import styles from "./seo-fields-panel.module.scss";
 
 export function SeoFieldsPanel({
@@ -23,6 +26,8 @@ export function SeoFieldsPanel({
     metaTitle: string | null;
     metaDescription: string | null;
     canonicalUrl: string | null;
+    ogImage: MediaPickerValue | null;
+    structuredData: unknown;
     noindex: boolean;
     nofollow: boolean;
   };
@@ -30,16 +35,32 @@ export function SeoFieldsPanel({
   const [metaTitle, setMetaTitle] = useState(initial.metaTitle ?? "");
   const [metaDescription, setMetaDescription] = useState(initial.metaDescription ?? "");
   const [canonicalUrl, setCanonicalUrl] = useState(initial.canonicalUrl ?? "");
+  const [ogImage, setOgImage] = useState(initial.ogImage);
+  const [structuredData, setStructuredData] = useState(
+    initial.structuredData ? JSON.stringify(initial.structuredData, null, 2) : "",
+  );
   const [noindex, setNoindex] = useState(initial.noindex);
   const [nofollow, setNofollow] = useState(initial.nofollow);
   const [pending, startTransition] = useTransition();
 
   function handleSave() {
+    let parsedStructuredData: unknown = null;
+    if (structuredData.trim()) {
+      try {
+        parsedStructuredData = JSON.parse(structuredData);
+      } catch {
+        toast.error("Custom JSON-LD isn't valid JSON.");
+        return;
+      }
+    }
+
     startTransition(async () => {
       const result = await saveSeoAction(entityType, entityId, {
         metaTitle: metaTitle || null,
         metaDescription: metaDescription || null,
         canonicalUrl: canonicalUrl || null,
+        ogImageId: ogImage?.id ?? null,
+        structuredData: parsedStructuredData as Prisma.InputJsonValue | null,
         noindex,
         nofollow,
       });
@@ -72,6 +93,17 @@ export function SeoFieldsPanel({
             id="seo-canonical"
             value={canonicalUrl}
             onChange={(event) => setCanonicalUrl(event.target.value)}
+          />
+        </div>
+        <MediaPicker label="OG image (overrides the cover image for social previews)" value={ogImage} onChange={setOgImage} />
+        <div className={styles.field}>
+          <Label htmlFor="seo-structured-data">Custom JSON-LD (replaces the auto-generated schema)</Label>
+          <Textarea
+            id="seo-structured-data"
+            value={structuredData}
+            onChange={(event) => setStructuredData(event.target.value)}
+            className={styles.jsonTextarea}
+            placeholder='{ "@context": "https://schema.org", "@type": "SoftwareSourceCode", ... }'
           />
         </div>
         <div className={styles.switchRow}>

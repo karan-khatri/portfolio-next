@@ -14,7 +14,7 @@ export default async function PostEditorRoute({
 
   const post = await prisma.post.findUnique({
     where: { id },
-    include: { tags: true, seo: true, coverImage: true },
+    include: { tags: true, seo: { include: { ogImage: true } }, coverImage: true },
   });
   if (!post) notFound();
 
@@ -68,6 +68,8 @@ export default async function PostEditorRoute({
         metaTitle: post.seo?.metaTitle ?? null,
         metaDescription: post.seo?.metaDescription ?? null,
         canonicalUrl: post.seo?.canonicalUrl ?? null,
+        ogImage: post.seo?.ogImage ? toMediaPickerValue(post.seo.ogImage) : null,
+        structuredData: post.seo?.structuredData ?? null,
         noindex: post.seo?.noindex ?? false,
         nofollow: post.seo?.nofollow ?? false,
       }}

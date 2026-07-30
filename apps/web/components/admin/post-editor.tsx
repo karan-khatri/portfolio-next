@@ -36,6 +36,8 @@ interface SeoInitial {
   metaTitle: string | null;
   metaDescription: string | null;
   canonicalUrl: string | null;
+  ogImage: MediaPickerValue | null;
+  structuredData: unknown;
   noindex: boolean;
   nofollow: boolean;
 }

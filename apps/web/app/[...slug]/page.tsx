@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { prisma, Locale, getSiteSettings } from "@portfolio/db/server";
 import { SectionRenderer } from "@/components/sections/section-renderer";
 import { PublicShell } from "@/components/public-shell";
+import { JsonLd } from "@/components/json-ld";
 import { getPublicNav } from "@/lib/public-nav";
 import { findRedirect, redirectOrNotFound } from "@/lib/redirect-or-404";
 
@@ -76,6 +77,9 @@ export default async function CatchAllPage({
         githubUrl={settings.githubUrl}
         linkedinUrl={settings.linkedinUrl}
       >
+        {page.seo?.structuredData ? (
+          <JsonLd data={page.seo.structuredData as Record<string, unknown>} />
+        ) : null}
         <SectionRenderer sections={page.sections} locale={LOCALE} />
       </PublicShell>
     );

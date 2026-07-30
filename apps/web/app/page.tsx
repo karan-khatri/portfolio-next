@@ -69,24 +69,26 @@ export default async function HomePage() {
       linkedinUrl={settings.linkedinUrl}
     >
       <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@graph": [
-            {
-              "@type": "WebSite",
-              name: settings.title,
-              url: siteUrl,
-              description: settings.description,
-            },
-            {
-              "@type": "Person",
-              name: settings.title,
-              url: siteUrl,
-              description: settings.description,
-              ...(sameAs.length > 0 ? { sameAs } : {}),
-            },
-          ],
-        }}
+        data={
+          (page.seo?.structuredData as Record<string, unknown> | null) ?? {
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "WebSite",
+                name: settings.title,
+                url: siteUrl,
+                description: settings.description,
+              },
+              {
+                "@type": "Person",
+                name: settings.title,
+                url: siteUrl,
+                description: settings.description,
+                ...(sameAs.length > 0 ? { sameAs } : {}),
+              },
+            ],
+          }
+        }
       />
       <SectionRenderer sections={page.sections} locale={LOCALE} />
     </PublicShell>

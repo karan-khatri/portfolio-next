@@ -11,6 +11,7 @@ export const flatRevisionDataSchema: z.ZodType<FlatRevisionData> = z.object({
   codeRepository: z.string().nullish(),
   liveUrl: z.string().nullish(),
   authorId: z.string().nullish(),
+  galleryImageIds: z.array(z.string()).optional(),
 });
 
 export const pageRevisionDataSchema: z.ZodType<PageRevisionData> = z.object({
