@@ -6,7 +6,6 @@ import { upsertSiteSettings, type SiteSettingsValues } from "./site-settings";
 import { upsertSeo, type SeoFields } from "./seo";
 import type { CreateMediaInput } from "./media";
 import type { SectionType } from "./generated/client";
-import { withUniqueRetry } from "./upsert-retry";
 
 const RESUME_EXPERIENCE = [
   {
@@ -515,28 +514,23 @@ const HOME_PAGE_SECTIONS: SeedSection[] = [
 async function seedMedia(): Promise<Map<string, string>> {
   const idByUrl = new Map<string, string>();
   for (const item of SEED_MEDIA) {
-    const media = await withUniqueRetry(() =>
-      prisma.media.upsert({
-        where: { url: item.url },
-        update: {},
-        create: item,
-      }),
-    );
+    const media = await prisma.media.upsert({
+      where: { url: item.url },
+      update: {},
+      create: item,
+    });
     idByUrl.set(item.url, media.id);
   }
   return idByUrl;
 }
 
 async function seedTechStack(): Promise<void> {
-  console.log("Seeding tech stack items...");
   for (const item of SEED_TECH_STACK) {
-    await withUniqueRetry(() =>
-      prisma.techStackItem.upsert({
-        where: { name: item.name },
-        update: {},
-        create: item,
-      }),
-    );
+    await prisma.techStackItem.upsert({
+      where: { name: item.name },
+      update: {},
+      create: item,
+    });
   }
 }
 
@@ -548,19 +542,17 @@ async function seedSiteSettings(): Promise<void> {
 
 async function seedProjects(adminId: string, mediaIdByUrl: Map<string, string>): Promise<void> {
   for (const entry of SEED_PROJECTS) {
-    const project = await withUniqueRetry(() =>
-      prisma.project.upsert({
-        where: { slug_locale: { slug: entry.slug, locale: "en" } },
-        update: {},
-        create: {
-          slug: entry.slug,
-          locale: "en",
-          translationGroupId: entry.slug,
-          title: entry.title,
-          status: "DRAFT",
-        },
-      }),
-    );
+    const project = await prisma.project.upsert({
+      where: { slug_locale: { slug: entry.slug, locale: "en" } },
+      update: {},
+      create: {
+        slug: entry.slug,
+        locale: "en",
+        translationGroupId: entry.slug,
+        title: entry.title,
+        status: "DRAFT",
+      },
+    });
 
     if (project.status !== "PUBLISHED") {
       const tagIds = await resolveTagIds(entry.tags);
@@ -602,19 +594,17 @@ async function seedProjects(adminId: string, mediaIdByUrl: Map<string, string>):
 }
 
 async function seedHomePage(adminId: string, mediaIdByUrl: Map<string, string>): Promise<void> {
-  const homePage = await withUniqueRetry(() =>
-    prisma.page.upsert({
-      where: { slug_locale: { slug: "home", locale: "en" } },
-      update: {},
-      create: {
-        slug: "home",
-        locale: "en",
-        translationGroupId: "home",
-        title: HOME_PAGE_TITLE,
-        status: "DRAFT",
-      },
-    }),
-  );
+  const homePage = await prisma.page.upsert({
+    where: { slug_locale: { slug: "home", locale: "en" } },
+    update: {},
+    create: {
+      slug: "home",
+      locale: "en",
+      translationGroupId: "home",
+      title: HOME_PAGE_TITLE,
+      status: "DRAFT",
+    },
+  });
 
   if (homePage.status !== "PUBLISHED") {
     const sections: PageSectionInput[] = HOME_PAGE_SECTIONS.map((section) => {
@@ -709,25 +699,21 @@ export async function ensureSeedData(): Promise<void> {
   }
   const adminEmail = normalizeEmail(adminEmailRaw);
 
-  const adminRole = await withUniqueRetry(() =>
-    prisma.role.upsert({
-      where: { name: "ADMIN" },
-      update: {},
-      create: { name: "ADMIN", isPermanent: true },
-    }),
-  );
+  const adminRole = await prisma.role.upsert({
+    where: { name: "ADMIN" },
+    update: {},
+    create: { name: "ADMIN", isPermanent: true },
+  });
 
-  const admin = await withUniqueRetry(() =>
-    prisma.user.upsert({
-      where: { email: adminEmail },
-      update: {},
-      create: {
-        email: adminEmail,
-        name: "Admin",
-        passwordHash: hashPassword(adminPassword),
-      },
-    }),
-  );
+  const admin = await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {},
+    create: {
+      email: adminEmail,
+      name: "Admin",
+      passwordHash: hashPassword(adminPassword),
+    },
+  });
 
   const hasAdminRole = await prisma.userRoleAssignment.findFirst({
     where: { userId: admin.id, roleId: adminRole.id },

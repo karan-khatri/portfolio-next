@@ -1,5 +1,4 @@
 import { prisma } from "./client";
-import { withUniqueRetry } from "./upsert-retry";
 
 export interface SiteSettingsValues {
   title: string;
@@ -81,15 +80,13 @@ export async function upsertSiteSettings(values: SiteSettingsValues): Promise<vo
     [LOCATION_KEY, values.location ?? ""],
   ];
 
-  await withUniqueRetry(() =>
-    prisma.$transaction(
-      entries.map(([key, value]) =>
-        prisma.siteSetting.upsert({
-          where: { key },
-          update: { value },
-          create: { key, value },
-        }),
-      ),
+  await prisma.$transaction(
+    entries.map(([key, value]) =>
+      prisma.siteSetting.upsert({
+        where: { key },
+        update: { value },
+        create: { key, value },
+      }),
     ),
   );
 }
