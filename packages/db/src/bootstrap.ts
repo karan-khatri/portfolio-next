@@ -528,6 +528,7 @@ async function seedMedia(): Promise<Map<string, string>> {
 }
 
 async function seedTechStack(): Promise<void> {
+  console.log("Seeding tech stack items...");
   for (const item of SEED_TECH_STACK) {
     await withUniqueRetry(() =>
       prisma.techStackItem.upsert({
