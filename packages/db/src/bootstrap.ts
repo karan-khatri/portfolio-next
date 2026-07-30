@@ -6,6 +6,7 @@ import { upsertSiteSettings, type SiteSettingsValues } from "./site-settings";
 import { upsertSeo, type SeoFields } from "./seo";
 import type { CreateMediaInput } from "./media";
 import type { SectionType } from "./generated/client";
+import { withUniqueRetry } from "./upsert-retry";
 
 const RESUME_EXPERIENCE = [
   {
@@ -514,11 +515,13 @@ const HOME_PAGE_SECTIONS: SeedSection[] = [
 async function seedMedia(): Promise<Map<string, string>> {
   const idByUrl = new Map<string, string>();
   for (const item of SEED_MEDIA) {
-    const media = await prisma.media.upsert({
-      where: { url: item.url },
-      update: {},
-      create: item,
-    });
+    const media = await withUniqueRetry(() =>
+      prisma.media.upsert({
+        where: { url: item.url },
+        update: {},
+        create: item,
+      }),
+    );
     idByUrl.set(item.url, media.id);
   }
   return idByUrl;
@@ -526,11 +529,13 @@ async function seedMedia(): Promise<Map<string, string>> {
 
 async function seedTechStack(): Promise<void> {
   for (const item of SEED_TECH_STACK) {
-    await prisma.techStackItem.upsert({
-      where: { name: item.name },
-      update: {},
-      create: item,
-    });
+    await withUniqueRetry(() =>
+      prisma.techStackItem.upsert({
+        where: { name: item.name },
+        update: {},
+        create: item,
+      }),
+    );
   }
 }
 
@@ -542,17 +547,19 @@ async function seedSiteSettings(): Promise<void> {
 
 async function seedProjects(adminId: string, mediaIdByUrl: Map<string, string>): Promise<void> {
   for (const entry of SEED_PROJECTS) {
-    const project = await prisma.project.upsert({
-      where: { slug_locale: { slug: entry.slug, locale: "en" } },
-      update: {},
-      create: {
-        slug: entry.slug,
-        locale: "en",
-        translationGroupId: entry.slug,
-        title: entry.title,
-        status: "DRAFT",
-      },
-    });
+    const project = await withUniqueRetry(() =>
+      prisma.project.upsert({
+        where: { slug_locale: { slug: entry.slug, locale: "en" } },
+        update: {},
+        create: {
+          slug: entry.slug,
+          locale: "en",
+          translationGroupId: entry.slug,
+          title: entry.title,
+          status: "DRAFT",
+        },
+      }),
+    );
 
     if (project.status !== "PUBLISHED") {
       const tagIds = await resolveTagIds(entry.tags);
@@ -594,17 +601,19 @@ async function seedProjects(adminId: string, mediaIdByUrl: Map<string, string>):
 }
 
 async function seedHomePage(adminId: string, mediaIdByUrl: Map<string, string>): Promise<void> {
-  const homePage = await prisma.page.upsert({
-    where: { slug_locale: { slug: "home", locale: "en" } },
-    update: {},
-    create: {
-      slug: "home",
-      locale: "en",
-      translationGroupId: "home",
-      title: HOME_PAGE_TITLE,
-      status: "DRAFT",
-    },
-  });
+  const homePage = await withUniqueRetry(() =>
+    prisma.page.upsert({
+      where: { slug_locale: { slug: "home", locale: "en" } },
+      update: {},
+      create: {
+        slug: "home",
+        locale: "en",
+        translationGroupId: "home",
+        title: HOME_PAGE_TITLE,
+        status: "DRAFT",
+      },
+    }),
+  );
 
   if (homePage.status !== "PUBLISHED") {
     const sections: PageSectionInput[] = HOME_PAGE_SECTIONS.map((section) => {
@@ -688,12 +697,7 @@ async function seedResumeContent(adminId: string, mediaIdByUrl: Map<string, stri
   await seedProjects(adminId, mediaIdByUrl);
 }
 
-// Arbitrary constant — identifies this app's seed routine for Postgres's
-// session-level advisory lock, scoped to the whole DB (not a row/table), so
-// it also serializes callers across separate connections/processes.
-const SEED_LOCK_ID = 727384910;
-
-async function runSeed(): Promise<void> {
+export async function ensureSeedData(): Promise<void> {
   const adminEmailRaw = process.env.SEED_ADMIN_EMAIL;
   const adminPassword = process.env.SEED_ADMIN_PASSWORD;
 
@@ -704,21 +708,25 @@ async function runSeed(): Promise<void> {
   }
   const adminEmail = normalizeEmail(adminEmailRaw);
 
-  const adminRole = await prisma.role.upsert({
-    where: { name: "ADMIN" },
-    update: {},
-    create: { name: "ADMIN", isPermanent: true },
-  });
+  const adminRole = await withUniqueRetry(() =>
+    prisma.role.upsert({
+      where: { name: "ADMIN" },
+      update: {},
+      create: { name: "ADMIN", isPermanent: true },
+    }),
+  );
 
-  const admin = await prisma.user.upsert({
-    where: { email: adminEmail },
-    update: {},
-    create: {
-      email: adminEmail,
-      name: "Admin",
-      passwordHash: hashPassword(adminPassword),
-    },
-  });
+  const admin = await withUniqueRetry(() =>
+    prisma.user.upsert({
+      where: { email: adminEmail },
+      update: {},
+      create: {
+        email: adminEmail,
+        name: "Admin",
+        passwordHash: hashPassword(adminPassword),
+      },
+    }),
+  );
 
   const hasAdminRole = await prisma.userRoleAssignment.findFirst({
     where: { userId: admin.id, roleId: adminRole.id },
@@ -734,23 +742,4 @@ async function runSeed(): Promise<void> {
   await seedSiteSettings();
   await seedHomePage(admin.id, mediaIdByUrl);
   await seedResumeContent(admin.id, mediaIdByUrl);
-}
-
-export async function ensureSeedData(): Promise<void> {
-  // instrumentation.ts's register() runs this on every server process cold
-  // start — on a serverless host, a fresh deploy can spin up several
-  // instances concurrently, each racing through this same sequence of
-  // upserts/creates. Without serializing them, two instances can both see
-  // "not seeded yet" for the same step and collide (e.g. both creating the
-  // same Seo row), throwing partway through and silently aborting whatever
-  // that instance hadn't gotten to yet (observed: Projects never seeded).
-  // The lock makes every concurrent caller queue up and run one at a time;
-  // by the time a queued caller gets the lock, the work is already done and
-  // every step's own upsert/count-gate makes it a no-op.
-  await prisma.$executeRaw`SELECT pg_advisory_lock(${SEED_LOCK_ID})`;
-  try {
-    await runSeed();
-  } finally {
-    await prisma.$executeRaw`SELECT pg_advisory_unlock(${SEED_LOCK_ID})`;
-  }
 }

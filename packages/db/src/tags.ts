@@ -1,4 +1,5 @@
 import { prisma } from "./client";
+import { withUniqueRetry } from "./upsert-retry";
 
 function slugify(name: string): string {
   return name
@@ -13,11 +14,13 @@ export async function resolveTagIds(names: string[]): Promise<string[]> {
 
   const tags = await Promise.all(
     unique.map((name) =>
-      prisma.tag.upsert({
-        where: { slug: slugify(name) },
-        update: {},
-        create: { slug: slugify(name), name },
-      }),
+      withUniqueRetry(() =>
+        prisma.tag.upsert({
+          where: { slug: slugify(name) },
+          update: {},
+          create: { slug: slugify(name), name },
+        }),
+      ),
     ),
   );
 
