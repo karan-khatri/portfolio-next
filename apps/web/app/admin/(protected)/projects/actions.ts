@@ -53,11 +53,17 @@ export async function reorderFeaturedProjectsAction(
 ): Promise<{ error?: string }> {
   try {
     await requireEditor();
-    await prisma.$transaction(
-      orderedIds.map((id, index) =>
+    // featuredOrder is unique, so swapping two rows' positions directly can
+    // collide mid-transaction (row A takes the value row B still holds).
+    // Move everything to negative placeholders first, then to final values.
+    await prisma.$transaction([
+      ...orderedIds.map((id, index) =>
+        prisma.project.update({ where: { id, featured: true }, data: { featuredOrder: -(index + 1) } }),
+      ),
+      ...orderedIds.map((id, index) =>
         prisma.project.update({ where: { id, featured: true }, data: { featuredOrder: index } }),
       ),
-    );
+    ]);
     revalidatePath("/");
     revalidatePath("/admin/projects");
     return {};
