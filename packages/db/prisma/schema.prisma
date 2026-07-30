@@ -229,10 +229,12 @@ model ContactMessage {
   name      String
   email     String
   message   String
+  ipAddress String?
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 
   @@index([email, createdAt])
+  @@index([ipAddress, createdAt])
 }
 
 model Media {

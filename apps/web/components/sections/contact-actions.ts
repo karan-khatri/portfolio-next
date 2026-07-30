@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { prisma } from "@portfolio/db/server";
 import { sendEmail, escapeHtml } from "@/lib/email";
 
@@ -11,11 +12,26 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const RATE_LIMIT_MAX_SUBMISSIONS = 3;
 
+async function getClientIp(): Promise<string | null> {
+  const headerList = await headers();
+  const forwardedFor = headerList.get("x-forwarded-for");
+  if (forwardedFor) return forwardedFor.split(",")[0].trim();
+  return headerList.get("x-real-ip");
+}
+
 export async function submitContactMessageAction(values: {
   name: string;
   email: string;
   message: string;
+  company?: string;
 }): Promise<ContactFormResult> {
+  // Honeypot: a field real users never see or fill in. Bots that
+  // auto-fill every input on the form will trip it. Report success
+  // without actually saving anything, so the bot doesn't learn it failed.
+  if (values.company) {
+    return {};
+  }
+
   const name = values.name.trim();
   const email = values.email.trim();
   const message = values.message.trim();
@@ -30,15 +46,18 @@ export async function submitContactMessageAction(values: {
     return { error: "Message is too long." };
   }
 
+  const ipAddress = await getClientIp();
   const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MS);
   const recentCount = await prisma.contactMessage.count({
-    where: { email, createdAt: { gte: windowStart } },
+    where: ipAddress
+      ? { ipAddress, createdAt: { gte: windowStart } }
+      : { email, createdAt: { gte: windowStart } },
   });
   if (recentCount >= RATE_LIMIT_MAX_SUBMISSIONS) {
     return { error: "You've sent a few messages already — please wait a bit before sending more." };
   }
 
-  await prisma.contactMessage.create({ data: { name, email, message } });
+  await prisma.contactMessage.create({ data: { name, email, message, ipAddress } });
 
   const notifyEmail = process.env.SEED_ADMIN_EMAIL;
   if (notifyEmail) {

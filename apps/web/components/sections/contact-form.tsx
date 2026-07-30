@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { submitContactMessageAction } from "./contact-actions";
 
-const INITIAL_VALUES = { name: "", email: "", message: "" };
+const INITIAL_VALUES = { name: "", email: "", message: "", company: "" };
 
 export function ContactForm() {
   const [values, setValues] = useState(INITIAL_VALUES);
@@ -33,6 +33,19 @@ export function ContactForm() {
       onSubmit={handleSubmit}
       className="glass-panel w-full rounded-2xl border border-border/60 bg-card/30 p-6 text-left shadow-2xl shadow-black/20 sm:p-8 lg:p-9"
     >
+      <div className="absolute left-[-9999px] top-auto" aria-hidden="true">
+        <label htmlFor="contact-hp">Leave this field blank</label>
+        <input
+          id="contact-hp"
+          name="contact_extra_field"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          value={values.company}
+          onChange={(event) => setValues((prev) => ({ ...prev, company: event.target.value }))}
+        />
+      </div>
+
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
           <h3 className="font-heading text-xl font-semibold sm:text-2xl">Send a message</h3>
