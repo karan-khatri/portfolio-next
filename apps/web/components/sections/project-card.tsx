@@ -33,7 +33,7 @@ export function ProjectCard({ project }: { project: ProjectCardItem }) {
           {project.coverImage ? (
             <Image
               src={project.coverImage.url}
-              alt={project.coverImage.altText ?? ""}
+              alt={project.coverImage.altText || project.title}
               fill
               sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
               placeholder={project.coverImage.blurDataUrl ? "blur" : undefined}

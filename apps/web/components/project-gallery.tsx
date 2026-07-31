@@ -13,7 +13,13 @@ export interface ProjectGalleryImage {
   blurDataUrl: string | null;
 }
 
-export function ProjectGallery({ images }: { images: ProjectGalleryImage[] }) {
+export function ProjectGallery({
+  images,
+  fallbackAlt,
+}: {
+  images: ProjectGalleryImage[];
+  fallbackAlt: string;
+}) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
@@ -43,7 +49,7 @@ export function ProjectGallery({ images }: { images: ProjectGalleryImage[] }) {
             <div key={image.url} className="relative aspect-video min-w-0 flex-[0_0_100%]">
               <Image
                 src={image.url}
-                alt={image.altText ?? ""}
+                alt={image.altText || `${fallbackAlt} — image ${index + 1}`}
                 fill
                 sizes="(min-width: 640px) 48rem, 100vw"
                 placeholder={image.blurDataUrl ? "blur" : undefined}

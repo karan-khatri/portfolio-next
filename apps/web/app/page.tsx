@@ -22,15 +22,16 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = page.seo?.metaTitle ?? page.title;
   const description = page.seo?.metaDescription ?? settings.description;
   const image = page.seo?.ogImage?.url;
+  const url = page.seo?.canonicalUrl ?? siteUrl;
 
   return {
     title,
     description,
-    alternates: page.seo?.canonicalUrl ? { canonical: page.seo.canonicalUrl } : undefined,
+    alternates: { canonical: url },
     robots: page.seo
       ? { index: !page.seo.noindex, follow: !page.seo.nofollow }
       : undefined,
-    openGraph: { url: siteUrl, title, description, images: image ? [{ url: image }] : undefined },
+    openGraph: { url, title, description, images: image ? [{ url: image }] : undefined },
     twitter: {
       card: "summary_large_image",
       title,

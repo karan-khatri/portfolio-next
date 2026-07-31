@@ -45,7 +45,7 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: page.seo?.canonicalUrl ? { canonical: page.seo.canonicalUrl } : undefined,
+    alternates: { canonical: url },
     robots: page.seo
       ? { index: !page.seo.noindex, follow: !page.seo.nofollow }
       : undefined,

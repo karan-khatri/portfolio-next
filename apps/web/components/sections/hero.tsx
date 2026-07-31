@@ -101,7 +101,7 @@ export function HeroSection({
             <div className="absolute inset-0 -rotate-3 overflow-hidden rounded-2xl shadow-2xl transition-transform duration-500 ease-out group-hover:rotate-0">
               <Image
                 src={image.url}
-                alt={image.altText ?? ""}
+                alt={image.altText || content.heading}
                 fill
                 priority
                 sizes="(min-width: 1024px) 28rem, (min-width: 640px) 24rem, 20rem"

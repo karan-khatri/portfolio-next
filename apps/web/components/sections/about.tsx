@@ -57,7 +57,7 @@ export function AboutSection({
           <div className="glass-panel relative h-full min-h-96 w-full overflow-hidden rounded-2xl lg:max-w-xl">
             <Image
               src={image.url}
-              alt={image.altText ?? ""}
+              alt={image.altText || content.heading}
               fill
               sizes="(min-width: 1024px) 36rem, 100vw"
               placeholder={image.blurDataUrl ? "blur" : undefined}

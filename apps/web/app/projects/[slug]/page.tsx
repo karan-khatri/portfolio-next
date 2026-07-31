@@ -50,7 +50,7 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: project.seo?.canonicalUrl ? { canonical: project.seo.canonicalUrl } : undefined,
+    alternates: { canonical: url },
     robots: project.seo
       ? { index: !project.seo.noindex, follow: !project.seo.nofollow }
       : undefined,
@@ -130,13 +130,14 @@ export default async function ProjectDetailPage({
                 height: entry.media.height,
                 blurDataUrl: entry.media.blurDataUrl,
               }))}
+              fallbackAlt={project.title}
             />
           </div>
         ) : project.coverImage ? (
           <div className="glass-panel relative mt-8 aspect-video w-full overflow-hidden rounded-xl">
             <Image
               src={project.coverImage.url}
-              alt={project.coverImage.altText ?? ""}
+              alt={project.coverImage.altText || project.title}
               fill
               sizes="(min-width: 640px) 48rem, 100vw"
               placeholder={project.coverImage.blurDataUrl ? "blur" : undefined}

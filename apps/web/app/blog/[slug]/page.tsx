@@ -50,7 +50,7 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: post.seo?.canonicalUrl ? { canonical: post.seo.canonicalUrl } : undefined,
+    alternates: { canonical: url },
     robots: post.seo ? { index: !post.seo.noindex, follow: !post.seo.nofollow } : undefined,
     openGraph: { type: "article", url, title, description, images: image ? [{ url: image }] : undefined },
     twitter: {
@@ -122,7 +122,7 @@ export default async function PostDetailPage({
           <div className="glass-panel relative mt-8 aspect-video w-full overflow-hidden rounded-xl">
             <Image
               src={post.coverImage.url}
-              alt={post.coverImage.altText ?? ""}
+              alt={post.coverImage.altText || post.title}
               fill
               sizes="(min-width: 640px) 48rem, 100vw"
               placeholder={post.coverImage.blurDataUrl ? "blur" : undefined}

@@ -21,7 +21,7 @@ export function PostCard({ post }: { post: PostCardItem }) {
           <div className="relative mb-4 aspect-4/3 w-full overflow-hidden rounded-lg">
             <Image
               src={post.coverImage.url}
-              alt={post.coverImage.altText ?? ""}
+              alt={post.coverImage.altText || post.title}
               fill
               sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
               placeholder={post.coverImage.blurDataUrl ? "blur" : undefined}
