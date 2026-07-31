@@ -61,8 +61,16 @@ async function renderSection(section: RenderableSection, locale: Locale) {
       const content = def.schema.parse(section.content);
       const headingId = slugifyHeading(content.heading, `section-${section.id}`);
       const image = await resolveSectionImage(content.imageId);
+      const settings = await getSiteSettings();
       return (
-        <HeroSection id={headingId} content={content} headingLevel={def.headingLevel} image={image} />
+        <HeroSection
+          id={headingId}
+          content={content}
+          headingLevel={def.headingLevel}
+          image={image}
+          githubUrl={settings.githubUrl}
+          linkedinUrl={settings.linkedinUrl}
+        />
       );
     }
     case SectionType.ABOUT: {

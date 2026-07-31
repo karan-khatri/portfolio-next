@@ -1,9 +1,15 @@
 import Image from "next/image";
 import type { HeroContent } from "@portfolio/sections";
 import { LuArrowRight } from "react-icons/lu";
+import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SectionHeading } from "./heading";
+
+const HERO_SOCIAL_LINKS = [
+  { key: "github", Icon: FaGithub, label: "GitHub" },
+  { key: "linkedin", Icon: FaLinkedin, label: "LinkedIn" },
+] as const;
 
 export interface SectionImage {
   url: string;
@@ -18,12 +24,21 @@ export function HeroSection({
   content,
   headingLevel,
   image,
+  githubUrl,
+  linkedinUrl,
 }: Readonly<{
   id: string;
   content: HeroContent;
   headingLevel: 1 | 2 | 3;
   image: SectionImage | null;
+  githubUrl?: string | null;
+  linkedinUrl?: string | null;
 }>) {
+  const urlsByKey: Record<(typeof HERO_SOCIAL_LINKS)[number]["key"], string | null | undefined> = {
+    github: githubUrl,
+    linkedin: linkedinUrl,
+  };
+  const socialLinks = HERO_SOCIAL_LINKS.filter((social) => urlsByKey[social.key]);
   return (
     <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-7xl flex-col-reverse items-center gap-12 px-6 py-20 sm:px-8 lg:flex-row lg:px-12">
       <div className="flex w-full flex-col items-center gap-6 text-center lg:w-1/2 lg:items-start lg:text-left">
@@ -41,17 +56,33 @@ export function HeroSection({
             {content.subheading}
           </p>
         ) : null}
-        {content.ctaLabel && content.ctaHref ? (
-          <a
-            href={content.ctaHref}
-            className={cn(
-              buttonVariants({ variant: "default", size: "lg" }),
-              "mt-2 w-fit font-heading text-sm font-semibold",
-            )}
-          >
-            {content.ctaLabel}
-            <LuArrowRight />
-          </a>
+        {(content.ctaLabel && content.ctaHref) || socialLinks.length > 0 ? (
+          <div className="mt-2 flex w-fit items-center gap-3">
+            {content.ctaLabel && content.ctaHref ? (
+              <a
+                href={content.ctaHref}
+                className={cn(
+                  buttonVariants({ variant: "default", size: "lg" }),
+                  "font-heading text-sm font-semibold",
+                )}
+              >
+                {content.ctaLabel}
+                <LuArrowRight />
+              </a>
+            ) : null}
+            {socialLinks.map((social) => (
+              <a
+                key={social.key}
+                href={urlsByKey[social.key] ?? undefined}
+                target="_blank"
+                rel="noreferrer"
+                className="flex size-11 items-center justify-center rounded-full border border-border bg-card text-foreground transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary"
+                aria-label={social.label}
+              >
+                <social.Icon className="size-5" />
+              </a>
+            ))}
+          </div>
         ) : null}
         <div className="mt-2 flex items-center gap-3">
           <span className="size-2 rounded-full bg-primary animate-pulse" />
