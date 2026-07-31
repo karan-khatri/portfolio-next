@@ -50,6 +50,12 @@ export async function generateMetadata(): Promise<Metadata> {
       title: settings.title,
       description: settings.description,
     },
+    verification: {
+      google: process.env.GOOGLE_SITE_VERIFICATION,
+      other: process.env.BING_SITE_VERIFICATION
+        ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION }
+        : undefined,
+    },
   };
 }
 
