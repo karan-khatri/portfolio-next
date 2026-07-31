@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LuPlus } from "react-icons/lu";
 import type { SectionType } from "@portfolio/db";
 import { sectionRegistry } from "@portfolio/sections";
@@ -27,12 +27,23 @@ import {
 import { ComposerActionBar } from "@/components/admin/composer-action-bar";
 import { EditorShell, PreviewLinkBox } from "@/components/admin/editor-shell";
 import { RevisionHistoryPanel, type RevisionHistoryItem } from "@/components/admin/revision-history-panel";
+import { SeoFieldsPanel } from "@/components/admin/seo-fields-panel";
 import { useEntityEditor } from "@/lib/admin/use-entity-editor";
 import styles from "./page-composer.module.scss";
 
 export type { ComposerSection };
 
 const ALL_SECTION_TYPES = Object.keys(sectionRegistry) as SectionType[];
+
+interface SeoInitial {
+  metaTitle: string | null;
+  metaDescription: string | null;
+  canonicalUrl: string | null;
+  ogImage: MediaPickerValue | null;
+  structuredData: unknown;
+  noindex: boolean;
+  nofollow: boolean;
+}
 
 export function PageComposer({
   pageId,
@@ -42,6 +53,7 @@ export function PageComposer({
   initialResolvedMedia,
   hasDraft,
   revisions,
+  seo,
 }: {
   pageId: string;
   pageStatus: string;
@@ -50,17 +62,24 @@ export function PageComposer({
   initialResolvedMedia: Record<string, MediaPickerValue>;
   hasDraft: boolean;
   revisions: RevisionHistoryItem[];
+  seo: SeoInitial;
 }) {
   const [title, setTitle] = useState(initialTitle);
   const [sections, setSections] = useState(initialSections);
   const [resolvedMedia, setResolvedMedia] = useState(initialResolvedMedia);
   const [newSectionType, setNewSectionType] = useState<SectionType>(ALL_SECTION_TYPES[0]);
 
+  // Only resync from server props when navigating to a different page — not
+  // on every background refresh of this same route (e.g. a media upload's
+  // server action), which would otherwise clobber in-progress local edits.
+  const loadedPageId = useRef(pageId);
   useEffect(() => {
+    if (loadedPageId.current === pageId) return;
+    loadedPageId.current = pageId;
     setTitle(initialTitle);
     setSections(initialSections);
     setResolvedMedia(initialResolvedMedia);
-  }, [initialTitle, initialSections, initialResolvedMedia]);
+  }, [pageId, initialTitle, initialSections, initialResolvedMedia]);
 
   function toInput() {
     return sections.map((section, index) => ({
@@ -164,6 +183,8 @@ export function PageComposer({
           Add section
         </Button>
       </div>
+
+      <SeoFieldsPanel entityType="Page" entityId={pageId} initial={seo} />
 
       {previewUrl ? <PreviewLinkBox previewUrl={previewUrl} onCopy={copyPreviewLink} /> : null}
 

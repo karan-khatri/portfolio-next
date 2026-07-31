@@ -14,7 +14,7 @@ export default async function PageComposerRoute({
 
   const page = await prisma.page.findUnique({
     where: { id },
-    include: { sections: { orderBy: { order: "asc" } } },
+    include: { sections: { orderBy: { order: "asc" } }, seo: { include: { ogImage: true } } },
   });
   if (!page) notFound();
 
@@ -71,6 +71,15 @@ export default async function PageComposerRoute({
       initialResolvedMedia={initialResolvedMedia}
       hasDraft={Boolean(latestDraft)}
       revisions={revisions}
+      seo={{
+        metaTitle: page.seo?.metaTitle ?? null,
+        metaDescription: page.seo?.metaDescription ?? null,
+        canonicalUrl: page.seo?.canonicalUrl ?? null,
+        ogImage: page.seo?.ogImage ? toMediaPickerValue(page.seo.ogImage) : null,
+        structuredData: page.seo?.structuredData ?? null,
+        noindex: page.seo?.noindex ?? false,
+        nofollow: page.seo?.nofollow ?? false,
+      }}
     />
   );
 }
