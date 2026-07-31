@@ -74,7 +74,7 @@ export function MobileNav({
             />
             {resumeUrl ? (
               <a
-                href={resumeUrl}
+                href="/resume.pdf"
                 target="_blank"
                 rel="noreferrer"
                 onClick={() => setOpen(false)}

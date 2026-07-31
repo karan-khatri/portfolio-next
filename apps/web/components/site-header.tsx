@@ -64,8 +64,8 @@ export function SiteHeader({
             />
             {resumeUrl ? (
               <a
-              href={resumeUrl}
-              target="_blank"
+                href="/resume.pdf"
+                target="_blank"
                 rel="noreferrer"
                 className="hidden rounded-md bg-primary px-4 py-2 font-heading text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_15px_var(--ring)] lg:inline-flex"
               >
