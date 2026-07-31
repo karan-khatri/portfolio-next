@@ -29,6 +29,9 @@ const seedSiteSettingsSchema = z.object({
   instagramUrl: z.string().nullable(),
   resumeUrl: z.string().nullable(),
   location: z.string().nullable(),
+  contactAutoReplyEnabled: z.boolean().default(false),
+  contactAutoReplySubject: z.string().default("Thanks for reaching out"),
+  contactAutoReplyBody: z.string().default(""),
 });
 
 const seedSeoFieldsSchema = z.object({

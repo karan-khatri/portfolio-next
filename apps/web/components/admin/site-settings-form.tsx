@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { MediaUrlField } from "@/components/admin/media-url-field";
 import { saveSiteSettingsAction } from "@/app/admin/(protected)/settings/actions";
 import type { SiteSettingsValues } from "@/lib/admin/view-models";
@@ -24,6 +25,9 @@ interface FormValues {
   instagramUrl: string;
   resumeUrl: string;
   location: string;
+  contactAutoReplyEnabled: boolean;
+  contactAutoReplySubject: string;
+  contactAutoReplyBody: string;
 }
 
 function toFormValues(initial: SiteSettingsValues): FormValues {
@@ -37,6 +41,9 @@ function toFormValues(initial: SiteSettingsValues): FormValues {
     instagramUrl: initial.instagramUrl ?? "",
     resumeUrl: initial.resumeUrl ?? "",
     location: initial.location ?? "",
+    contactAutoReplyEnabled: initial.contactAutoReplyEnabled,
+    contactAutoReplySubject: initial.contactAutoReplySubject,
+    contactAutoReplyBody: initial.contactAutoReplyBody,
   };
 }
 
@@ -65,6 +72,9 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
         instagramUrl: values.instagramUrl || null,
         resumeUrl: values.resumeUrl || null,
         location: values.location || null,
+        contactAutoReplyEnabled: values.contactAutoReplyEnabled,
+        contactAutoReplySubject: values.contactAutoReplySubject,
+        contactAutoReplyBody: values.contactAutoReplyBody,
       });
       if (result.error) toast.error(result.error);
       else toast.success("Settings saved");
@@ -183,6 +193,42 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
             placeholder="Link to a hosted PDF, or browse Media"
             icon={<LuFileText />}
           />
+        </div>
+      </section>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Contact Form Auto-Reply</h2>
+        <div className={styles.field}>
+          <div className={styles.switchRow}>
+            <Switch
+              id="site-autoreply-enabled"
+              checked={values.contactAutoReplyEnabled}
+              onCheckedChange={(checked) => setField("contactAutoReplyEnabled", checked)}
+            />
+            <Label htmlFor="site-autoreply-enabled">
+              Send an automatic reply to whoever submits the contact form
+            </Label>
+          </div>
+        </div>
+        <div className={styles.field}>
+          <Label htmlFor="site-autoreply-subject">Subject</Label>
+          <Input
+            id="site-autoreply-subject"
+            value={values.contactAutoReplySubject}
+            onChange={(event) => setField("contactAutoReplySubject", event.target.value)}
+          />
+        </div>
+        <div className={styles.field}>
+          <Label htmlFor="site-autoreply-body">Body</Label>
+          <Textarea
+            id="site-autoreply-body"
+            rows={6}
+            value={values.contactAutoReplyBody}
+            onChange={(event) => setField("contactAutoReplyBody", event.target.value)}
+          />
+          <p className={styles.hint}>
+            Use <code>{"{{name}}"}</code> anywhere in the subject or body to insert the sender&rsquo;s name.
+          </p>
         </div>
       </section>
 

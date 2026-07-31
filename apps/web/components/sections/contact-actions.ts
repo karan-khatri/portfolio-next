@@ -1,7 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
-import { prisma } from "@portfolio/db/server";
+import { prisma, getSiteSettings } from "@portfolio/db/server";
 import { sendEmail, escapeHtml } from "@/lib/email";
 
 export interface ContactFormResult {
@@ -59,6 +59,8 @@ export async function submitContactMessageAction(values: {
 
   await prisma.contactMessage.create({ data: { name, email, message, ipAddress } });
 
+  const settings = await getSiteSettings();
+
   const notifyEmail = process.env.SEED_ADMIN_EMAIL;
   if (notifyEmail) {
     await sendEmail({
@@ -70,6 +72,16 @@ export async function submitContactMessageAction(values: {
         <p>${escapeHtml(message).replaceAll("\n", "<br>")}</p>
         <p><a href="${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/admin/messages">View in admin</a></p>
       `,
+    });
+  }
+
+  if (settings.contactAutoReplyEnabled && settings.contactAutoReplySubject && settings.contactAutoReplyBody) {
+    const subject = settings.contactAutoReplySubject.replaceAll("{{name}}", name);
+    const body = settings.contactAutoReplyBody.replaceAll("{{name}}", name);
+    await sendEmail({
+      to: email,
+      subject,
+      html: `<p>${escapeHtml(body).replaceAll("\n", "<br>")}</p>`,
     });
   }
 

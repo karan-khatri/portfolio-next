@@ -10,7 +10,14 @@ export interface SiteSettingsValues {
   instagramUrl: string | null;
   resumeUrl: string | null;
   location: string | null;
+  contactAutoReplyEnabled: boolean;
+  contactAutoReplySubject: string;
+  contactAutoReplyBody: string;
 }
+
+const DEFAULT_AUTO_REPLY_SUBJECT = "Thanks for reaching out";
+const DEFAULT_AUTO_REPLY_BODY =
+  "Hi {{name}},\n\nThanks for getting in touch — I've received your message and will get back to you soon.\n\nBest,\nKaran";
 
 const DEFAULTS: SiteSettingsValues = {
   title: "Portfolio",
@@ -22,6 +29,9 @@ const DEFAULTS: SiteSettingsValues = {
   instagramUrl: null,
   resumeUrl: null,
   location: null,
+  contactAutoReplyEnabled: false,
+  contactAutoReplySubject: DEFAULT_AUTO_REPLY_SUBJECT,
+  contactAutoReplyBody: DEFAULT_AUTO_REPLY_BODY,
 };
 
 const TITLE_KEY = "site.title";
@@ -33,6 +43,9 @@ const FIVERR_KEY = "site.social.fiverr";
 const INSTAGRAM_KEY = "site.social.instagram";
 const RESUME_KEY = "site.resumeUrl";
 const LOCATION_KEY = "site.location";
+const AUTO_REPLY_ENABLED_KEY = "site.email.contactAutoReply.enabled";
+const AUTO_REPLY_SUBJECT_KEY = "site.email.contactAutoReply.subject";
+const AUTO_REPLY_BODY_KEY = "site.email.contactAutoReply.body";
 
 const ALL_KEYS = [
   TITLE_KEY,
@@ -44,6 +57,9 @@ const ALL_KEYS = [
   INSTAGRAM_KEY,
   RESUME_KEY,
   LOCATION_KEY,
+  AUTO_REPLY_ENABLED_KEY,
+  AUTO_REPLY_SUBJECT_KEY,
+  AUTO_REPLY_BODY_KEY,
 ];
 
 function readString(value: unknown): string | null {
@@ -64,6 +80,9 @@ export async function getSiteSettings(): Promise<SiteSettingsValues> {
     instagramUrl: readString(byKey[INSTAGRAM_KEY]),
     resumeUrl: readString(byKey[RESUME_KEY]),
     location: readString(byKey[LOCATION_KEY]),
+    contactAutoReplyEnabled: byKey[AUTO_REPLY_ENABLED_KEY] === "true",
+    contactAutoReplySubject: readString(byKey[AUTO_REPLY_SUBJECT_KEY]) ?? DEFAULTS.contactAutoReplySubject,
+    contactAutoReplyBody: readString(byKey[AUTO_REPLY_BODY_KEY]) ?? DEFAULTS.contactAutoReplyBody,
   };
 }
 
@@ -78,6 +97,9 @@ export async function upsertSiteSettings(values: SiteSettingsValues): Promise<vo
     [INSTAGRAM_KEY, values.instagramUrl ?? ""],
     [RESUME_KEY, values.resumeUrl ?? ""],
     [LOCATION_KEY, values.location ?? ""],
+    [AUTO_REPLY_ENABLED_KEY, values.contactAutoReplyEnabled ? "true" : "false"],
+    [AUTO_REPLY_SUBJECT_KEY, values.contactAutoReplySubject],
+    [AUTO_REPLY_BODY_KEY, values.contactAutoReplyBody],
   ];
 
   await prisma.$transaction(

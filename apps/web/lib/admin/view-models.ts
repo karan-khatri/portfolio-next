@@ -23,4 +23,7 @@ export interface SiteSettingsValues {
   instagramUrl: string | null;
   resumeUrl: string | null;
   location: string | null;
+  contactAutoReplyEnabled: boolean;
+  contactAutoReplySubject: string;
+  contactAutoReplyBody: string;
 }

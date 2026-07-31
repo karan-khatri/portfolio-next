@@ -224,6 +224,10 @@ const SEED_SITE_SETTINGS: SiteSettingsValues = {
   instagramUrl: null,
   resumeUrl: "https://2lthuylud3nefzql.public.blob.vercel-storage.com/25f6e0a8-4efa-42af-a3af-fe8b3592b6e4.pdf",
   location: "Florence (Firenze), Italy",
+  contactAutoReplyEnabled: false,
+  contactAutoReplySubject: "Thanks for reaching out",
+  contactAutoReplyBody:
+    "Hi {{name}},\n\nThanks for getting in touch — I've received your message and will get back to you soon.\n\nBest,\nKaran",
 };
 
 interface SeedProject {
