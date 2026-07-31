@@ -46,6 +46,7 @@ export interface SeedProjectInput {
   featuredOrder: number | null;
   seo: SeedSeoFields | null;
   images: string[];
+  publish: boolean;
 }
 
 export interface SeedSectionInput {
@@ -230,12 +231,14 @@ async function applyProjects(
       },
       userId: adminId,
     });
-    await publishRevision({
-      entityType: "Project",
-      entityId: projectId,
-      revisionId: revision.id,
-      userId: adminId,
-    });
+    if (entry.publish) {
+      await publishRevision({
+        entityType: "Project",
+        entityId: projectId,
+        revisionId: revision.id,
+        userId: adminId,
+      });
+    }
 
     await prisma.project.update({
       where: { id: projectId },
@@ -433,6 +436,7 @@ export async function exportSeedPayload(): Promise<SeedPayload> {
       liveUrl: project.liveUrl,
       featured: project.featured,
       featuredOrder: project.featuredOrder,
+      publish: project.status === "PUBLISHED",
       seo: project.seo
         ? {
             metaTitle: project.seo.metaTitle,

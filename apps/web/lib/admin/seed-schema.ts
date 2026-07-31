@@ -54,6 +54,7 @@ const seedProjectSchema = z.object({
   featuredOrder: z.number().int().nullable().default(null),
   seo: seedSeoFieldsSchema.nullable().default(null),
   images: z.array(z.string()).default([]),
+  publish: z.boolean().default(true),
 });
 
 const seedSectionSchema = z
