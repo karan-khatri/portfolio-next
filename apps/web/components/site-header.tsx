@@ -1,6 +1,7 @@
 import type { SectionNavItem } from "@/components/sections/section-renderer";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { MobileNav } from "@/components/mobile-nav";
+import { resolveNavHref } from "@/lib/nav-href";
 import Link from "next/link";
 
 export function SiteHeader({
@@ -27,7 +28,7 @@ export function SiteHeader({
               item.children && item.children.length > 0 ? (
                 <div key={item.id} className="group relative">
                   <a
-                    href={item.href}
+                    href={resolveNavHref(item.href)}
                     className="font-mono text-xs tracking-widest text-muted-foreground uppercase transition-colors hover:text-primary"
                   >
                     {item.label}
@@ -37,7 +38,7 @@ export function SiteHeader({
                       {item.children.map((child) => (
                         <a
                           key={child.id}
-                          href={child.href}
+                          href={resolveNavHref(child.href)}
                           className="rounded-md px-3 py-2 font-mono text-xs tracking-widest text-muted-foreground uppercase transition-colors hover:bg-foreground/5 hover:text-primary"
                         >
                           {child.label}
@@ -49,7 +50,7 @@ export function SiteHeader({
               ) : (
                 <a
                   key={item.id}
-                  href={item.href}
+                  href={resolveNavHref(item.href)}
                   className="font-mono text-xs tracking-widest text-muted-foreground uppercase transition-colors hover:text-primary"
                 >
                   {item.label}

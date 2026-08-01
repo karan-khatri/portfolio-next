@@ -5,6 +5,7 @@ import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { LuMenu, LuX } from "react-icons/lu";
 import type { SectionNavItem } from "@/components/sections/section-renderer";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { resolveNavHref } from "@/lib/nav-href";
 
 export function MobileNav({
   navItems,
@@ -43,7 +44,7 @@ export function MobileNav({
             {navItems.map((item) => (
               <div key={item.id} className="flex flex-col">
                 <a
-                  href={item.href}
+                  href={resolveNavHref(item.href)}
                   onClick={() => setOpen(false)}
                   className="rounded-md px-3 py-3 font-mono text-sm tracking-widest text-foreground uppercase transition-colors hover:bg-foreground/5 hover:text-primary"
                 >
@@ -54,7 +55,7 @@ export function MobileNav({
                     {item.children.map((child) => (
                       <a
                         key={child.id}
-                        href={child.href}
+                        href={resolveNavHref(child.href)}
                         onClick={() => setOpen(false)}
                         className="rounded-md px-3 py-2 font-mono text-xs tracking-widest text-muted-foreground uppercase transition-colors hover:bg-foreground/5 hover:text-primary"
                       >
