@@ -28,10 +28,12 @@ const nextConfig: NextConfig = {
     // Real protection still comes from every other directive here, plus the
     // existing sanitize-html allowlist on any user-authored rich text content
     // (no <script>/event-handler attributes are ever permitted through it).
-    // Hotjar's tracking now ships from Contentsquare's domain post-merger —
-    // the script itself needs script-src, and the session-recording/heatmap
-    // data it captures gets POSTed back out, needing connect-src too.
-    const contentsquareHosts = "https://*.contentsquare.net";
+    // Hotjar's tracking now ships from Contentsquare's domains post-merger —
+    // the script itself needs script-src, and the session-recording/heatmap/
+    // install-verification data it sends back out needs connect-src too.
+    // They split traffic across both .net (script host) and .com (API/verify
+    // endpoints like tcvsapi.contentsquare.com) — both are needed.
+    const contentsquareHosts = "https://*.contentsquare.net https://*.contentsquare.com";
 
     const scriptSrc =
       process.env.NODE_ENV === "production"
