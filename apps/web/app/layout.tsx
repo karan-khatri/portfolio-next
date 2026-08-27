@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
@@ -85,6 +86,9 @@ export default function RootLayout({
           <Toaster />
         </ThemeProvider>
         <Analytics />
+        {process.env.NODE_ENV === "production" ? (
+          <Script async src="https://t.contentsquare.net/uxa/caec894f69b60.js" strategy="afterInteractive" />
+        ) : null}
       </body>
     </html>
   );

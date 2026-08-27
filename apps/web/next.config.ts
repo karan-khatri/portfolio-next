@@ -28,9 +28,14 @@ const nextConfig: NextConfig = {
     // Real protection still comes from every other directive here, plus the
     // existing sanitize-html allowlist on any user-authored rich text content
     // (no <script>/event-handler attributes are ever permitted through it).
+    // Hotjar's tracking now ships from Contentsquare's domain post-merger —
+    // the script itself needs script-src, and the session-recording/heatmap
+    // data it captures gets POSTed back out, needing connect-src too.
+    const contentsquareHosts = "https://*.contentsquare.net";
+
     const scriptSrc =
       process.env.NODE_ENV === "production"
-        ? "'self' 'unsafe-inline' https://va.vercel-scripts.com"
+        ? `'self' 'unsafe-inline' https://va.vercel-scripts.com ${contentsquareHosts}`
         : "'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com";
 
     // Vercel Analytics/Speed Insights beacon endpoint — same-origin-proxied
@@ -38,13 +43,21 @@ const nextConfig: NextConfig = {
     // posts here directly.
     const vercelAnalyticsHosts = "https://va.vercel-scripts.com https://vitals.vercel-insights.com";
 
+    const connectSrc = [
+      "'self'",
+      vercelAnalyticsHosts,
+      process.env.NODE_ENV === "production" ? contentsquareHosts : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
     const csp = [
       "default-src 'self'",
       `script-src ${scriptSrc}`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https://*.public.blob.vercel-storage.com",
       "font-src 'self' data:",
-      `connect-src 'self' ${vercelAnalyticsHosts}`,
+      `connect-src ${connectSrc}`,
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
