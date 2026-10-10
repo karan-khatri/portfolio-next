@@ -109,11 +109,28 @@ function describeApiError(status: number, body: ChatCompletionResponse | null, r
   return `LLM request failed (HTTP ${status}). ${detail}`.trim();
 }
 
+interface RequestOptions {
+  jsonMode: boolean;
+  sendTemperature: boolean;
+  tokenParam: "max_tokens" | "max_completion_tokens";
+}
+
+type RejectedParam = "json" | "temperature" | "max_tokens";
+
+function detectRejectedParam(raw: string, options: RequestOptions): RejectedParam | null {
+  if (options.jsonMode && /response_format|json_object|json mode/i.test(raw)) return "json";
+  if (options.sendTemperature && /temperature/i.test(raw)) return "temperature";
+  if (options.tokenParam === "max_tokens" && /max_tokens|max_completion_tokens/i.test(raw)) {
+    return "max_tokens";
+  }
+  return null;
+}
+
 async function requestOnce(
   config: LlmConfig,
   params: LlmCompleteParams,
-  useJsonMode: boolean,
-): Promise<{ completion: LlmCompletion } | { jsonModeRejected: true }> {
+  options: RequestOptions,
+): Promise<{ completion: LlmCompletion } | { rejected: RejectedParam }> {
   const timeoutMs = params.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -124,10 +141,10 @@ async function requestOnce(
       { role: "system", content: params.system },
       { role: "user", content: params.prompt },
     ],
-    temperature: params.temperature ?? 0.4,
-    max_tokens: params.maxTokens ?? 4000,
+    [options.tokenParam]: params.maxTokens ?? 4000,
   };
-  if (useJsonMode) body.response_format = { type: "json_object" };
+  if (options.sendTemperature) body.temperature = params.temperature;
+  if (options.jsonMode) body.response_format = { type: "json_object" };
 
   let response: Response;
   try {
@@ -174,8 +191,9 @@ async function requestOnce(
   }
 
   if (!response.ok) {
-    if (useJsonMode && response.status === 400 && /response_format|json_object|json mode/i.test(raw)) {
-      return { jsonModeRejected: true };
+    if (response.status === 400) {
+      const rejected = detectRejectedParam(raw, options);
+      if (rejected) return { rejected };
     }
     throw new LlmError(describeApiError(response.status, parsed, raw), {
       status: response.status,
@@ -223,14 +241,20 @@ async function complete(params: LlmCompleteParams): Promise<LlmCompletion> {
   }
 
   const maxAttempts = params.maxAttempts ?? DEFAULT_MAX_ATTEMPTS;
-  let useJsonMode = Boolean(params.json);
+  const options: RequestOptions = {
+    jsonMode: Boolean(params.json),
+    sendTemperature: params.temperature !== undefined,
+    tokenParam: "max_tokens",
+  };
   let attempt = 1;
 
   for (;;) {
     try {
-      const result = await requestOnce(config, params, useJsonMode);
-      if ("jsonModeRejected" in result) {
-        useJsonMode = false;
+      const result = await requestOnce(config, params, options);
+      if ("rejected" in result) {
+        if (result.rejected === "json") options.jsonMode = false;
+        else if (result.rejected === "temperature") options.sendTemperature = false;
+        else options.tokenParam = "max_completion_tokens";
         continue;
       }
       return result.completion;
