@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
     serverActions: { bodySizeLimit: "10mb" },
   },
   serverExternalPackages: ["sharp"],
+  outputFileTracingIncludes: {
+    "/api/admin/ai-blog/**": ["../../docs/blog-style-guide.md"],
+  },
   images: {
     // Media uploads go through either LocalDiskStorageAdapter (served
     // same-origin from /uploads/, no remote pattern needed) or

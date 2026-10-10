@@ -36,9 +36,24 @@ pnpm typecheck    # tsc --noEmit across all packages
 pnpm db:generate  # regenerate the Prisma client after editing schema.prisma
 pnpm db:migrate   # create + apply a new migration
 
+pnpm test                               # unit tests (AI Blog Generator pipeline)
 pnpm --filter @portfolio/web test:e2e   # Playwright e2e suite (needs the dev server + DB up)
 pnpm --filter @portfolio/db studio      # Prisma Studio
 ```
+
+## AI Blog Generator
+
+Admin → **AI Blog Generator** discovers trending topics (Hacker News, dev.to, GitHub Trending, Reddit), researches each one from its source pages, and saves a reviewable **draft** post. Nothing is ever auto-published.
+
+Set these server-side variables in `apps/web/.env` (see `.env.example`):
+
+```
+EXPLABS_API_KEY=...                                   # required
+EXPLABS_BASE_URL=https://api.experientiallabs.ai/v1   # optional, OpenAI-compatible
+EXPLABS_MODEL=claude-haiku-5.5                        # optional
+```
+
+`pnpm --filter @portfolio/web ai-blog:smoke` makes one real call and prints the response shape. Prompts live in `apps/web/lib/ai-blog/prompts.ts`, trend sources in `sources.config.ts`, and the style reference in `docs/blog-style-guide.md`.
 
 ## Project structure
 

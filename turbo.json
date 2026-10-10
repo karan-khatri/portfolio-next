@@ -10,7 +10,10 @@
     "BLOB_READ_WRITE_TOKEN",
     "BLOB_STORE_ID",
     "RESEND_API_KEY",
-    "RESEND_FROM_EMAIL"
+    "RESEND_FROM_EMAIL",
+    "EXPLABS_API_KEY",
+    "EXPLABS_BASE_URL",
+    "EXPLABS_MODEL"
   ],
   "tasks": {
     "build": {

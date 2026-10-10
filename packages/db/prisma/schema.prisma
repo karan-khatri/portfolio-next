@@ -63,6 +63,7 @@ model User {
   roleAssignments UserRoleAssignment[]
   grantedRoles    UserRoleAssignment[] @relation("RoleGrantedBy")
   uploadedMedia   Media[]
+  aiBlogRuns      AiBlogRun[]
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt
 }
@@ -400,6 +401,7 @@ model Post {
   status             ContentStatus @default(DRAFT)
   publishedAt        DateTime?
   seo                Seo?
+  aiBlogItems        AiBlogRunItem[]
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
 
@@ -508,4 +510,61 @@ model SiteSetting {
   id    String @id @default(cuid())
   key   String @unique
   value Json
+}
+
+enum AiBlogRunStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum AiBlogItemStatus {
+  QUEUED
+  RESEARCHING
+  WRITING
+  SAVED
+  FAILED
+}
+
+model AiBlogRun {
+  id             String           @id @default(cuid())
+  status         AiBlogRunStatus  @default(RUNNING)
+  requestedCount Int
+  focusKeyword   String?
+  discoveredAt   DateTime?
+  discoveryUsage Json?
+  error          String?
+  heartbeatAt    DateTime         @default(now())
+  createdById    String?
+  createdBy      User?            @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt      DateTime         @default(now())
+  finishedAt     DateTime?
+  items          AiBlogRunItem[]
+
+  @@index([createdAt])
+  @@index([createdById, createdAt])
+}
+
+model AiBlogRunItem {
+  id          String           @id @default(cuid())
+  runId       String
+  run         AiBlogRun        @relation(fields: [runId], references: [id], onDelete: Cascade)
+  position    Int
+  topic       String
+  angle       String
+  whyTrending String
+  sourceUrls  String[]
+  status      AiBlogItemStatus @default(QUEUED)
+  failedStage String?
+  error       String?
+  research    Json?
+  usage       Json?
+  warnings    String[]
+  postId      String?
+  post        Post?            @relation(fields: [postId], references: [id], onDelete: SetNull)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([runId, position])
+  @@index([postId])
 }
