@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE } from "./lib/auth/constants";
 import { DEFAULT_LOCALE } from "./lib/i18n/config";
+import { LOCALE_COOKIE, resolveLocaleRedirect } from "./lib/i18n/negotiate";
 import { splitLocalePrefix } from "./lib/i18n/paths";
 
 const PUBLIC_ADMIN_PATHS = ["/admin/login", "/admin/accept-invite"];
@@ -26,6 +27,21 @@ export function proxy(request: NextRequest) {
       const target = request.nextUrl.clone();
       target.pathname = pathname.slice(DEFAULT_LOCALE.length + 1) || "/";
       return NextResponse.redirect(target, 308);
+    }
+
+    const redirectPath = resolveLocaleRedirect({
+      method: request.method,
+      pathname,
+      search: request.nextUrl.search,
+      cookie: request.cookies.get(LOCALE_COOKIE)?.value,
+      country: request.headers.get("x-vercel-ip-country"),
+      userAgent: request.headers.get("user-agent"),
+    });
+    if (redirectPath) {
+      const response = NextResponse.redirect(new URL(redirectPath, request.url), 307);
+      response.headers.set("Cache-Control", "private, no-store");
+      response.headers.set("Vary", "Cookie");
+      return response;
     }
 
     const { locale } = splitLocalePrefix(pathname);

@@ -59,6 +59,8 @@ EXPLABS_MODEL=claude-haiku-5.5                        # optional
 
 The public site is multilingual: English lives at `/` and every other language under its own prefix (`/it`, ...). A visitor on `/it/...` sees Italian content, falling back to the English version of anything not yet translated (with a notice). Pages, projects and posts link their translations through `translationGroupId`; profile lists (experience, education, skills, languages, services, testimonials) group per-language rows the same way. Admin stays in English, but every editor lets you write each language side by side.
 
+First-time visitors from Italy (Vercel's `x-vercel-ip-country` header) are redirected from unprefixed URLs to the same page under `/it`; everyone else gets English. Clicking EN/IT in the header stores a `locale` cookie that overrides the country from then on. Crawlers and `/preview` links are never redirected.
+
 Adding a language (e.g. French):
 
 1. Add `fr` to the `Locale` enum in `packages/db/prisma/schema.prisma` and create a migration (`ALTER TYPE "Locale" ADD VALUE 'fr'`).
