@@ -3,33 +3,38 @@ import type { AboutContent } from "@portfolio/sections";
 import { SectionShell } from "./section-shell";
 import { ProseContent } from "@/components/prose-content";
 import type { SectionImage } from "./hero";
+import type { AppLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 export function AboutSection({
+  locale,
   id,
   content,
   headingLevel,
   image,
 }: Readonly<{
+  locale: AppLocale;
   id: string;
   content: AboutContent;
   headingLevel: 1 | 2 | 3;
   image: SectionImage | null;
 }>) {
+  const t = getDictionary(locale);
   const stats = [
-    { label: "Location", value: content.location },
-    { label: "Focus", value: content.focusTag },
-    { label: "Education", value: content.education },
+    { label: t.about.location, value: content.location },
+    { label: t.about.focus, value: content.focusTag },
+    { label: t.about.education, value: content.education },
   ].filter((stat) => stat.value);
 
   const terminalLines = [
-    { label: "Role", value: content.role },
-    { label: "Focus", value: content.focusDetail },
-    { label: "Currently", value: content.currently },
+    { label: t.about.role, value: content.role },
+    { label: t.about.focus, value: content.focusDetail },
+    { label: t.about.currently, value: content.currently },
   ].filter((line) => line.value);
 
   return (
     <SectionShell
-      eyebrow="About"
+      eyebrow={t.eyebrow.about}
       id={id}
       headingLevel={headingLevel}
       heading={content.heading}
@@ -95,7 +100,7 @@ export function AboutSection({
             </div>
             {content.status ? (
               <div className="hidden lg:block mt-8 border-t border-border/60 pt-6 lg:max-w-xl">
-                <p className="font-mono text-[10px] tracking-[0.28em] text-primary uppercase">Status</p>
+                <p className="font-mono text-[10px] tracking-[0.28em] text-primary uppercase">{t.about.status}</p>
                 <p className="mt-1.5 font-mono text-sm font-semibold">{content.status}</p>
               </div>
             ) : null}

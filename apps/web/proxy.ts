@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE } from "./lib/auth/constants";
+import { DEFAULT_LOCALE } from "./lib/i18n/config";
+import { splitLocalePrefix } from "./lib/i18n/paths";
 
 const PUBLIC_ADMIN_PATHS = ["/admin/login", "/admin/accept-invite"];
 
@@ -19,6 +21,24 @@ export function proxy(request: NextRequest) {
     }
   }
 
+  if (!isAdminRoute && !isApiRoute) {
+    if (pathname === `/${DEFAULT_LOCALE}` || pathname.startsWith(`/${DEFAULT_LOCALE}/`)) {
+      const target = request.nextUrl.clone();
+      target.pathname = pathname.slice(DEFAULT_LOCALE.length + 1) || "/";
+      return NextResponse.redirect(target, 308);
+    }
+
+    const { locale } = splitLocalePrefix(pathname);
+
+    if (locale === DEFAULT_LOCALE) {
+      const target = request.nextUrl.clone();
+      target.pathname = pathname === "/" ? `/${DEFAULT_LOCALE}` : `/${DEFAULT_LOCALE}${pathname}`;
+      return NextResponse.rewrite(target);
+    }
+
+    return NextResponse.next();
+  }
+
   const response = NextResponse.next();
   if (isAdminRoute || isApiRoute) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
@@ -27,5 +47,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/:path*"],
+  matcher: ["/admin/:path*", "/api/:path*", "/((?!_next|api|admin|opengraph-image|.*\\..*).*)"],
 };

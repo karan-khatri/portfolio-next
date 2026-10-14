@@ -55,6 +55,18 @@ EXPLABS_MODEL=claude-haiku-5.5                        # optional
 
 `pnpm --filter @portfolio/web ai-blog:smoke` makes one real call and prints the response shape. Prompts live in `apps/web/lib/ai-blog/prompts.ts`, trend sources in `sources.config.ts`, and the style reference in `docs/blog-style-guide.md`.
 
+## Languages
+
+The public site is multilingual: English lives at `/` and every other language under its own prefix (`/it`, ...). A visitor on `/it/...` sees Italian content, falling back to the English version of anything not yet translated (with a notice). Pages, projects and posts link their translations through `translationGroupId`; profile lists (experience, education, skills, languages, services, testimonials) group per-language rows the same way. Admin stays in English, but every editor lets you write each language side by side.
+
+Adding a language (e.g. French):
+
+1. Add `fr` to the `Locale` enum in `packages/db/prisma/schema.prisma` and create a migration (`ALTER TYPE "Locale" ADD VALUE 'fr'`).
+2. Add an entry to `LOCALE_META` in `apps/web/lib/i18n/config.ts`.
+3. Add a dictionary for it in `apps/web/lib/i18n/dictionaries.ts` (the compiler flags any missing key).
+
+Everything else (routing, language switcher, hreflang, sitemap, admin language tabs) picks it up automatically.
+
 ## Project structure
 
 ```

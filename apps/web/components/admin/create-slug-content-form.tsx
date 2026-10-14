@@ -5,6 +5,7 @@ import { LuLoaderCircle } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DEFAULT_LOCALE, LOCALES, LOCALE_META } from "@/lib/i18n/config";
 import styles from "./create-slug-content-form.module.scss";
 
 export interface CreateSlugContentState {
@@ -34,12 +35,14 @@ export function CreateSlugContentForm({
         <Input id="slug" name="slug" required placeholder={slugPlaceholder} />
       </div>
       <div className={styles.field}>
-        <Label htmlFor="locale">Locale</Label>
-        {/* "en" is the only value the Locale enum accepts today — read-only
-            rather than a free-text input an admin could mistype into an
-            invalid value (the server action validates this too, but there's
-            no reason to let the mistake happen in the first place). */}
-        <Input id="locale" name="locale" required defaultValue="en" readOnly className={styles.localeInput} />
+        <Label htmlFor="locale">Language</Label>
+        <select id="locale" name="locale" required defaultValue={DEFAULT_LOCALE} className={styles.localeInput}>
+          {LOCALES.map((locale) => (
+            <option key={locale} value={locale}>
+              {LOCALE_META[locale].nativeName}
+            </option>
+          ))}
+        </select>
       </div>
       <div className={styles.field}>
         <Label htmlFor="title">Title</Label>

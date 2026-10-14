@@ -137,12 +137,14 @@ enum ContentStatus {
   ARCHIVED
 }
 
-// Only "en" exists today — this isn't i18n support, just a closed vocabulary
-// so a typo ("En", "en-US") can't silently create content that never shows
-// up anywhere. Add a value here (and a migration) when a second locale
-// actually ships.
+// Closed vocabulary of site languages, so a typo ("En", "en-US") can't
+// silently create content that never shows up anywhere. To add a language:
+// add a value here (plus a migration), then register it in
+// apps/web/lib/i18n/config.ts and add its dictionary in
+// apps/web/lib/i18n/dictionaries.ts.
 enum Locale {
   en
+  it
 }
 
 // Page/Project/Post revisions share one polymorphic table since Prisma can't
@@ -421,17 +423,22 @@ model Tag {
 model Experience {
   id          String   @id @default(cuid())
   locale      Locale @default(en)
+  translationGroupId String
   company     String
   title       String
   startDate   DateTime
   endDate     DateTime?
   description String?
   order       Int      @default(0)
+
+  @@unique([translationGroupId, locale])
+  @@index([locale, order])
 }
 
 model Education {
   id          String    @id @default(cuid())
   locale      Locale @default(en)
+  translationGroupId String
   institution String
   degree      String
   location    String?
@@ -439,6 +446,9 @@ model Education {
   endDate     DateTime?
   description String?
   order       Int       @default(0)
+
+  @@unique([translationGroupId, locale])
+  @@index([locale, order])
 }
 
 // level is CHECKed (1-5, raw SQL in the migration — see UserRoleAssignment's
@@ -447,10 +457,14 @@ model Education {
 model Skill {
   id       String @id @default(cuid())
   locale   Locale @default(en)
+  translationGroupId String
   name     String
   category String?
   level    Int?
   order    Int    @default(0)
+
+  @@unique([translationGroupId, locale])
+  @@index([locale, order])
 }
 
 // No `locale` (unlike its sibling simple-list models): a tech logo/name isn't
@@ -472,27 +486,39 @@ model TechStackItem {
 model Language {
   id          String @id @default(cuid())
   locale      Locale @default(en)
+  translationGroupId String
   name        String
   proficiency String
   order       Int    @default(0)
+
+  @@unique([translationGroupId, locale])
+  @@index([locale, order])
 }
 
 model Service {
   id          String  @id @default(cuid())
   locale      Locale @default(en)
+  translationGroupId String
   title       String
   description String?
   order       Int     @default(0)
+
+  @@unique([translationGroupId, locale])
+  @@index([locale, order])
 }
 
 model Testimonial {
   id         String  @id @default(cuid())
   locale     Locale @default(en)
+  translationGroupId String
   authorName String
   authorRole String?
   quote      String
   avatarUrl  String?
   order      Int     @default(0)
+
+  @@unique([translationGroupId, locale])
+  @@index([locale, order])
 }
 
 model NavigationItem {

@@ -1,4 +1,6 @@
 import type { LanguagesContent } from "@portfolio/sections";
+import type { AppLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { SectionShell } from "./section-shell";
 import { EmptyState } from "./empty-state";
 
@@ -9,19 +11,23 @@ export interface LanguageListItem {
 }
 
 export function LanguagesSection({
+  locale,
   id,
   content,
   headingLevel,
   items,
 }: {
+  locale: AppLocale;
   id: string;
   content: LanguagesContent;
   headingLevel: 1 | 2 | 3;
   items: LanguageListItem[];
 }) {
+  const t = getDictionary(locale);
+
   return (
     <SectionShell
-      eyebrow="Languages"
+      eyebrow={t.eyebrow.languages}
       id={id}
       headingLevel={headingLevel}
       heading={content.heading}
@@ -30,7 +36,7 @@ export function LanguagesSection({
       headingAlign={content.headingAlign}
     >
       {items.length === 0 ? (
-        <EmptyState message="No languages listed yet." />
+        <EmptyState message={t.empty.languages} />
       ) : (
         <div className="flex flex-wrap gap-3">
           {items.map((item) => (

@@ -13,6 +13,7 @@ import {
 import { requireEditor } from "@/lib/auth/require-admin";
 import { storage } from "@/lib/storage";
 import { toMediaPickerValue, type MediaPickerValue } from "@/lib/admin/media";
+import { revalidatePublicSite } from "@/lib/admin/revalidate";
 
 const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 const DOCUMENT_TYPES = new Set(["application/pdf"]);
@@ -133,7 +134,7 @@ export async function deleteMediaAction(id: string): Promise<{ error?: string }>
       metadata: { filename: media.filename },
     });
     revalidatePath("/admin/media");
-    revalidatePath("/");
+    revalidatePublicSite();
     return {};
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Could not delete image" };

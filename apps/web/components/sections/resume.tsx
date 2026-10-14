@@ -2,20 +2,26 @@ import type { ResumeContent } from "@portfolio/sections";
 import { LuDownload, LuFileText } from "react-icons/lu";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import type { AppLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { SectionShell } from "./section-shell";
 
 export function ResumeSection({
+  locale,
   id,
   content,
   headingLevel,
 }: {
+  locale: AppLocale;
   id: string;
   content: ResumeContent;
   headingLevel: 1 | 2 | 3;
 }) {
+  const t = getDictionary(locale);
+
   return (
     <SectionShell
-      eyebrow="Resume"
+      eyebrow={t.eyebrow.resume}
       id={id}
       headingLevel={headingLevel}
       heading={content.heading}
@@ -28,7 +34,7 @@ export function ResumeSection({
               <LuFileText className="size-5" />
             </span>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              The full story — roles, stack, and what I&rsquo;ve shipped.
+              {t.resume.blurb}
             </p>
           </div>
           <a
@@ -39,7 +45,7 @@ export function ResumeSection({
             )}
           >
             <LuDownload />
-            {content.ctaLabel ?? "Download resume"}
+            {content.ctaLabel ?? t.resume.download}
           </a>
         </div>
     </SectionShell>

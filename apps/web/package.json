@@ -24,7 +24,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test lib/ai-blog/*.test.ts",
+    "test": "tsx --test lib/ai-blog/*.test.ts lib/i18n/*.test.ts",
     "test:e2e": "playwright test",
     "ai-blog:smoke": "tsx --env-file=.env scripts/ai-blog-smoke-test.ts"
   },

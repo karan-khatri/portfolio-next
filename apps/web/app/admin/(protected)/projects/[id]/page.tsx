@@ -6,6 +6,7 @@ import { ProjectEditor } from "@/components/admin/project-editor";
 import { toMediaPickerValue, type MediaPickerValue } from "@/lib/admin/media";
 import type { GalleryImageEntry } from "@/components/admin/project-gallery-picker";
 import type { RevisionHistoryItem } from "@/components/admin/revision-history-panel";
+import { EditorTranslationBar } from "@/components/admin/editor-translation-bar";
 
 export default async function ProjectEditorRoute({
   params,
@@ -82,6 +83,15 @@ export default async function ProjectEditorRoute({
       projectStatus={project.status}
       hasDraft={Boolean(latestDraft)}
       revisions={revisions}
+      translationBar={
+        <EditorTranslationBar
+          entityType="Project"
+          id={project.id}
+          slug={project.slug}
+          locale={project.locale}
+          groupId={project.translationGroupId}
+        />
+      }
       initial={{
         title,
         excerpt,

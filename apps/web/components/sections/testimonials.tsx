@@ -1,4 +1,6 @@
 import type { TestimonialsContent } from "@portfolio/sections";
+import type { AppLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { SectionShell } from "./section-shell";
 import { EmptyState } from "./empty-state";
 
@@ -10,19 +12,23 @@ export interface TestimonialListItem {
 }
 
 export function TestimonialsSection({
+  locale,
   id,
   content,
   headingLevel,
   items,
 }: {
+  locale: AppLocale;
   id: string;
   content: TestimonialsContent;
   headingLevel: 1 | 2 | 3;
   items: TestimonialListItem[];
 }) {
+  const t = getDictionary(locale);
+
   return (
     <SectionShell
-      eyebrow="Testimonials"
+      eyebrow={t.eyebrow.testimonials}
       id={id}
       headingLevel={headingLevel}
       heading={content.heading}
@@ -31,7 +37,7 @@ export function TestimonialsSection({
       headingAlign={content.headingAlign}
     >
       {items.length === 0 ? (
-        <EmptyState message="No testimonials yet." />
+        <EmptyState message={t.empty.testimonials} />
       ) : (
         <ul className="grid gap-6 sm:grid-cols-2">
           {items.map((item) => (

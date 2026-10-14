@@ -11,70 +11,79 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { MediaUrlField } from "@/components/admin/media-url-field";
+import { LocaleSwitch } from "@/components/admin/locale-switch";
 import { saveSiteSettingsAction } from "@/app/admin/(protected)/settings/actions";
-import type { SiteSettingsValues } from "@/lib/admin/view-models";
+import type { LocalizedSiteSettingsValues, TranslatableSettingsValues } from "@/lib/admin/view-models";
+import { DEFAULT_LOCALE, LOCALES, LOCALE_META, type AppLocale } from "@/lib/i18n/config";
 import styles from "./site-settings-form.module.scss";
 
-interface FormValues {
-  title: string;
-  description: string;
+interface SharedFormValues {
   githubUrl: string;
   linkedinUrl: string;
   upworkUrl: string;
   fiverrUrl: string;
   instagramUrl: string;
-  resumeUrl: string;
-  location: string;
   contactAutoReplyEnabled: boolean;
-  contactAutoReplySubject: string;
-  contactAutoReplyBody: string;
 }
 
-function toFormValues(initial: SiteSettingsValues): FormValues {
+function toSharedValues(initial: LocalizedSiteSettingsValues): SharedFormValues {
   return {
-    title: initial.title,
-    description: initial.description,
-    githubUrl: initial.githubUrl ?? "",
-    linkedinUrl: initial.linkedinUrl ?? "",
-    upworkUrl: initial.upworkUrl ?? "",
-    fiverrUrl: initial.fiverrUrl ?? "",
-    instagramUrl: initial.instagramUrl ?? "",
-    resumeUrl: initial.resumeUrl ?? "",
-    location: initial.location ?? "",
-    contactAutoReplyEnabled: initial.contactAutoReplyEnabled,
-    contactAutoReplySubject: initial.contactAutoReplySubject,
-    contactAutoReplyBody: initial.contactAutoReplyBody,
+    githubUrl: initial.shared.githubUrl ?? "",
+    linkedinUrl: initial.shared.linkedinUrl ?? "",
+    upworkUrl: initial.shared.upworkUrl ?? "",
+    fiverrUrl: initial.shared.fiverrUrl ?? "",
+    instagramUrl: initial.shared.instagramUrl ?? "",
+    contactAutoReplyEnabled: initial.shared.contactAutoReplyEnabled,
   };
 }
 
-export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
-  const [values, setValues] = useState<FormValues>(() => toFormValues(initial));
+function cloneTranslations(initial: LocalizedSiteSettingsValues): Record<AppLocale, TranslatableSettingsValues> {
+  return Object.fromEntries(
+    LOCALES.map((locale) => [locale, { ...initial.translations[locale] }]),
+  ) as Record<AppLocale, TranslatableSettingsValues>;
+}
+
+export function SiteSettingsForm({ initial }: { initial: LocalizedSiteSettingsValues }) {
+  const [shared, setShared] = useState<SharedFormValues>(() => toSharedValues(initial));
+  const [translations, setTranslations] = useState(() => cloneTranslations(initial));
+  const [activeLocale, setActiveLocale] = useState<AppLocale>(DEFAULT_LOCALE);
   const [pending, startTransition] = useTransition();
 
-  function setField<K extends keyof FormValues>(key: K, value: FormValues[K]) {
-    setValues((prev) => ({ ...prev, [key]: value }));
+  const current = translations[activeLocale];
+  const fallback = translations[DEFAULT_LOCALE];
+  const isDefault = activeLocale === DEFAULT_LOCALE;
+  const localeName = LOCALE_META[activeLocale].nativeName;
+
+  function setShare<K extends keyof SharedFormValues>(key: K, value: SharedFormValues[K]) {
+    setShared((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function setTranslated<K extends keyof TranslatableSettingsValues>(key: K, value: string) {
+    setTranslations((prev) => ({ ...prev, [activeLocale]: { ...prev[activeLocale], [key]: value } }));
+  }
+
+  function placeholderFor(key: keyof TranslatableSettingsValues, base?: string) {
+    return isDefault ? base : fallback[key] || base;
   }
 
   function handleReset() {
-    setValues(toFormValues(initial));
+    setShared(toSharedValues(initial));
+    setTranslations(cloneTranslations(initial));
   }
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     startTransition(async () => {
       const result = await saveSiteSettingsAction({
-        title: values.title,
-        description: values.description,
-        githubUrl: values.githubUrl || null,
-        linkedinUrl: values.linkedinUrl || null,
-        upworkUrl: values.upworkUrl || null,
-        fiverrUrl: values.fiverrUrl || null,
-        instagramUrl: values.instagramUrl || null,
-        resumeUrl: values.resumeUrl || null,
-        location: values.location || null,
-        contactAutoReplyEnabled: values.contactAutoReplyEnabled,
-        contactAutoReplySubject: values.contactAutoReplySubject,
-        contactAutoReplyBody: values.contactAutoReplyBody,
+        shared: {
+          githubUrl: shared.githubUrl || null,
+          linkedinUrl: shared.linkedinUrl || null,
+          upworkUrl: shared.upworkUrl || null,
+          fiverrUrl: shared.fiverrUrl || null,
+          instagramUrl: shared.instagramUrl || null,
+          contactAutoReplyEnabled: shared.contactAutoReplyEnabled,
+        },
+        translations,
       });
       if (result.error) toast.error(result.error);
       else toast.success("Settings saved");
@@ -83,18 +92,26 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
+      <LocaleSwitch value={activeLocale} onChange={setActiveLocale} label="Editing language" />
+
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Site Identity</h2>
+        <h2 className={styles.sectionTitle}>Site Identity · {localeName}</h2>
         <div className={styles.field}>
           <Label htmlFor="site-title">Site title</Label>
-          <Input id="site-title" value={values.title} onChange={(event) => setField("title", event.target.value)} />
+          <Input
+            id="site-title"
+            value={current.title}
+            placeholder={placeholderFor("title")}
+            onChange={(event) => setTranslated("title", event.target.value)}
+          />
         </div>
         <div className={styles.field}>
           <Label htmlFor="site-description">Site description</Label>
           <Textarea
             id="site-description"
-            value={values.description}
-            onChange={(event) => setField("description", event.target.value)}
+            value={current.description}
+            placeholder={placeholderFor("description")}
+            onChange={(event) => setTranslated("description", event.target.value)}
           />
         </div>
         <div className={styles.field}>
@@ -103,17 +120,22 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
             <LuMapPin className={styles.inputIcon} />
             <Input
               id="site-location"
-              placeholder="Florence (Firenze), Italy"
+              placeholder={placeholderFor("location", "Florence (Firenze), Italy")}
               className={styles.inputWithIcon}
-              value={values.location}
-              onChange={(event) => setField("location", event.target.value)}
+              value={current.location}
+              onChange={(event) => setTranslated("location", event.target.value)}
             />
           </div>
         </div>
+        {!isDefault ? (
+          <p className={styles.hint}>
+            Empty {localeName} fields fall back to the {LOCALE_META[DEFAULT_LOCALE].nativeName} text on the {localeName} site.
+          </p>
+        ) : null}
       </section>
 
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>External Links</h2>
+        <h2 className={styles.sectionTitle}>External Links (same in every language)</h2>
         <div className={styles.field}>
           <Label htmlFor="site-github">GitHub URL</Label>
           <div className={styles.inputWrap}>
@@ -123,8 +145,8 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
               type="url"
               placeholder="https://github.com/your-username"
               className={styles.inputWithIcon}
-              value={values.githubUrl}
-              onChange={(event) => setField("githubUrl", event.target.value)}
+              value={shared.githubUrl}
+              onChange={(event) => setShare("githubUrl", event.target.value)}
             />
           </div>
         </div>
@@ -137,8 +159,8 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
               type="url"
               placeholder="https://linkedin.com/in/your-username"
               className={styles.inputWithIcon}
-              value={values.linkedinUrl}
-              onChange={(event) => setField("linkedinUrl", event.target.value)}
+              value={shared.linkedinUrl}
+              onChange={(event) => setShare("linkedinUrl", event.target.value)}
             />
           </div>
         </div>
@@ -151,8 +173,8 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
               type="url"
               placeholder="https://upwork.com/freelancers/your-profile"
               className={styles.inputWithIcon}
-              value={values.upworkUrl}
-              onChange={(event) => setField("upworkUrl", event.target.value)}
+              value={shared.upworkUrl}
+              onChange={(event) => setShare("upworkUrl", event.target.value)}
             />
           </div>
         </div>
@@ -165,8 +187,8 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
               type="url"
               placeholder="https://fiverr.com/your-username"
               className={styles.inputWithIcon}
-              value={values.fiverrUrl}
-              onChange={(event) => setField("fiverrUrl", event.target.value)}
+              value={shared.fiverrUrl}
+              onChange={(event) => setShare("fiverrUrl", event.target.value)}
             />
           </div>
         </div>
@@ -179,20 +201,27 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
               type="url"
               placeholder="https://instagram.com/your-username"
               className={styles.inputWithIcon}
-              value={values.instagramUrl}
-              onChange={(event) => setField("instagramUrl", event.target.value)}
+              value={shared.instagramUrl}
+              onChange={(event) => setShare("instagramUrl", event.target.value)}
             />
           </div>
         </div>
+      </section>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Resume · {localeName}</h2>
         <div className={styles.field}>
           <Label htmlFor="site-resume">Resume URL</Label>
           <MediaUrlField
             id="site-resume"
-            value={values.resumeUrl}
-            onChange={(value) => setField("resumeUrl", value)}
-            placeholder="Link to a hosted PDF, or browse Media"
+            value={current.resumeUrl}
+            onChange={(value) => setTranslated("resumeUrl", value)}
+            placeholder={placeholderFor("resumeUrl", "Link to a hosted PDF, or browse Media")}
             icon={<LuFileText />}
           />
+          {!isDefault ? (
+            <p className={styles.hint}>Leave empty to use the {LOCALE_META[DEFAULT_LOCALE].nativeName} resume.</p>
+          ) : null}
         </div>
       </section>
 
@@ -202,8 +231,8 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
           <div className={styles.switchRow}>
             <Switch
               id="site-autoreply-enabled"
-              checked={values.contactAutoReplyEnabled}
-              onCheckedChange={(checked) => setField("contactAutoReplyEnabled", checked)}
+              checked={shared.contactAutoReplyEnabled}
+              onCheckedChange={(checked) => setShare("contactAutoReplyEnabled", checked)}
             />
             <Label htmlFor="site-autoreply-enabled">
               Send an automatic reply to whoever submits the contact form
@@ -211,23 +240,26 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettingsValues }) {
           </div>
         </div>
         <div className={styles.field}>
-          <Label htmlFor="site-autoreply-subject">Subject</Label>
+          <Label htmlFor="site-autoreply-subject">Subject · {localeName}</Label>
           <Input
             id="site-autoreply-subject"
-            value={values.contactAutoReplySubject}
-            onChange={(event) => setField("contactAutoReplySubject", event.target.value)}
+            value={current.contactAutoReplySubject}
+            placeholder={placeholderFor("contactAutoReplySubject")}
+            onChange={(event) => setTranslated("contactAutoReplySubject", event.target.value)}
           />
         </div>
         <div className={styles.field}>
-          <Label htmlFor="site-autoreply-body">Body</Label>
+          <Label htmlFor="site-autoreply-body">Body · {localeName}</Label>
           <Textarea
             id="site-autoreply-body"
             rows={6}
-            value={values.contactAutoReplyBody}
-            onChange={(event) => setField("contactAutoReplyBody", event.target.value)}
+            value={current.contactAutoReplyBody}
+            placeholder={placeholderFor("contactAutoReplyBody")}
+            onChange={(event) => setTranslated("contactAutoReplyBody", event.target.value)}
           />
           <p className={styles.hint}>
-            Use <code>{"{{name}}"}</code> anywhere in the subject or body to insert the sender&rsquo;s name.
+            Use <code>{"{{name}}"}</code> anywhere in the subject or body to insert the sender&rsquo;s name. The
+            reply is sent in the language of the page the visitor wrote from.
           </p>
         </div>
       </section>

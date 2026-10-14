@@ -12,6 +12,7 @@ export function EditorShell({
   status,
   hasDraft,
   sidebar,
+  translationBar,
   children,
 }: {
   backHref: string;
@@ -20,6 +21,7 @@ export function EditorShell({
   status: string;
   hasDraft: boolean;
   sidebar: ReactNode;
+  translationBar?: ReactNode;
   children: ReactNode;
 }) {
   return (
@@ -35,6 +37,8 @@ export function EditorShell({
           {hasDraft ? <StatusBadge status="UNPUBLISHED DRAFT LOADED" /> : null}
         </div>
       </div>
+
+      {translationBar}
 
       <div className={styles.layout}>
         <div className={styles.mainColumn}>{children}</div>

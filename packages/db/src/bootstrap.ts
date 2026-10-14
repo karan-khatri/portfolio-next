@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { prisma } from "./client";
 import { hashPassword, normalizeEmail } from "./auth";
 import { saveDraft, publishRevision, type PageSectionInput } from "./cms";
@@ -642,6 +643,7 @@ async function seedResumeContent(adminId: string, mediaIdByUrl: Map<string, stri
     await prisma.experience.createMany({
       data: RESUME_EXPERIENCE.map((entry, index) => ({
         locale: "en",
+        translationGroupId: randomUUID(),
         company: entry.company,
         title: entry.title,
         startDate: entry.startDate,
@@ -656,6 +658,7 @@ async function seedResumeContent(adminId: string, mediaIdByUrl: Map<string, stri
     await prisma.education.createMany({
       data: RESUME_EDUCATION.map((entry, index) => ({
         locale: "en",
+        translationGroupId: randomUUID(),
         institution: entry.institution,
         degree: entry.degree,
         location: entry.location,
@@ -671,6 +674,7 @@ async function seedResumeContent(adminId: string, mediaIdByUrl: Map<string, stri
     await prisma.language.createMany({
       data: RESUME_LANGUAGES.map((entry, index) => ({
         locale: "en",
+        translationGroupId: randomUUID(),
         name: entry.name,
         proficiency: entry.proficiency,
         order: index,
@@ -682,6 +686,7 @@ async function seedResumeContent(adminId: string, mediaIdByUrl: Map<string, stri
     await prisma.skill.createMany({
       data: RESUME_SKILLS.map((skill, index) => ({
         locale: "en",
+        translationGroupId: randomUUID(),
         name: skill.name,
         category: skill.category,
         order: index,

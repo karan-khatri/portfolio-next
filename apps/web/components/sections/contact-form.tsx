@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/lib/i18n/context";
 import { submitContactMessageAction } from "./contact-actions";
 
 const INITIAL_VALUES = { name: "", email: "", message: "", company: "" };
@@ -14,16 +15,17 @@ const INITIAL_VALUES = { name: "", email: "", message: "", company: "" };
 export function ContactForm() {
   const [values, setValues] = useState(INITIAL_VALUES);
   const [pending, startTransition] = useTransition();
+  const { locale, t } = useI18n();
 
   function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     startTransition(async () => {
-      const result = await submitContactMessageAction(values);
+      const result = await submitContactMessageAction(values, locale);
       if (result.error) {
         toast.error(result.error);
         return;
       }
-      toast.success("Message sent — thanks for reaching out.");
+      toast.success(t.contact.sent);
       setValues(INITIAL_VALUES);
     });
   }
@@ -48,9 +50,9 @@ export function ContactForm() {
 
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h3 className="font-heading text-xl font-semibold sm:text-2xl">Send a message</h3>
+          <h3 className="font-heading text-xl font-semibold sm:text-2xl">{t.contact.sendAMessage}</h3>
           <p className="mt-1.5 font-mono text-[10px] tracking-[0.28em] text-muted-foreground uppercase">
-            secure channel: <span className="text-primary">encrypted</span>
+            {t.contact.secureChannel} <span className="text-primary">{t.contact.encrypted}</span>
           </p>
         </div>
         <div className="mt-1.5 flex shrink-0 items-center gap-1.5">
@@ -63,13 +65,13 @@ export function ContactForm() {
       <div className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="contact-name" className="text-sm">
-            Name
+            {t.contact.name}
           </Label>
           <div className="relative">
             <LuUser className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="contact-name"
-              placeholder="Your name"
+              placeholder={t.contact.namePlaceholder}
               required
               value={values.name}
               className="h-12 pl-10.5 text-base"
@@ -79,14 +81,14 @@ export function ContactForm() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="contact-email" className="text-sm">
-            Email
+            {t.contact.email}
           </Label>
           <div className="relative">
             <LuAtSign className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="contact-email"
               type="email"
-              placeholder="Your email"
+              placeholder={t.contact.emailPlaceholder}
               required
               value={values.email}
               className="h-12 pl-10.5 text-base"
@@ -96,14 +98,14 @@ export function ContactForm() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="contact-message" className="text-sm">
-            Message
+            {t.contact.message}
           </Label>
           <div className="relative">
             <LuMessageSquare className="pointer-events-none absolute top-4 left-3.5 size-4 text-muted-foreground" />
             <Textarea
               id="contact-message"
               required
-              placeholder="Your message"
+              placeholder={t.contact.messagePlaceholder}
               rows={7}
               value={values.message}
               className="min-h-40 pl-10.5 text-base leading-relaxed"
@@ -119,13 +121,13 @@ export function ContactForm() {
         disabled={pending}
         className="mt-6 h-12 w-full font-heading text-sm font-semibold tracking-widest uppercase"
       >
-        {pending ? "Sending…" : "Send message"}
+        {pending ? t.contact.sending : t.contact.send}
         <LuSend />
       </Button>
 
       <p className="mt-4 flex items-center justify-center gap-1.5 font-mono text-[10px] tracking-wide text-muted-foreground/70">
         <LuLock className="size-3" />
-        your message is handled securely
+        {t.contact.handledSecurely}
       </p>
     </form>
   );

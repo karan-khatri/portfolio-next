@@ -4,7 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Reorder, useDragControls } from "framer-motion";
 import { toast } from "sonner";
-import { LuGripVertical, LuLoaderCircle, LuPlus, LuTrash2 } from "react-icons/lu";
+import { LuCopy, LuGripVertical, LuLoaderCircle, LuPlus, LuTrash2 } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,7 +13,9 @@ import {
   updateNavigationItemAction,
   deleteNavigationItemAction,
   reorderNavigationItemAction,
+  copyNavigationFromDefaultAction,
 } from "@/app/admin/(protected)/navigation/actions";
+import { DEFAULT_LOCALE, LOCALE_META, type AppLocale } from "@/lib/i18n/config";
 import styles from "./navigation-manager.module.scss";
 
 export interface NavigationItemRow {
@@ -134,9 +136,11 @@ function ChildRow({ item, onChanged }: { item: NavigationItemRow; onChanged: () 
 
 function NavigationItemCard({
   item,
+  locale,
   onChanged,
 }: {
   item: NavigationItemWithChildren;
+  locale: AppLocale;
   onChanged: () => void;
 }) {
   const controls = useDragControls();
@@ -149,7 +153,7 @@ function NavigationItemCard({
 
   function handleCreateChild(values: { label: string; href: string }) {
     startCreatingChild(async () => {
-      const result = await createNavigationItemAction({ ...values, parentId: item.id });
+      const result = await createNavigationItemAction({ ...values, parentId: item.id, locale });
       if (result.error) toast.error(result.error);
       else {
         toast.success("Added");
@@ -242,10 +246,17 @@ function NavigationItemCard({
   );
 }
 
-export function NavigationManager({ items }: { items: NavigationItemWithChildren[] }) {
+export function NavigationManager({
+  items,
+  locale,
+}: {
+  items: NavigationItemWithChildren[];
+  locale: AppLocale;
+}) {
   const router = useRouter();
   const [orderedItems, setOrderedItems] = useState(items);
   const [creating, startCreating] = useTransition();
+  const [copying, startCopying] = useTransition();
   const [createKey, setCreateKey] = useState(0);
 
   useEffect(() => setOrderedItems(items), [items]);
@@ -264,9 +275,20 @@ export function NavigationManager({ items }: { items: NavigationItemWithChildren
     });
   }
 
+  function handleCopyDefault() {
+    startCopying(async () => {
+      const result = await copyNavigationFromDefaultAction(locale);
+      if (result.error) toast.error(result.error);
+      else {
+        toast.success("Links copied — translate the labels");
+        router.refresh();
+      }
+    });
+  }
+
   function handleCreate(values: { label: string; href: string }) {
     startCreating(async () => {
-      const result = await createNavigationItemAction(values);
+      const result = await createNavigationItemAction({ ...values, locale });
       if (result.error) toast.error(result.error);
       else {
         toast.success("Added");
@@ -281,12 +303,22 @@ export function NavigationManager({ items }: { items: NavigationItemWithChildren
       {orderedItems.length > 0 ? (
         <Reorder.Group axis="y" values={orderedItems} onReorder={handleReorder} className={styles.group}>
           {orderedItems.map((item) => (
-            <NavigationItemCard key={item.id} item={item} onChanged={refresh} />
+            <NavigationItemCard key={item.id} item={item} locale={locale} onChanged={refresh} />
           ))}
         </Reorder.Group>
       ) : null}
       {orderedItems.length === 0 ? (
-        <p className={styles.empty}>No nav links yet — using auto-generated section links.</p>
+        <p className={styles.empty}>
+          {locale === DEFAULT_LOCALE
+            ? "No nav links yet — using auto-generated section links."
+            : `No ${LOCALE_META[locale].nativeName} nav links yet — the ${LOCALE_META[DEFAULT_LOCALE].nativeName} links (or auto-generated section links) are shown instead.`}
+        </p>
+      ) : null}
+      {orderedItems.length === 0 && locale !== DEFAULT_LOCALE ? (
+        <Button type="button" variant="outline" size="sm" onClick={handleCopyDefault} disabled={copying}>
+          {copying ? <LuLoaderCircle className={styles.spinner} /> : <LuCopy />}
+          Copy links from {LOCALE_META[DEFAULT_LOCALE].nativeName}
+        </Button>
       ) : null}
 
       <details className={styles.createDisclosure}>

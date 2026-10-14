@@ -1,15 +1,21 @@
 import { LuArrowUp } from "react-icons/lu";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
+import type { AppLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 export function SiteFooter({
+  locale,
   title,
   githubUrl,
   linkedinUrl,
 }: {
+  locale: AppLocale;
   title: string;
   githubUrl?: string | null;
   linkedinUrl?: string | null;
 }) {
+  const dictionary = getDictionary(locale);
+
   return (
     <footer className="border-t border-border bg-card/40">
       <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-6 px-6 py-10 sm:px-8 md:flex-row lg:px-12">
@@ -27,7 +33,7 @@ export function SiteFooter({
               className="flex items-center gap-2 font-mono text-xs text-muted-foreground transition-colors hover:text-primary"
             >
               <FaGithub className="size-4" />
-              GitHub
+              {dictionary.common.github}
             </a>
           ) : null}
           {linkedinUrl ? (
@@ -38,13 +44,13 @@ export function SiteFooter({
               className="flex items-center gap-2 font-mono text-xs text-muted-foreground transition-colors hover:text-primary"
             >
               <FaLinkedin className="size-4" />
-              LinkedIn
+              {dictionary.common.linkedin}
             </a>
           ) : null}
           <a
             href="#top"
             className="flex size-9 items-center justify-center rounded-full border border-border text-primary transition-colors hover:bg-primary/10"
-            aria-label="Back to top"
+            aria-label={dictionary.common.backToTop}
           >
             <LuArrowUp className="size-4" />
           </a>

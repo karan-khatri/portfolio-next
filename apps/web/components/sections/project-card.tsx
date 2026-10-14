@@ -3,6 +3,9 @@ import Link from "next/link";
 import { LuExternalLink, LuFolderGit2 } from "react-icons/lu";
 import { FaGithub } from "react-icons/fa";
 import type { SectionImage } from "./hero";
+import type { AppLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { localizePath } from "@/lib/i18n/paths";
 
 export interface ProjectCardItem {
   id: string;
@@ -15,7 +18,8 @@ export interface ProjectCardItem {
   liveUrl: string | null;
 }
 
-export function ProjectCard({ project }: { project: ProjectCardItem }) {
+export function ProjectCard({ project, locale }: { project: ProjectCardItem; locale: AppLocale }) {
+  const t = getDictionary(locale);
   const hasLinks = Boolean(project.codeRepository || project.liveUrl);
 
   return (
@@ -24,7 +28,7 @@ export function ProjectCard({ project }: { project: ProjectCardItem }) {
             while the icon links below sit above it (relative + higher z-index)
             so they keep working as independent, separately-clickable targets. */}
         <Link
-          href={`/projects/${project.slug}`}
+          href={localizePath(`/projects/${project.slug}`, locale)}
           className="absolute inset-0 z-10"
           aria-label={project.title}
         />
@@ -60,8 +64,8 @@ export function ProjectCard({ project }: { project: ProjectCardItem }) {
                     href={project.codeRepository}
                     target="_blank"
                     rel="noreferrer"
-                    aria-label="View source repository"
-                    title="View source repository"
+                    aria-label={t.projects.viewSourceRepository}
+                    title={t.projects.viewSourceRepository}
                     className="flex size-8 items-center justify-center rounded-full text-foreground/90 transition-colors hover:bg-white/10 hover:text-primary"
                   >
                     <FaGithub className="size-4" />
@@ -72,8 +76,8 @@ export function ProjectCard({ project }: { project: ProjectCardItem }) {
                     href={project.liveUrl}
                     target="_blank"
                     rel="noreferrer"
-                    aria-label="View live site"
-                    title="View live site"
+                    aria-label={t.projects.viewLiveSite}
+                    title={t.projects.viewLiveSite}
                     className="flex size-8 items-center justify-center rounded-full text-foreground/90 transition-colors hover:bg-white/10 hover:text-primary"
                   >
                     <LuExternalLink className="size-4" />

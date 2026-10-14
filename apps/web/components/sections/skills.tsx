@@ -1,5 +1,7 @@
 import type { SkillsContent } from "@portfolio/sections";
 import { TechMarquee, type TechMarqueeItem } from "@/components/tech-marquee";
+import type { AppLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { SectionShell } from "./section-shell";
 import { EmptyState } from "./empty-state";
 import { SkillsDiagram } from "./skills-diagram";
@@ -43,18 +45,21 @@ function SkillTileList({ items }: { items: SkillListItem[] }) {
 }
 
 export function SkillsSection({
+  locale,
   id,
   content,
   headingLevel,
   items,
   techStackItems,
 }: {
+  locale: AppLocale;
   id: string;
   content: SkillsContent;
   headingLevel: 1 | 2 | 3;
   items: SkillListItem[];
   techStackItems: TechMarqueeItem[];
 }) {
+  const t = getDictionary(locale);
   const { ungrouped, grouped } = groupByCategory(items);
 
   const diagramClusterItems = [
@@ -67,7 +72,7 @@ export function SkillsSection({
 
   return (
     <SectionShell
-      eyebrow="Stack"
+      eyebrow={t.eyebrow.stack}
       id={id}
       headingLevel={headingLevel}
       heading={content.heading}
@@ -78,6 +83,7 @@ export function SkillsSection({
       <TechMarquee items={techStackItems} />
       {showDiagram ? (
         <SkillsDiagram
+          defaultCenterLabel={t.skills.techStack}
           centerLabel={content.diagramCenterLabel}
           centerSubtitle={content.diagramCenterSubtitle}
           topLeftTitle={content.diagramTopLeftTitle}
@@ -90,7 +96,7 @@ export function SkillsSection({
           bottomRightItems={content.diagramBottomRightItems}
         />
       ) : items.length === 0 ? (
-        <EmptyState message="No skills listed yet." />
+        <EmptyState message={t.empty.skills} />
       ) : (
         <div className="mt-10 space-y-8">
           {ungrouped.length > 0 ? <SkillTileList items={ungrouped} /> : null}

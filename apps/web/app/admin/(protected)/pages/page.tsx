@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LuPlus } from "react-icons/lu";
 import { prisma } from "@portfolio/db/server";
 import { CreateSlugContentForm } from "@/components/admin/create-slug-content-form";
+import { TranslationChips } from "@/components/admin/translation-chips";
+import type { AppLocale } from "@/lib/i18n/config";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { Pagination } from "@/components/pagination";
 import { SearchInput } from "@/components/admin/search-input";
@@ -33,6 +35,17 @@ export default async function AdminPagesListPage({
     prisma.page.count({ where }),
   ]);
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const siblingRows = await prisma.page.findMany({
+    where: { translationGroupId: { in: pages.map((row) => row.translationGroupId) } },
+    select: { translationGroupId: true, locale: true },
+  });
+  const presentByGroup = new Map<string, AppLocale[]>();
+  for (const sibling of siblingRows) {
+    presentByGroup.set(sibling.translationGroupId, [
+      ...(presentByGroup.get(sibling.translationGroupId) ?? []),
+      sibling.locale,
+    ]);
+  }
 
   return (
     <div className={styles.page}>
@@ -50,13 +63,19 @@ export default async function AdminPagesListPage({
                   <span className={styles.rowMain}>
                     <span className={styles.title}>{page.title}</span>
                     <span className={styles.meta}>
-                      {page.slug}/{page.locale} · updated{" "}
+                      {page.slug} · updated{" "}
                       <time dateTime={page.updatedAt.toISOString()}>
                         {formatRelativeTime(page.updatedAt)}
                       </time>
                     </span>
                   </span>
-                  <StatusBadge status={page.status} />
+                  <span className={styles.rowBadges}>
+                    <TranslationChips
+                      present={presentByGroup.get(page.translationGroupId) ?? [page.locale]}
+                      current={page.locale}
+                    />
+                    <StatusBadge status={page.status} />
+                  </span>
                 </Link>
               </li>
             ))}

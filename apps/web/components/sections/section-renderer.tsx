@@ -1,5 +1,11 @@
 import { prisma, SectionType, getSiteSettings, type Locale } from "@portfolio/db/server";
 import { sectionRegistry } from "@portfolio/sections";
+import {
+  localesToQuery,
+  pickFeaturedLocalized,
+  pickLocalized,
+  pickLocalizedList,
+} from "@/lib/i18n/content";
 import { HeroSection } from "./hero";
 import { AboutSection } from "./about";
 import { ProjectsSection } from "./projects";
@@ -61,9 +67,10 @@ async function renderSection(section: RenderableSection, locale: Locale) {
       const content = def.schema.parse(section.content);
       const headingId = slugifyHeading(content.heading, `section-${section.id}`);
       const image = await resolveSectionImage(content.imageId);
-      const settings = await getSiteSettings();
+      const settings = await getSiteSettings(locale);
       return (
         <HeroSection
+          locale={locale}
           id={headingId}
           content={content}
           headingLevel={def.headingLevel}
@@ -79,7 +86,13 @@ async function renderSection(section: RenderableSection, locale: Locale) {
       const headingId = slugifyHeading(content.heading, `section-${section.id}`);
       const image = await resolveSectionImage(content.imageId);
       return (
-        <AboutSection id={headingId} content={content} headingLevel={def.headingLevel} image={image} />
+        <AboutSection
+          locale={locale}
+          id={headingId}
+          content={content}
+          headingLevel={def.headingLevel}
+          image={image}
+        />
       );
     }
     case SectionType.PROJECTS: {
@@ -87,12 +100,11 @@ async function renderSection(section: RenderableSection, locale: Locale) {
       const content = def.schema.parse(section.content);
       const headingId = slugifyHeading(content.heading, `section-${section.id}`);
       const isCuratedMode = content.displayMode === "featured" || content.displayMode === "slider";
-      const projects = await prisma.project.findMany({
+      const rows = await prisma.project.findMany({
         where: isCuratedMode
-          ? { locale, status: "PUBLISHED", featured: true }
-          : { locale, status: "PUBLISHED" },
-        orderBy: isCuratedMode ? { featuredOrder: "asc" } : { publishedAt: "desc" },
-        take: content.limit ?? (isCuratedMode ? undefined : 6),
+          ? { locale: { in: localesToQuery(locale) }, status: "PUBLISHED" }
+          : { locale: { in: localesToQuery(locale) }, status: "PUBLISHED" },
+        orderBy: { publishedAt: "desc" },
         select: {
           id: true,
           slug: true,
@@ -100,14 +112,22 @@ async function renderSection(section: RenderableSection, locale: Locale) {
           excerpt: true,
           codeRepository: true,
           liveUrl: true,
+          locale: true,
+          translationGroupId: true,
+          featured: true,
+          featuredOrder: true,
+          publishedAt: true,
           coverImage: {
             select: { url: true, width: true, height: true, blurDataUrl: true, altText: true },
           },
           tags: { select: { name: true } },
         },
       });
+      const ordered = isCuratedMode ? pickFeaturedLocalized(rows, locale) : pickLocalized(rows, locale);
+      const projects = ordered.slice(0, content.limit ?? (isCuratedMode ? undefined : 6));
       return (
         <ProjectsSection
+          locale={locale}
           id={headingId}
           content={content}
           headingLevel={def.headingLevel}
@@ -123,7 +143,7 @@ async function renderSection(section: RenderableSection, locale: Locale) {
       const content = def.schema.parse(section.content);
       const headingId = slugifyHeading(content.heading, `section-${section.id}`);
       const items = await prisma.experience.findMany({
-        where: { locale },
+        where: { locale: { in: localesToQuery(locale) } },
         orderBy: { order: "asc" },
         select: {
           id: true,
@@ -132,10 +152,19 @@ async function renderSection(section: RenderableSection, locale: Locale) {
           startDate: true,
           endDate: true,
           description: true,
+          locale: true,
+          translationGroupId: true,
+          order: true,
         },
       });
       return (
-        <ExperienceSection id={headingId} content={content} headingLevel={def.headingLevel} items={items} />
+        <ExperienceSection
+          locale={locale}
+          id={headingId}
+          content={content}
+          headingLevel={def.headingLevel}
+          items={pickLocalizedList(items, locale)}
+        />
       );
     }
     case SectionType.EDUCATION: {
@@ -143,7 +172,7 @@ async function renderSection(section: RenderableSection, locale: Locale) {
       const content = def.schema.parse(section.content);
       const headingId = slugifyHeading(content.heading, `section-${section.id}`);
       const items = await prisma.education.findMany({
-        where: { locale },
+        where: { locale: { in: localesToQuery(locale) } },
         orderBy: { order: "asc" },
         select: {
           id: true,
@@ -153,10 +182,19 @@ async function renderSection(section: RenderableSection, locale: Locale) {
           startDate: true,
           endDate: true,
           description: true,
+          locale: true,
+          translationGroupId: true,
+          order: true,
         },
       });
       return (
-        <EducationSection id={headingId} content={content} headingLevel={def.headingLevel} items={items} />
+        <EducationSection
+          locale={locale}
+          id={headingId}
+          content={content}
+          headingLevel={def.headingLevel}
+          items={pickLocalizedList(items, locale)}
+        />
       );
     }
     case SectionType.SKILLS: {
@@ -164,9 +202,9 @@ async function renderSection(section: RenderableSection, locale: Locale) {
       const content = def.schema.parse(section.content);
       const headingId = slugifyHeading(content.heading, `section-${section.id}`);
       const items = await prisma.skill.findMany({
-        where: { locale },
+        where: { locale: { in: localesToQuery(locale) } },
         orderBy: { order: "asc" },
-        select: { id: true, name: true, category: true },
+        select: { id: true, name: true, category: true, locale: true, translationGroupId: true, order: true },
       });
       const techStackItems = await prisma.techStackItem.findMany({
         orderBy: { order: "asc" },
@@ -174,10 +212,11 @@ async function renderSection(section: RenderableSection, locale: Locale) {
       });
       return (
         <SkillsSection
+          locale={locale}
           id={headingId}
           content={content}
           headingLevel={def.headingLevel}
-          items={items}
+          items={pickLocalizedList(items, locale)}
           techStackItems={techStackItems}
         />
       );
@@ -187,12 +226,18 @@ async function renderSection(section: RenderableSection, locale: Locale) {
       const content = def.schema.parse(section.content);
       const headingId = slugifyHeading(content.heading, `section-${section.id}`);
       const items = await prisma.language.findMany({
-        where: { locale },
+        where: { locale: { in: localesToQuery(locale) } },
         orderBy: { order: "asc" },
-        select: { id: true, name: true, proficiency: true },
+        select: { id: true, name: true, proficiency: true, locale: true, translationGroupId: true, order: true },
       });
       return (
-        <LanguagesSection id={headingId} content={content} headingLevel={def.headingLevel} items={items} />
+        <LanguagesSection
+          locale={locale}
+          id={headingId}
+          content={content}
+          headingLevel={def.headingLevel}
+          items={pickLocalizedList(items, locale)}
+        />
       );
     }
     case SectionType.SERVICES: {
@@ -200,12 +245,18 @@ async function renderSection(section: RenderableSection, locale: Locale) {
       const content = def.schema.parse(section.content);
       const headingId = slugifyHeading(content.heading, `section-${section.id}`);
       const items = await prisma.service.findMany({
-        where: { locale },
+        where: { locale: { in: localesToQuery(locale) } },
         orderBy: { order: "asc" },
-        select: { id: true, title: true, description: true },
+        select: { id: true, title: true, description: true, locale: true, translationGroupId: true, order: true },
       });
       return (
-        <ServicesSection id={headingId} content={content} headingLevel={def.headingLevel} items={items} />
+        <ServicesSection
+          locale={locale}
+          id={headingId}
+          content={content}
+          headingLevel={def.headingLevel}
+          items={pickLocalizedList(items, locale)}
+        />
       );
     }
     case SectionType.TESTIMONIALS: {
@@ -213,43 +264,67 @@ async function renderSection(section: RenderableSection, locale: Locale) {
       const content = def.schema.parse(section.content);
       const headingId = slugifyHeading(content.heading, `section-${section.id}`);
       const items = await prisma.testimonial.findMany({
-        where: { locale },
+        where: { locale: { in: localesToQuery(locale) } },
         orderBy: { order: "asc" },
-        select: { id: true, authorName: true, authorRole: true, quote: true },
+        select: {
+          id: true,
+          authorName: true,
+          authorRole: true,
+          quote: true,
+          locale: true,
+          translationGroupId: true,
+          order: true,
+        },
       });
       return (
-        <TestimonialsSection id={headingId} content={content} headingLevel={def.headingLevel} items={items} />
+        <TestimonialsSection
+          locale={locale}
+          id={headingId}
+          content={content}
+          headingLevel={def.headingLevel}
+          items={pickLocalizedList(items, locale)}
+        />
       );
     }
     case SectionType.BLOG: {
       const def = sectionRegistry[SectionType.BLOG];
       const content = def.schema.parse(section.content);
       const headingId = slugifyHeading(content.heading, `section-${section.id}`);
-      const posts = await prisma.post.findMany({
-        where: { locale, status: "PUBLISHED" },
+      const postRows = await prisma.post.findMany({
+        where: { locale: { in: localesToQuery(locale) }, status: "PUBLISHED" },
         orderBy: { publishedAt: "desc" },
-        take: content.limit ?? 3,
         select: {
           id: true,
           slug: true,
           title: true,
           excerpt: true,
+          locale: true,
+          translationGroupId: true,
+          publishedAt: true,
           coverImage: {
             select: { url: true, width: true, height: true, blurDataUrl: true, altText: true },
           },
         },
       });
+      const posts = pickLocalized(postRows, locale).slice(0, content.limit ?? 3);
       return (
-        <BlogSection id={headingId} content={content} headingLevel={def.headingLevel} items={posts} />
+        <BlogSection
+          locale={locale}
+          id={headingId}
+          content={content}
+          headingLevel={def.headingLevel}
+          items={posts}
+        />
       );
     }
     case SectionType.CONTACT: {
       const def = sectionRegistry[SectionType.CONTACT];
       const content = def.schema.parse(section.content);
       const headingId = slugifyHeading(content.heading, `section-${section.id}`);
-      const settings = await getSiteSettings();
+      const settings = await getSiteSettings(locale);
       return (
         <ContactSection
+          locale={locale}
           id={headingId}
           content={content}
           headingLevel={def.headingLevel}
@@ -266,13 +341,13 @@ async function renderSection(section: RenderableSection, locale: Locale) {
       const def = sectionRegistry[SectionType.RESUME];
       const content = def.schema.parse(section.content);
       const headingId = slugifyHeading(content.heading, `section-${section.id}`);
-      return <ResumeSection id={headingId} content={content} headingLevel={def.headingLevel} />;
+      return <ResumeSection locale={locale} id={headingId} content={content} headingLevel={def.headingLevel} />;
     }
     case SectionType.NOW: {
       const def = sectionRegistry[SectionType.NOW];
       const content = def.schema.parse(section.content);
       const headingId = slugifyHeading(content.heading, `section-${section.id}`);
-      return <NowSection id={headingId} content={content} headingLevel={def.headingLevel} />;
+      return <NowSection locale={locale} id={headingId} content={content} headingLevel={def.headingLevel} />;
     }
     default:
       return null;

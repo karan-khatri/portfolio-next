@@ -3,6 +3,8 @@ import { LuMail, LuMapPin, LuChevronRight } from "react-icons/lu";
 import { FaGithub, FaLinkedin, FaInstagram } from "react-icons/fa";
 import { SiUpwork, SiFiverr } from "react-icons/si";
 import { ContactForm } from "./contact-form";
+import type { AppLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { SectionShell } from "./section-shell";
 
 const SOCIAL_LINKS = [
@@ -14,6 +16,7 @@ const SOCIAL_LINKS = [
 ] as const;
 
 export function ContactSection({
+  locale,
   id,
   content,
   headingLevel,
@@ -24,6 +27,7 @@ export function ContactSection({
   instagramUrl,
   location,
 }: Readonly<{
+  locale: AppLocale;
   id: string;
   content: ContactContent;
   headingLevel: 1 | 2 | 3;
@@ -34,6 +38,7 @@ export function ContactSection({
   instagramUrl?: string | null;
   location?: string | null;
 }>) {
+  const t = getDictionary(locale);
   const urlsByKey: Record<(typeof SOCIAL_LINKS)[number]["key"], string | null | undefined> = {
     github: githubUrl,
     linkedin: linkedinUrl,
@@ -45,7 +50,7 @@ export function ContactSection({
 
   return (
     <SectionShell
-      eyebrow="Contact"
+      eyebrow={t.eyebrow.contact}
       id={id}
       headingLevel={headingLevel}
       heading={content.heading}
@@ -58,7 +63,7 @@ export function ContactSection({
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1.5">
             <span className="size-1.5 rounded-full bg-primary" />
             <span className="font-mono text-[10px] tracking-[0.28em] text-primary uppercase">
-              System online
+              {t.contact.systemOnline}
             </span>
           </div>
 
@@ -72,7 +77,7 @@ export function ContactSection({
               </span>
               <div className="min-w-0 flex-1">
                 <p className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-                  Email
+                  {t.contact.email}
                 </p>
                 <p className="truncate text-sm font-semibold">{content.email}</p>
               </div>
@@ -86,7 +91,7 @@ export function ContactSection({
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-                    Location
+                    {t.contact.location}
                   </p>
                   <p className="truncate text-sm font-semibold">{location}</p>
                 </div>
@@ -97,7 +102,7 @@ export function ContactSection({
           {socialLinks.length > 0 ? (
             <div>
               <p className="mb-3 font-mono text-[10px] tracking-[0.28em] text-muted-foreground uppercase">
-                Find me elsewhere
+                {t.contact.findMeElsewhere}
               </p>
               <div className="flex flex-wrap gap-3">
                 {socialLinks.map((social) => (

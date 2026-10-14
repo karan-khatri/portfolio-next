@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { LuArrowLeft, LuArrowRight, LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import adminStyles from "./admin/pagination.module.scss";
+import type { AppLocale } from "@/lib/i18n/config";
+import { formatMessage, getDictionary } from "@/lib/i18n/dictionaries";
+import { localizePath } from "@/lib/i18n/paths";
 
 function buildPageHref(basePath: string, page: number, query?: Record<string, string | undefined>) {
   const params = new URLSearchParams();
@@ -18,16 +21,20 @@ export function Pagination({
   basePath,
   query,
   variant = "site",
+  locale = "en",
 }: {
   currentPage: number;
   totalPages: number;
   basePath: string;
   query?: Record<string, string | undefined>;
   variant?: "site" | "admin";
+  locale?: AppLocale;
 }) {
   if (totalPages <= 1) return null;
 
-  const pageHref = (page: number) => buildPageHref(basePath, page, query);
+  const t = getDictionary(locale);
+  const pageHref = (page: number) =>
+    buildPageHref(variant === "site" ? localizePath(basePath, locale) : basePath, page, query);
 
   if (variant === "admin") {
     return (
@@ -64,24 +71,24 @@ export function Pagination({
   }
 
   return (
-    <nav aria-label="Pagination" className="mt-16 flex items-center justify-between gap-4">
+    <nav aria-label={t.pagination.label} className="mt-16 flex items-center justify-between gap-4">
       {currentPage > 1 ? (
         <Link
           href={pageHref(currentPage - 1)}
           className="group flex items-center gap-2 font-mono text-xs text-primary"
         >
           <LuArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-1" />
-          Prev
+          {t.pagination.prev}
         </Link>
       ) : (
         <span className="flex items-center gap-2 font-mono text-xs text-muted-foreground/40">
           <LuArrowLeft className="size-3.5" />
-          Prev
+          {t.pagination.prev}
         </span>
       )}
 
       <span className="font-mono text-xs text-muted-foreground">
-        Page {currentPage} of {totalPages}
+        {formatMessage(t.pagination.pageOf, { current: currentPage, total: totalPages })}
       </span>
 
       {currentPage < totalPages ? (
@@ -89,12 +96,12 @@ export function Pagination({
           href={pageHref(currentPage + 1)}
           className="group flex items-center gap-2 font-mono text-xs text-primary"
         >
-          Next
+          {t.pagination.next}
           <LuArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
         </Link>
       ) : (
         <span className="flex items-center gap-2 font-mono text-xs text-muted-foreground/40">
-          Next
+          {t.pagination.next}
           <LuArrowRight className="size-3.5" />
         </span>
       )}

@@ -1,0 +1,27 @@
+@use "../../styles/admin/mixins" as mix;
+
+.chips {
+  display: inline-flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.chip {
+  padding: 0.0625rem 0.4375rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  @include mix.label-mono;
+  color: var(--muted-foreground);
+  opacity: 0.5;
+
+  &[data-present="true"] {
+    border-color: color-mix(in oklch, var(--primary) 45%, transparent);
+    color: var(--primary);
+    opacity: 1;
+  }
+
+  &[data-current="true"] {
+    background: color-mix(in oklch, var(--primary) 14%, transparent);
+    font-weight: 700;
+  }
+}

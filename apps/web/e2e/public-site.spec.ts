@@ -48,7 +48,7 @@ test.describe("public site golden paths", () => {
     page,
   }) => {
     await page.goto("/projects");
-    const link = page.locator('a:has-text("E2E Public Project")').first();
+    const link = page.locator('a[aria-label="E2E Public Project"], a:has-text("E2E Public Project")').first();
     await expect(link).toBeVisible();
     await link.click();
     await expect(page).toHaveURL(/\/projects\/e2e-public-project$/);

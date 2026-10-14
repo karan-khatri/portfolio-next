@@ -4,6 +4,8 @@ import { LuArrowRight } from "react-icons/lu";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import type { AppLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { SectionHeading } from "./heading";
 
 const HERO_SOCIAL_LINKS = [
@@ -20,6 +22,7 @@ export interface SectionImage {
 }
 
 export function HeroSection({
+  locale,
   id,
   content,
   headingLevel,
@@ -27,6 +30,7 @@ export function HeroSection({
   githubUrl,
   linkedinUrl,
 }: Readonly<{
+  locale: AppLocale;
   id: string;
   content: HeroContent;
   headingLevel: 1 | 2 | 3;
@@ -34,6 +38,7 @@ export function HeroSection({
   githubUrl?: string | null;
   linkedinUrl?: string | null;
 }>) {
+  const t = getDictionary(locale);
   const urlsByKey: Record<(typeof HERO_SOCIAL_LINKS)[number]["key"], string | null | undefined> = {
     github: githubUrl,
     linkedin: linkedinUrl,
@@ -87,7 +92,7 @@ export function HeroSection({
         <div className="mt-2 flex items-center gap-3">
           <span className="size-2 rounded-full bg-primary animate-pulse" />
           <span className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-            Open to remote roles
+            {t.hero.openToRemote}
           </span>
         </div>
       </div>

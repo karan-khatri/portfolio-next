@@ -1,8 +1,8 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { prisma, upsertSeo, type SeoEntityType, type SeoFields } from "@portfolio/db/server";
 import { requireEditor } from "@/lib/auth/require-admin";
+import { revalidatePublicSite } from "@/lib/admin/revalidate";
 
 export interface SaveSeoResult {
   error?: string;
@@ -11,13 +11,13 @@ export interface SaveSeoResult {
 async function revalidateEntityPath(entityType: SeoEntityType, entityId: string): Promise<void> {
   if (entityType === "Project") {
     const project = await prisma.project.findUnique({ where: { id: entityId }, select: { slug: true } });
-    if (project) revalidatePath(`/projects/${project.slug}`);
+    if (project) revalidatePublicSite();
   } else if (entityType === "Post") {
     const post = await prisma.post.findUnique({ where: { id: entityId }, select: { slug: true } });
-    if (post) revalidatePath(`/blog/${post.slug}`);
+    if (post) revalidatePublicSite();
   } else {
     const page = await prisma.page.findUnique({ where: { id: entityId }, select: { slug: true } });
-    if (page) revalidatePath(page.slug === "home" ? "/" : `/${page.slug}`);
+    if (page) revalidatePublicSite();
   }
 }
 

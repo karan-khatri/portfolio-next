@@ -1,20 +1,27 @@
-import { prisma, getSiteSettings, type SiteSettingsValues, type Locale } from "@portfolio/db/server";
+import { prisma, getSiteSettings, type SiteSettingsValues } from "@portfolio/db/server";
 import { getSectionNavItems, type SectionNavItem } from "@/components/sections/section-renderer";
+import { DEFAULT_LOCALE, type AppLocale } from "@/lib/i18n/config";
 
-const LOCALE: Locale = "en";
+async function loadConfiguredNav(locale: AppLocale) {
+  return prisma.navigationItem.findMany({
+    where: { locale, parentId: null },
+    orderBy: { order: "asc" },
+    include: { children: { orderBy: { order: "asc" } } },
+  });
+}
 
-export async function getPublicNav(): Promise<{
+export async function getPublicNav(locale: AppLocale = DEFAULT_LOCALE): Promise<{
   navItems: SectionNavItem[];
   settings: SiteSettingsValues;
 }> {
-  const [configuredNav, settings] = await Promise.all([
-    prisma.navigationItem.findMany({
-      where: { locale: LOCALE, parentId: null },
-      orderBy: { order: "asc" },
-      include: { children: { orderBy: { order: "asc" } } },
-    }),
-    getSiteSettings(),
-  ]);
+  const settingsPromise = getSiteSettings(locale);
+
+  let configuredNav = await loadConfiguredNav(locale);
+  if (configuredNav.length === 0 && locale !== DEFAULT_LOCALE) {
+    configuredNav = await loadConfiguredNav(DEFAULT_LOCALE);
+  }
+
+  const settings = await settingsPromise;
 
   if (configuredNav.length > 0) {
     return {
@@ -32,10 +39,17 @@ export async function getPublicNav(): Promise<{
     };
   }
 
-  const homePage = await prisma.page.findFirst({
-    where: { slug: "home", locale: LOCALE, status: "PUBLISHED" },
-    include: { sections: true },
-  });
+  const homePage =
+    (await prisma.page.findFirst({
+      where: { slug: "home", locale, status: "PUBLISHED" },
+      include: { sections: true },
+    })) ??
+    (locale !== DEFAULT_LOCALE
+      ? await prisma.page.findFirst({
+          where: { slug: "home", locale: DEFAULT_LOCALE, status: "PUBLISHED" },
+          include: { sections: true },
+        })
+      : null);
 
   return {
     navItems: homePage ? getSectionNavItems(homePage.sections) : [],

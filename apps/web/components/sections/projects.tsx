@@ -3,26 +3,31 @@ import { SectionShell } from "./section-shell";
 import { EmptyState } from "./empty-state";
 import { ProjectCard, type ProjectCardItem } from "./project-card";
 import { ProjectSlider } from "./project-slider";
+import type { AppLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 export type ProjectListItem = ProjectCardItem;
 
 export function ProjectsSection({
+  locale,
   id,
   content,
   headingLevel,
   items,
 }: {
+  locale: AppLocale;
   id: string;
   content: ProjectsContent;
   headingLevel: 1 | 2 | 3;
   items: ProjectListItem[];
 }) {
+  const t = getDictionary(locale);
   const emptyMessage =
-    content.displayMode === "list" ? "No projects published yet." : "No featured projects yet.";
+    content.displayMode === "list" ? t.empty.projects : t.empty.featuredProjects;
 
   return (
     <SectionShell
-      eyebrow="Projects"
+      eyebrow={t.eyebrow.projects}
       id={id}
       headingLevel={headingLevel}
       heading={content.heading}
@@ -33,12 +38,12 @@ export function ProjectsSection({
       {items.length === 0 ? (
         <EmptyState message={emptyMessage} />
       ) : content.displayMode === "slider" ? (
-        <ProjectSlider items={items} />
+        <ProjectSlider locale={locale} items={items} />
       ) : (
         <ul className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {items.map((project) => (
             <li key={project.id}>
-              <ProjectCard project={project} />
+              <ProjectCard locale={locale} project={project} />
             </li>
           ))}
         </ul>

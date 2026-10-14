@@ -56,6 +56,7 @@ export function ProjectEditor({
   revisions,
   initial,
   seo,
+  translationBar,
 }: {
   projectId: string;
   projectStatus: string;
@@ -63,6 +64,7 @@ export function ProjectEditor({
   revisions: RevisionHistoryItem[];
   initial: ProjectEditorInitial;
   seo: SeoInitial;
+  translationBar?: React.ReactNode;
 }) {
   const [title, setTitle] = useState(initial.title);
   const [excerpt, setExcerpt] = useState(initial.excerpt);
@@ -131,6 +133,7 @@ export function ProjectEditor({
       heading="Edit project"
       status={projectStatus}
       hasDraft={hasDraft}
+      translationBar={translationBar}
       sidebar={<RevisionHistoryPanel entityType="Project" entityId={projectId} revisions={revisions} />}
     >
       <Card>

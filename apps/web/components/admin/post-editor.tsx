@@ -59,6 +59,7 @@ export function PostEditor({
   authors,
   initial,
   seo,
+  translationBar,
 }: {
   postId: string;
   postStatus: string;
@@ -67,6 +68,7 @@ export function PostEditor({
   authors: { id: string; name: string }[];
   initial: PostEditorInitial;
   seo: SeoInitial;
+  translationBar?: React.ReactNode;
 }) {
   const [title, setTitle] = useState(initial.title);
   const [excerpt, setExcerpt] = useState(initial.excerpt);
@@ -113,6 +115,7 @@ export function PostEditor({
       heading="Edit post"
       status={postStatus}
       hasDraft={hasDraft}
+      translationBar={translationBar}
       sidebar={<RevisionHistoryPanel entityType="Post" entityId={postId} revisions={revisions} />}
     >
       <Card>

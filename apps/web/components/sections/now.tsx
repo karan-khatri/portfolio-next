@@ -1,6 +1,8 @@
 import type { NowContent } from "@portfolio/sections";
 import { LuCircleCheck, LuCircleDot, LuCircle } from "react-icons/lu";
 import { cn } from "@/lib/utils";
+import type { AppLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { SectionShell } from "./section-shell";
 
 const STATUS_ICON = {
@@ -22,17 +24,21 @@ const STATUS_LABEL_CLASS = {
 } as const;
 
 export function NowSection({
+  locale,
   id,
   content,
   headingLevel,
 }: Readonly<{
+  locale: AppLocale;
   id: string;
   content: NowContent;
   headingLevel: 1 | 2 | 3;
 }>) {
+  const t = getDictionary(locale);
+
   return (
     <SectionShell
-      eyebrow="Now"
+      eyebrow={t.eyebrow.now}
       id={id}
       headingLevel={headingLevel}
       heading={content.heading}

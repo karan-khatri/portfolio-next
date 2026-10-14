@@ -54,6 +54,7 @@ export function PageComposer({
   hasDraft,
   revisions,
   seo,
+  translationBar,
 }: {
   pageId: string;
   pageStatus: string;
@@ -63,6 +64,7 @@ export function PageComposer({
   hasDraft: boolean;
   revisions: RevisionHistoryItem[];
   seo: SeoInitial;
+  translationBar?: React.ReactNode;
 }) {
   const [title, setTitle] = useState(initialTitle);
   const [sections, setSections] = useState(initialSections);
@@ -140,6 +142,7 @@ export function PageComposer({
       heading="Edit page"
       status={pageStatus}
       hasDraft={hasDraft}
+      translationBar={translationBar}
       sidebar={<RevisionHistoryPanel entityType="Page" entityId={pageId} revisions={revisions} />}
     >
       <Card>

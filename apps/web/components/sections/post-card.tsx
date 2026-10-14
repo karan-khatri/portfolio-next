@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { LuArrowUpRight } from "react-icons/lu";
 import type { SectionImage } from "./hero";
+import type { AppLocale } from "@/lib/i18n/config";
+import { localizePath } from "@/lib/i18n/paths";
 
 export interface PostCardItem {
   id: string;
@@ -11,10 +13,10 @@ export interface PostCardItem {
   coverImage: SectionImage | null;
 }
 
-export function PostCard({ post }: { post: PostCardItem }) {
+export function PostCard({ post, locale }: { post: PostCardItem; locale: AppLocale }) {
   return (
       <Link
-        href={`/blog/${post.slug}`}
+        href={localizePath(`/blog/${post.slug}`, locale)}
         className="glass-panel glow-primary group flex h-full flex-col rounded-xl p-6 transition-all duration-300 sm:p-8"
       >
         {post.coverImage ? (

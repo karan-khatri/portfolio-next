@@ -62,6 +62,13 @@
     font-weight: 500;
   }
 
+  .rowBadges {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    flex-shrink: 0;
+  }
+
   .meta {
     font-family: var(--font-mono);
     font-size: 0.75rem;

@@ -1,7 +1,12 @@
 import { Locale } from "./generated/client";
 
-const VALID_LOCALES: string[] = Object.values(Locale);
+export const LOCALES: Locale[] = Object.values(Locale);
+export const DEFAULT_LOCALE: Locale = "en";
 
 export function isValidLocale(value: string): value is Locale {
-  return VALID_LOCALES.includes(value);
+  return LOCALES.includes(value as Locale);
+}
+
+export function resolveLocale(value: string | null | undefined): Locale {
+  return value && isValidLocale(value) ? value : DEFAULT_LOCALE;
 }

@@ -1,4 +1,5 @@
 import { prisma, getSiteSettings } from "@portfolio/db/server";
+import { DEFAULT_LOCALE, NON_DEFAULT_LOCALES, LOCALE_META } from "@/lib/i18n/config";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -8,21 +9,21 @@ function section(title: string, lines: string[]): string {
 }
 
 export async function GET() {
-  const settings = await getSiteSettings();
+  const settings = await getSiteSettings(DEFAULT_LOCALE);
 
   const [pages, projects, posts] = await Promise.all([
     prisma.page.findMany({
-      where: { status: "PUBLISHED", slug: { not: "home" }, OR: [{ seo: null }, { seo: { noindex: false } }] },
+      where: { status: "PUBLISHED", locale: DEFAULT_LOCALE, slug: { not: "home" }, OR: [{ seo: null }, { seo: { noindex: false } }] },
       select: { slug: true, title: true },
       orderBy: { title: "asc" },
     }),
     prisma.project.findMany({
-      where: { status: "PUBLISHED", OR: [{ seo: null }, { seo: { noindex: false } }] },
+      where: { status: "PUBLISHED", locale: DEFAULT_LOCALE, OR: [{ seo: null }, { seo: { noindex: false } }] },
       select: { slug: true, title: true, excerpt: true },
       orderBy: { createdAt: "desc" },
     }),
     prisma.post.findMany({
-      where: { status: "PUBLISHED", OR: [{ seo: null }, { seo: { noindex: false } }] },
+      where: { status: "PUBLISHED", locale: DEFAULT_LOCALE, OR: [{ seo: null }, { seo: { noindex: false } }] },
       select: { slug: true, title: true, excerpt: true },
       orderBy: { publishedAt: "desc" },
     }),
@@ -50,6 +51,9 @@ export async function GET() {
         settings.resumeUrl ? `- [Resume (PDF)](${siteUrl}/resume.pdf)` : "",
         settings.githubUrl ? `- [GitHub](${settings.githubUrl})` : "",
         settings.linkedinUrl ? `- [LinkedIn](${settings.linkedinUrl})` : "",
+        ...NON_DEFAULT_LOCALES.map(
+          (locale) => `- [${LOCALE_META[locale].label} version](${siteUrl}/${locale})`,
+        ),
       ].filter(Boolean),
     ),
   ];

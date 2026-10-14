@@ -1,9 +1,9 @@
-import { getSiteSettings } from "@portfolio/db/server";
+import { getLocalizedSiteSettings } from "@portfolio/db/server";
 import { SiteSettingsForm } from "@/components/admin/site-settings-form";
 import styles from "./page.module.scss";
 
 export default async function AdminSettingsPage() {
-  const settings = await getSiteSettings();
+  const settings = await getLocalizedSiteSettings();
 
   return (
     <div className={styles.page}>

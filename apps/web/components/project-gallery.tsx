@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import useEmblaCarousel from "embla-carousel-react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
+import { useI18n } from "@/lib/i18n/context";
+import { formatMessage } from "@/lib/i18n/dictionaries";
 
 export interface ProjectGalleryImage {
   url: string;
@@ -20,6 +22,7 @@ export function ProjectGallery({
   images: ProjectGalleryImage[];
   fallbackAlt: string;
 }) {
+  const { t } = useI18n();
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
@@ -70,7 +73,7 @@ export function ProjectGallery({
                 key={image.url}
                 type="button"
                 onClick={() => emblaApi?.scrollTo(index)}
-                aria-label={`Go to image ${index + 1}`}
+                aria-label={formatMessage(t.projects.goToImage, { n: index + 1 })}
                 className={`h-1.5 rounded-full transition-all ${
                   index === selectedIndex ? "w-6 bg-primary" : "w-1.5 bg-border"
                 }`}
@@ -80,7 +83,7 @@ export function ProjectGallery({
           <button
             type="button"
             onClick={() => emblaApi?.scrollPrev()}
-            aria-label="Previous image"
+            aria-label={t.projects.previousImage}
             disabled={!canScrollPrev}
             className="glass-panel absolute top-1/2 -left-4 hidden -translate-y-1/2 items-center justify-center rounded-full p-2 text-foreground transition-opacity disabled:opacity-30 sm:flex"
           >
@@ -89,7 +92,7 @@ export function ProjectGallery({
           <button
             type="button"
             onClick={() => emblaApi?.scrollNext()}
-            aria-label="Next image"
+            aria-label={t.projects.nextImage}
             disabled={!canScrollNext}
             className="glass-panel absolute top-1/2 -right-4 hidden -translate-y-1/2 items-center justify-center rounded-full p-2 text-foreground transition-opacity disabled:opacity-30 sm:flex"
           >

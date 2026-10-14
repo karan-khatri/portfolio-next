@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LuPlus } from "react-icons/lu";
 import { prisma } from "@portfolio/db/server";
 import { CreateSlugContentForm } from "@/components/admin/create-slug-content-form";
+import { TranslationChips } from "@/components/admin/translation-chips";
+import type { AppLocale } from "@/lib/i18n/config";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { Pagination } from "@/components/pagination";
 import { SearchInput } from "@/components/admin/search-input";
@@ -39,6 +41,17 @@ export default async function AdminProjectsListPage({
     }),
   ]);
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const siblingRows = await prisma.project.findMany({
+    where: { translationGroupId: { in: projects.map((row) => row.translationGroupId) } },
+    select: { translationGroupId: true, locale: true },
+  });
+  const presentByGroup = new Map<string, AppLocale[]>();
+  for (const sibling of siblingRows) {
+    presentByGroup.set(sibling.translationGroupId, [
+      ...(presentByGroup.get(sibling.translationGroupId) ?? []),
+      sibling.locale,
+    ]);
+  }
 
   return (
     <div className={styles.page}>
@@ -58,13 +71,19 @@ export default async function AdminProjectsListPage({
                   <span className={styles.rowMain}>
                     <span className={styles.title}>{project.title}</span>
                     <span className={styles.meta}>
-                      {project.slug}/{project.locale} · updated{" "}
+                      {project.slug} · updated{" "}
                       <time dateTime={project.updatedAt.toISOString()}>
                         {formatRelativeTime(project.updatedAt)}
                       </time>
                     </span>
                   </span>
-                  <StatusBadge status={project.status} />
+                  <span className={styles.rowBadges}>
+                    <TranslationChips
+                      present={presentByGroup.get(project.translationGroupId) ?? [project.locale]}
+                      current={project.locale}
+                    />
+                    <StatusBadge status={project.status} />
+                  </span>
                 </Link>
               </li>
             ))}

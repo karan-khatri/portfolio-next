@@ -12,6 +12,7 @@ import {
 } from "@portfolio/db/server";
 import { requireEditor } from "@/lib/auth/require-admin";
 import type { ComposerActionResult } from "@/lib/admin/action-result";
+import { revalidatePublicSite } from "@/lib/admin/revalidate";
 
 export interface ProjectFormInput {
   title: string;
@@ -76,12 +77,7 @@ export async function publishAction(
       revisionId: revision.id,
       userId: user.id,
     });
-    const project = await prisma.project.findUniqueOrThrow({
-      where: { id: projectId },
-      select: { slug: true },
-    });
-    revalidatePath("/");
-    revalidatePath(`/projects/${project.slug}`);
+    revalidatePublicSite();
     return { revisionId: revision.id };
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Could not publish" };
@@ -92,12 +88,7 @@ export async function unpublishAction(projectId: string): Promise<ComposerAction
   try {
     const user = await requireEditor();
     await unpublishEntity({ entityType: "Project", entityId: projectId, userId: user.id });
-    const project = await prisma.project.findUniqueOrThrow({
-      where: { id: projectId },
-      select: { slug: true },
-    });
-    revalidatePath("/");
-    revalidatePath(`/projects/${project.slug}`);
+    revalidatePublicSite();
     return {};
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Could not unpublish" };
@@ -122,7 +113,7 @@ export async function toggleFeaturedAction(
         data: { featured: false, featuredOrder: null },
       });
     }
-    revalidatePath("/");
+    revalidatePublicSite();
     revalidatePath("/admin/projects");
     return {};
   } catch (error) {

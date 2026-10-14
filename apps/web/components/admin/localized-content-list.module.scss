@@ -1,0 +1,80 @@
+@use "../../styles/admin/mixins" as mix;
+
+.sharedBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.blockLabel {
+  @include mix.label-mono;
+  color: var(--muted-foreground);
+}
+
+.localeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 1rem;
+}
+
+.localeBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.localeLegend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-inline: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.localeCode {
+  @include mix.label-mono;
+  color: var(--primary);
+}
+
+.optional {
+  @include mix.label-mono;
+  color: var(--muted-foreground);
+}
+
+.localeHint {
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+}
+
+.localeChips {
+  display: inline-flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.chip {
+  padding: 0.0625rem 0.4375rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  @include mix.label-mono;
+  color: var(--muted-foreground);
+  opacity: 0.55;
+
+  &[data-present="true"] {
+    border-color: color-mix(in oklch, var(--primary) 45%, transparent);
+    color: var(--primary);
+    opacity: 1;
+  }
+}
+
+.localeFields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  min-width: 0;
+}

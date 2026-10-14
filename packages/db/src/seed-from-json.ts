@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { prisma } from "./client";
 import { assertHasActiveRole } from "./auth";
 import { saveDraft, publishRevision, type PageSectionInput } from "./cms";
@@ -307,7 +308,7 @@ async function replaceResumeExperience(items: SeedExperienceInput[]): Promise<nu
   await prisma.$transaction([
     prisma.experience.deleteMany({ where: { locale: "en" } }),
     prisma.experience.createMany({
-      data: items.map((entry, index) => ({ locale: "en" as const, ...entry, order: index })),
+      data: items.map((entry, index) => ({ locale: "en" as const, translationGroupId: randomUUID(), ...entry, order: index })),
     }),
   ]);
   return items.length;
@@ -317,7 +318,7 @@ async function replaceResumeEducation(items: SeedEducationInput[]): Promise<numb
   await prisma.$transaction([
     prisma.education.deleteMany({ where: { locale: "en" } }),
     prisma.education.createMany({
-      data: items.map((entry, index) => ({ locale: "en" as const, ...entry, order: index })),
+      data: items.map((entry, index) => ({ locale: "en" as const, translationGroupId: randomUUID(), ...entry, order: index })),
     }),
   ]);
   return items.length;
@@ -327,7 +328,7 @@ async function replaceResumeLanguages(items: SeedLanguageInput[]): Promise<numbe
   await prisma.$transaction([
     prisma.language.deleteMany({ where: { locale: "en" } }),
     prisma.language.createMany({
-      data: items.map((entry, index) => ({ locale: "en" as const, ...entry, order: index })),
+      data: items.map((entry, index) => ({ locale: "en" as const, translationGroupId: randomUUID(), ...entry, order: index })),
     }),
   ]);
   return items.length;
@@ -337,7 +338,7 @@ async function replaceResumeSkills(items: SeedSkillInput[]): Promise<number> {
   await prisma.$transaction([
     prisma.skill.deleteMany({ where: { locale: "en" } }),
     prisma.skill.createMany({
-      data: items.map((entry, index) => ({ locale: "en" as const, ...entry, order: index })),
+      data: items.map((entry, index) => ({ locale: "en" as const, translationGroupId: randomUUID(), ...entry, order: index })),
     }),
   ]);
   return items.length;

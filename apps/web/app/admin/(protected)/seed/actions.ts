@@ -1,10 +1,10 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { applySeedPayload, logAudit, type SeedApplyResult } from "@portfolio/db/server";
 import { requireAdminRole } from "@/lib/auth/require-admin";
 import { seedPayloadSchema } from "@/lib/admin/seed-schema";
 import type { ActionResult } from "@/lib/admin/action-result";
+import { revalidatePublicSite } from "@/lib/admin/revalidate";
 
 const MAX_BYTES = 2 * 1024 * 1024;
 
@@ -48,7 +48,7 @@ export async function applySeedJsonAction(formData: FormData): Promise<SeedUploa
       metadata: summary as Record<string, unknown>,
     });
 
-    revalidatePath("/", "layout");
+    revalidatePublicSite();
     return { summary };
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Seeding failed" };

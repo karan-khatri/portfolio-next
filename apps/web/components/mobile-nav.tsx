@@ -6,20 +6,24 @@ import { LuMenu, LuX } from "react-icons/lu";
 import type { SectionNavItem } from "@/components/sections/section-renderer";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { resolveNavHref } from "@/lib/nav-href";
+import { useI18n } from "@/lib/i18n/context";
 
 export function MobileNav({
   navItems,
   resumeUrl,
+  languageSwitcher,
 }: {
   navItems: SectionNavItem[];
   resumeUrl?: string | null;
+  languageSwitcher?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const { locale, t } = useI18n();
 
   return (
     <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
       <DialogPrimitive.Trigger
-        aria-label="Open menu"
+        aria-label={t.common.openMenu}
         className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-primary lg:hidden"
       >
         <LuMenu className="size-5" />
@@ -30,10 +34,10 @@ export function MobileNav({
         <DialogPrimitive.Popup className="top-0 fixed inset-y-0 right-0 z-50 flex w-full max-w-xs flex-col gap-8 border-l border-border bg-background p-6 outline-none data-open:animate-in data-open:slide-in-from-right data-closed:animate-out data-closed:slide-out-to-right lg:hidden">
           <div className="flex items-center justify-between">
             <span className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
-              Menu
+              {t.common.menu}
             </span>
             <DialogPrimitive.Close
-              aria-label="Close menu"
+              aria-label={t.common.closeMenu}
               className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-primary"
             >
               <LuX className="size-5" />
@@ -44,7 +48,7 @@ export function MobileNav({
             {navItems.map((item) => (
               <div key={item.id} className="flex flex-col">
                 <a
-                  href={resolveNavHref(item.href)}
+                  href={resolveNavHref(item.href, locale)}
                   onClick={() => setOpen(false)}
                   className="rounded-md px-3 py-3 font-mono text-sm tracking-widest text-foreground uppercase transition-colors hover:bg-foreground/5 hover:text-primary"
                 >
@@ -55,7 +59,7 @@ export function MobileNav({
                     {item.children.map((child) => (
                       <a
                         key={child.id}
-                        href={resolveNavHref(child.href)}
+                        href={resolveNavHref(child.href, locale)}
                         onClick={() => setOpen(false)}
                         className="rounded-md px-3 py-2 font-mono text-xs tracking-widest text-muted-foreground uppercase transition-colors hover:bg-foreground/5 hover:text-primary"
                       >
@@ -67,6 +71,8 @@ export function MobileNav({
               </div>
             ))}
           </nav>
+
+          {languageSwitcher ? <div className="border-t border-border pt-6">{languageSwitcher}</div> : null}
 
           <div className="flex items-center justify-between border-t border-border pt-6">
             <ThemeToggle
@@ -81,7 +87,7 @@ export function MobileNav({
                 onClick={() => setOpen(false)}
                 className="rounded-md bg-primary px-4 py-2 font-heading text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_15px_var(--ring)]"
               >
-                Resume
+                {t.common.resume}
               </a>
             ) : null}
           </div>

@@ -107,6 +107,7 @@ function CenterOrb({ label, subtitle }: { label: string; subtitle?: string }) {
 
 export interface SkillsDiagramProps {
   centerLabel?: string;
+  defaultCenterLabel?: string;
   centerSubtitle?: string;
   topLeftTitle?: string;
   topLeftItems: SkillsDiagramItem[];
@@ -120,6 +121,7 @@ export interface SkillsDiagramProps {
 
 export function SkillsDiagram({
   centerLabel,
+  defaultCenterLabel = "Tech Stack",
   centerSubtitle,
   topLeftTitle,
   topLeftItems,
@@ -149,7 +151,7 @@ export function SkillsDiagram({
     <div className="mt-16 flex flex-col items-center">
       {/* Compact stacked layout below the orbit breakpoint */}
       <div className="flex flex-col items-center gap-8 md:hidden">
-        <CenterOrb label={centerLabel ?? "Tech Stack"} subtitle={centerSubtitle} />
+        <CenterOrb label={centerLabel ?? defaultCenterLabel} subtitle={centerSubtitle} />
         <div className="flex w-full flex-col gap-6">
           {stackedClusters.map((cluster) => (
             <div key={cluster.title ?? cluster.items[0]?.id} className="flex flex-col gap-2.5">
@@ -167,7 +169,7 @@ export function SkillsDiagram({
       {/* Orbit layout */}
       <div className="relative justify-center items-center w-full min-h-80 hidden md:flex">
         <div className="relative mx-auto">
-          <CenterOrb label={centerLabel ?? "Tech Stack"} subtitle={centerSubtitle} />
+          <CenterOrb label={centerLabel ?? defaultCenterLabel} subtitle={centerSubtitle} />
         </div>
         <div className="absolute inline-block top-0 left-0 lg:left-1/7 xl:left-1/6">
           <ClusterBlock

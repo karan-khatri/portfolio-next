@@ -1,5 +1,6 @@
 "use server";
 
+import { randomUUID } from "node:crypto";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma, isValidLocale } from "@portfolio/db/server";
@@ -41,7 +42,7 @@ export async function createPageAction(
   }
 
   const page = await prisma.page.create({
-    data: { slug, locale, translationGroupId: slug, title, status: "DRAFT" },
+    data: { slug, locale, translationGroupId: randomUUID(), title, status: "DRAFT" },
   });
 
   revalidatePath("/admin/pages");

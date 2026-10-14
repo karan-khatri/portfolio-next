@@ -1,8 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import {
-  prisma,
   saveDraft,
   publishRevision,
   unpublishEntity,
@@ -13,12 +11,7 @@ import {
 import { validateSectionContent, SectionValidationError } from "@portfolio/sections";
 import { requireEditor } from "@/lib/auth/require-admin";
 import type { ComposerActionResult } from "@/lib/admin/action-result";
-
-// The "home" page is served at "/" (app/page.tsx), not "/home" — every other
-// standalone page is served at "/{slug}" via the app/[...slug] catch-all.
-function pagePath(slug: string): string {
-  return slug === "home" ? "/" : `/${slug}`;
-}
+import { revalidatePublicSite } from "@/lib/admin/revalidate";
 
 function buildValidatedData(title: string, sections: PageSectionInput[]): PageRevisionData {
   return {
@@ -61,12 +54,7 @@ export async function publishAction(
       revisionId: revision.id,
       userId: user.id,
     });
-    const page = await prisma.page.findUniqueOrThrow({
-      where: { id: pageId },
-      select: { slug: true },
-    });
-    revalidatePath("/");
-    revalidatePath(pagePath(page.slug));
+    revalidatePublicSite();
     return { revisionId: revision.id };
   } catch (error) {
     if (error instanceof SectionValidationError) return { error: error.message };
@@ -78,12 +66,7 @@ export async function unpublishAction(pageId: string): Promise<ComposerActionRes
   try {
     const user = await requireEditor();
     await unpublishEntity({ entityType: "Page", entityId: pageId, userId: user.id });
-    const page = await prisma.page.findUniqueOrThrow({
-      where: { id: pageId },
-      select: { slug: true },
-    });
-    revalidatePath("/");
-    revalidatePath(pagePath(page.slug));
+    revalidatePublicSite();
     return {};
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Could not unpublish" };

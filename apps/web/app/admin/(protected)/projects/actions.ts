@@ -1,9 +1,11 @@
 "use server";
 
+import { randomUUID } from "node:crypto";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma, isValidLocale } from "@portfolio/db/server";
 import { requireEditor } from "@/lib/auth/require-admin";
+import { revalidatePublicSite } from "@/lib/admin/revalidate";
 
 export interface CreateProjectState {
   error?: string;
@@ -41,7 +43,7 @@ export async function createProjectAction(
   }
 
   const project = await prisma.project.create({
-    data: { slug, locale, translationGroupId: slug, title, status: "DRAFT" },
+    data: { slug, locale, translationGroupId: randomUUID(), title, status: "DRAFT" },
   });
 
   revalidatePath("/admin/projects");
@@ -64,7 +66,7 @@ export async function reorderFeaturedProjectsAction(
         prisma.project.update({ where: { id, featured: true }, data: { featuredOrder: index } }),
       ),
     ]);
-    revalidatePath("/");
+    revalidatePublicSite();
     revalidatePath("/admin/projects");
     return {};
   } catch (error) {
@@ -79,7 +81,7 @@ export async function unfeatureProjectAction(projectId: string): Promise<{ error
       where: { id: projectId },
       data: { featured: false, featuredOrder: null },
     });
-    revalidatePath("/");
+    revalidatePublicSite();
     revalidatePath("/admin/projects");
     return {};
   } catch (error) {

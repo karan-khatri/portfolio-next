@@ -4,6 +4,7 @@ import { flatRevisionDataSchema } from "@/lib/revision-data";
 import { PostEditor } from "@/components/admin/post-editor";
 import { toMediaPickerValue, type MediaPickerValue } from "@/lib/admin/media";
 import type { RevisionHistoryItem } from "@/components/admin/revision-history-panel";
+import { EditorTranslationBar } from "@/components/admin/editor-translation-bar";
 
 export default async function PostEditorRoute({
   params,
@@ -62,6 +63,15 @@ export default async function PostEditorRoute({
       postStatus={post.status}
       hasDraft={Boolean(latestDraft)}
       revisions={revisions}
+      translationBar={
+        <EditorTranslationBar
+          entityType="Post"
+          id={post.id}
+          slug={post.slug}
+          locale={post.locale}
+          groupId={post.translationGroupId}
+        />
+      }
       authors={authors}
       initial={{ title, excerpt, body, tags: tagNames, coverImage, authorId }}
       seo={{

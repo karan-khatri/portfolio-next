@@ -4,6 +4,7 @@ import { pageRevisionDataSchema } from "@/lib/revision-data";
 import { PageComposer, type ComposerSection } from "@/components/admin/composer/page-composer";
 import { toMediaPickerValue, type MediaPickerValue } from "@/lib/admin/media";
 import type { RevisionHistoryItem } from "@/components/admin/revision-history-panel";
+import { EditorTranslationBar } from "@/components/admin/editor-translation-bar";
 
 export default async function PageComposerRoute({
   params,
@@ -71,6 +72,15 @@ export default async function PageComposerRoute({
       initialResolvedMedia={initialResolvedMedia}
       hasDraft={Boolean(latestDraft)}
       revisions={revisions}
+      translationBar={
+        <EditorTranslationBar
+          entityType="Page"
+          id={page.id}
+          slug={page.slug}
+          locale={page.locale}
+          groupId={page.translationGroupId}
+        />
+      }
       seo={{
         metaTitle: page.seo?.metaTitle ?? null,
         metaDescription: page.seo?.metaDescription ?? null,

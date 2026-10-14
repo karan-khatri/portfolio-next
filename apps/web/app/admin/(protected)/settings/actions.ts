@@ -1,16 +1,16 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { upsertSiteSettings, logAudit, type SiteSettingsValues } from "@portfolio/db/server";
+import { saveLocalizedSiteSettings, logAudit, type LocalizedSiteSettings } from "@portfolio/db/server";
 import { requireEditor } from "@/lib/auth/require-admin";
+import { revalidatePublicSite } from "@/lib/admin/revalidate";
 import type { ActionResult } from "@/lib/admin/action-result";
 
-export async function saveSiteSettingsAction(values: SiteSettingsValues): Promise<ActionResult> {
+export async function saveSiteSettingsAction(values: LocalizedSiteSettings): Promise<ActionResult> {
   try {
     const user = await requireEditor();
-    await upsertSiteSettings(values);
+    await saveLocalizedSiteSettings(values);
     await logAudit({ userId: user.id, action: "siteSettings.updated", entity: "SiteSetting", entityId: "site" });
-    revalidatePath("/");
+    revalidatePublicSite();
     return {};
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Could not save settings" };

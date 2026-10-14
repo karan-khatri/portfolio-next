@@ -1,8 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import {
-  prisma,
   saveDraft,
   publishRevision,
   unpublishEntity,
@@ -12,6 +10,7 @@ import {
 } from "@portfolio/db/server";
 import { requireEditor } from "@/lib/auth/require-admin";
 import type { ComposerActionResult } from "@/lib/admin/action-result";
+import { revalidatePublicSite } from "@/lib/admin/revalidate";
 
 export interface PostFormInput {
   title: string;
@@ -62,12 +61,7 @@ export async function publishAction(
       revisionId: revision.id,
       userId: user.id,
     });
-    const post = await prisma.post.findUniqueOrThrow({
-      where: { id: postId },
-      select: { slug: true },
-    });
-    revalidatePath("/");
-    revalidatePath(`/blog/${post.slug}`);
+    revalidatePublicSite();
     return { revisionId: revision.id };
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Could not publish" };
@@ -78,12 +72,7 @@ export async function unpublishAction(postId: string): Promise<ComposerActionRes
   try {
     const user = await requireEditor();
     await unpublishEntity({ entityType: "Post", entityId: postId, userId: user.id });
-    const post = await prisma.post.findUniqueOrThrow({
-      where: { id: postId },
-      select: { slug: true },
-    });
-    revalidatePath("/");
-    revalidatePath(`/blog/${post.slug}`);
+    revalidatePublicSite();
     return {};
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Could not unpublish" };

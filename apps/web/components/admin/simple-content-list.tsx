@@ -23,9 +23,9 @@ export interface SimpleContentItem {
   [key: string]: unknown;
 }
 
-type FieldValue = string | string[] | boolean;
+export type FieldValue = string | string[] | boolean;
 
-function toInputValue(field: SimpleField, raw: unknown): FieldValue {
+export function toInputValue(field: SimpleField, raw: unknown): FieldValue {
   if (field.type === "tags") return Array.isArray(raw) ? raw : [];
   if (field.type === "boolean") return Boolean(raw);
   if (raw == null) return "";
@@ -40,6 +40,70 @@ function toInputType(field: SimpleField): string {
   if (field.type === "date") return "date";
   if (field.type === "url") return "url";
   return "text";
+}
+
+export function FieldControl({
+  field,
+  fieldId,
+  value,
+  onChange,
+}: {
+  field: SimpleField;
+  fieldId: string;
+  value: FieldValue;
+  onChange: (value: FieldValue) => void;
+}) {
+  if (field.type === "tags") {
+    return (
+      <div className={styles.field}>
+        <TagInput label={field.label} value={value as string[]} onChange={onChange} />
+      </div>
+    );
+  }
+  if (field.type === "boolean") {
+    return (
+      <div className={styles.booleanField}>
+        <Switch id={fieldId} checked={value as boolean} onCheckedChange={onChange} />
+        <Label htmlFor={fieldId}>{field.booleanLabel ?? field.label}</Label>
+      </div>
+    );
+  }
+  if (field.type === "richtext") {
+    return (
+      <div className={styles.field}>
+        <Label htmlFor={fieldId}>{field.label}</Label>
+        <RichTextEditor value={value as string} onChange={(html) => onChange(html)} />
+      </div>
+    );
+  }
+  return (
+    <div className={styles.field}>
+      <Label htmlFor={fieldId}>{field.label}</Label>
+      {field.type === "textarea" ? (
+        <Textarea
+          id={fieldId}
+          value={value as string}
+          required={field.required}
+          onChange={(event) => onChange(event.target.value)}
+        />
+      ) : (
+        <Input
+          id={fieldId}
+          type={toInputType(field)}
+          value={value as string}
+          required={field.required}
+          onChange={(event) => onChange(event.target.value)}
+        />
+      )}
+    </div>
+  );
+}
+
+export function serializeFieldValue(field: SimpleField, raw: FieldValue): unknown {
+  if (field.type === "tags" || field.type === "boolean") return raw;
+  if (field.type === "number") return raw === "" ? null : Number(raw);
+  if (field.type === "date") return raw === "" ? null : new Date(raw as string);
+  return raw === "" ? null : raw;
 }
 
 function SimpleContentForm({
@@ -71,16 +135,7 @@ function SimpleContentForm({
     event.preventDefault();
     const payload: Record<string, unknown> = {};
     for (const field of fields) {
-      const raw = values[field.key];
-      if (field.type === "tags" || field.type === "boolean") {
-        payload[field.key] = raw;
-      } else if (field.type === "number") {
-        payload[field.key] = raw === "" ? null : Number(raw);
-      } else if (field.type === "date") {
-        payload[field.key] = raw === "" ? null : new Date(raw as string);
-      } else {
-        payload[field.key] = raw === "" ? null : raw;
-      }
+      payload[field.key] = serializeFieldValue(field, values[field.key]);
     }
     onSubmit(payload);
   }
@@ -88,64 +143,15 @@ function SimpleContentForm({
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.fieldGrid}>
-        {fields.map((field) => {
-          const fieldId = `${idPrefix}-${field.key}`;
-          if (field.type === "tags") {
-            return (
-              <div key={field.key} className={styles.field}>
-                <TagInput
-                  label={field.label}
-                  value={values[field.key] as string[]}
-                  onChange={(next) => setField(field.key, next)}
-                />
-              </div>
-            );
-          }
-          if (field.type === "boolean") {
-            return (
-              <div key={field.key} className={styles.booleanField}>
-                <Switch
-                  id={fieldId}
-                  checked={values[field.key] as boolean}
-                  onCheckedChange={(checked) => setField(field.key, checked)}
-                />
-                <Label htmlFor={fieldId}>{field.booleanLabel ?? field.label}</Label>
-              </div>
-            );
-          }
-          if (field.type === "richtext") {
-            return (
-              <div key={field.key} className={styles.field}>
-                <Label htmlFor={fieldId}>{field.label}</Label>
-                <RichTextEditor
-                  value={values[field.key] as string}
-                  onChange={(html) => setField(field.key, html)}
-                />
-              </div>
-            );
-          }
-          return (
-            <div key={field.key} className={styles.field}>
-              <Label htmlFor={fieldId}>{field.label}</Label>
-              {field.type === "textarea" ? (
-                <Textarea
-                  id={fieldId}
-                  value={values[field.key] as string}
-                  required={field.required}
-                  onChange={(event) => setField(field.key, event.target.value)}
-                />
-              ) : (
-                <Input
-                  id={fieldId}
-                  type={toInputType(field)}
-                  value={values[field.key] as string}
-                  required={field.required}
-                  onChange={(event) => setField(field.key, event.target.value)}
-                />
-              )}
-            </div>
-          );
-        })}
+        {fields.map((field) => (
+          <FieldControl
+            key={field.key}
+            field={field}
+            fieldId={`${idPrefix}-${field.key}`}
+            value={values[field.key]}
+            onChange={(next) => setField(field.key, next)}
+          />
+        ))}
       </div>
       <Button type="submit" size="sm" disabled={pending}>
         {pending ? <LuLoaderCircle className={styles.spinner} /> : null}

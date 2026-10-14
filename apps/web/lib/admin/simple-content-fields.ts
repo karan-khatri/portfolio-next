@@ -118,3 +118,54 @@ export const techStackFields: SimpleField[] = [
     type: "url",
   },
 ];
+
+export type LocalizedListKey =
+  | "experience"
+  | "education"
+  | "skill"
+  | "language"
+  | "service"
+  | "testimonial";
+
+export interface LocalizedListConfig {
+  contentType: SimpleContentType;
+  shared: SimpleField[];
+  translated: SimpleField[];
+}
+
+function pick(fields: SimpleField[], keys: string[]): SimpleField[] {
+  return fields.filter((field) => keys.includes(field.key));
+}
+
+export const localizedListConfigs: Record<LocalizedListKey, LocalizedListConfig> = {
+  experience: {
+    contentType: "experience",
+    shared: pick(experienceFields, ["startDate", "endDate"]),
+    translated: pick(experienceFields, ["company", "title", "description"]),
+  },
+  education: {
+    contentType: "education",
+    shared: pick(educationFields, ["startDate", "endDate"]),
+    translated: pick(educationFields, ["institution", "degree", "location", "description"]),
+  },
+  skill: {
+    contentType: "skill",
+    shared: pick(skillFields, ["level"]),
+    translated: pick(skillFields, ["name", "category"]),
+  },
+  language: {
+    contentType: "language",
+    shared: [],
+    translated: languageFields,
+  },
+  service: {
+    contentType: "service",
+    shared: [],
+    translated: serviceFields,
+  },
+  testimonial: {
+    contentType: "testimonial",
+    shared: pick(testimonialFields, ["authorName", "avatarUrl"]),
+    translated: pick(testimonialFields, ["authorRole", "quote"]),
+  },
+};

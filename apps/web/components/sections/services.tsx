@@ -1,4 +1,6 @@
 import type { ServicesContent } from "@portfolio/sections";
+import type { AppLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { SectionShell } from "./section-shell";
 import { EmptyState } from "./empty-state";
 
@@ -9,19 +11,23 @@ export interface ServiceListItem {
 }
 
 export function ServicesSection({
+  locale,
   id,
   content,
   headingLevel,
   items,
 }: {
+  locale: AppLocale;
   id: string;
   content: ServicesContent;
   headingLevel: 1 | 2 | 3;
   items: ServiceListItem[];
 }) {
+  const t = getDictionary(locale);
+
   return (
     <SectionShell
-      eyebrow="Services"
+      eyebrow={t.eyebrow.services}
       id={id}
       headingLevel={headingLevel}
       heading={content.heading}
@@ -30,7 +36,7 @@ export function ServicesSection({
       headingAlign={content.headingAlign}
     >
       {items.length === 0 ? (
-        <EmptyState message="No services listed yet." />
+        <EmptyState message={t.empty.services} />
       ) : (
         <ul className="grid gap-6 sm:grid-cols-3">
           {items.map((item, index) => (

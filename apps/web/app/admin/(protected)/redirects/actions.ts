@@ -1,9 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { prisma, logAudit } from "@portfolio/db/server";
 import { requireEditor } from "@/lib/auth/require-admin";
 import type { ActionResult } from "@/lib/admin/action-result";
+import { revalidatePublicSite } from "@/lib/admin/revalidate";
 
 function toRedirectData(values: Record<string, unknown>) {
   return {
@@ -18,7 +18,7 @@ export async function createRedirectAction(values: Record<string, unknown>): Pro
     const user = await requireEditor();
     const created = await prisma.redirect.create({ data: toRedirectData(values) });
     await logAudit({ userId: user.id, action: "redirect.created", entity: "Redirect", entityId: created.id });
-    revalidatePath("/");
+    revalidatePublicSite();
     return {};
   } catch (error) {
     if (error instanceof Error && error.message.includes("Unique constraint")) {
@@ -36,7 +36,7 @@ export async function updateRedirectAction(
     const user = await requireEditor();
     await prisma.redirect.update({ where: { id }, data: toRedirectData(values) });
     await logAudit({ userId: user.id, action: "redirect.updated", entity: "Redirect", entityId: id });
-    revalidatePath("/");
+    revalidatePublicSite();
     return {};
   } catch (error) {
     if (error instanceof Error && error.message.includes("Unique constraint")) {
@@ -51,7 +51,7 @@ export async function deleteRedirectAction(id: string): Promise<ActionResult> {
     const user = await requireEditor();
     await prisma.redirect.delete({ where: { id } });
     await logAudit({ userId: user.id, action: "redirect.deleted", entity: "Redirect", entityId: id });
-    revalidatePath("/");
+    revalidatePublicSite();
     return {};
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Could not delete" };

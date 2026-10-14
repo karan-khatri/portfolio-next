@@ -3,6 +3,8 @@
 import { headers } from "next/headers";
 import { prisma, getSiteSettings } from "@portfolio/db/server";
 import { sendEmail, escapeHtml } from "@/lib/email";
+import { resolveAppLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 export interface ContactFormResult {
   error?: string;
@@ -24,7 +26,9 @@ export async function submitContactMessageAction(values: {
   email: string;
   message: string;
   company?: string;
-}): Promise<ContactFormResult> {
+}, localeInput?: string): Promise<ContactFormResult> {
+  const locale = resolveAppLocale(localeInput);
+  const errors = getDictionary(locale).contact.errors;
   // Honeypot: a field real users never see or fill in. Bots that
   // auto-fill every input on the form will trip it. Report success
   // without actually saving anything, so the bot doesn't learn it failed.
@@ -37,13 +41,13 @@ export async function submitContactMessageAction(values: {
   const message = values.message.trim();
 
   if (!name || !email || !message) {
-    return { error: "Please fill in every field." };
+    return { error: errors.fillEveryField };
   }
   if (!EMAIL_PATTERN.test(email)) {
-    return { error: "Please enter a valid email address." };
+    return { error: errors.invalidEmail };
   }
   if (message.length > 5000) {
-    return { error: "Message is too long." };
+    return { error: errors.tooLong };
   }
 
   const ipAddress = await getClientIp();
@@ -54,12 +58,12 @@ export async function submitContactMessageAction(values: {
       : { email, createdAt: { gte: windowStart } },
   });
   if (recentCount >= RATE_LIMIT_MAX_SUBMISSIONS) {
-    return { error: "You've sent a few messages already — please wait a bit before sending more." };
+    return { error: errors.rateLimited };
   }
 
   await prisma.contactMessage.create({ data: { name, email, message, ipAddress } });
 
-  const settings = await getSiteSettings();
+  const settings = await getSiteSettings(locale);
 
   const notifyEmail = process.env.SEED_ADMIN_EMAIL;
   if (notifyEmail) {
